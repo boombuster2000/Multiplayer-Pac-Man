@@ -8,12 +8,11 @@ MenuLayer::MenuLayer()
 {
 
 	Components::TextStyle unselectedStyle = { 50, BLACK };
-	Components::TextStyle selectedStyle = { 50, RED };
+	Components::TextStyle selectedStyle = { 60, RED };
 	
 	m_menu.AddOption(Components::MenuOption("Start Game", selectedStyle, unselectedStyle, true, true));
 	m_menu.AddOption(Components::MenuOption("Options", selectedStyle, unselectedStyle, true, false));
 	m_menu.AddOption(Components::MenuOption("Exit", selectedStyle, unselectedStyle, true, false));
-	m_menu.UpdateOptionsAnchorPointPositions();
 }
 
 
@@ -32,6 +31,11 @@ void MenuLayer::OnUpdate(float ts)
 	else if (IsKeyPressed(KEY_UP))
 	{
 		m_menu.SelectPrevious();
+	}
+
+	if (m_menu.IsUIUpdateNeeded())
+	{
+		m_menu.UpdateOptionsAnchorPointPositions();
 	}
 
 }
