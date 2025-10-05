@@ -5,7 +5,7 @@
 
 namespace Components { 
     Menu::Menu(Vector2 anchorPointPosition, AnchorPoint anchorPoint, Alignment alignment, bool visible, int spacing)
-        : RenderableObject(anchorPointPosition, visible, anchorPoint), m_selectedIndex(0), m_spacing(spacing), m_alignment(alignment)
+        : RenderableObject(anchorPointPosition, visible, anchorPoint), m_selectedIndex(0), m_spacing(spacing), m_alignment(alignment), m_isUIupdateNeeded(true)
     {
         UpdateDrawPoint();
         m_options = std::vector<MenuOption>();
@@ -33,6 +33,7 @@ namespace Components {
             newOption.SetSelected(true);
         }
         
+        m_isUIupdateNeeded = true;
     }
 
     void Menu::DeleteOption(int index)
@@ -47,12 +48,17 @@ namespace Components {
 
         if (!m_options.empty())
             m_options[m_selectedIndex].SetSelected(true);
+
+        m_isUIupdateNeeded = true;
+
     }
 
     void Menu::ClearOptions()
     {
         m_options.clear();
         m_selectedIndex = 0;
+
+        m_isUIupdateNeeded = true;
     }
 
     void Menu::SelectNext()
@@ -63,6 +69,9 @@ namespace Components {
         m_options[m_selectedIndex].SetSelected(false);
         m_selectedIndex = (m_selectedIndex + 1) % m_options.size();
         m_options[m_selectedIndex].SetSelected(true);
+
+        m_isUIupdateNeeded = true;
+
     }
 
     void Menu::SelectPrevious()
@@ -73,6 +82,8 @@ namespace Components {
         m_options[m_selectedIndex].SetSelected(false);
         m_selectedIndex = (m_selectedIndex - 1 + m_options.size()) % m_options.size();
         m_options[m_selectedIndex].SetSelected(true);
+
+        m_isUIupdateNeeded = true;
     }
 
     const MenuOption& Menu::GetSelectedOption() const
@@ -86,6 +97,11 @@ namespace Components {
     int Menu::GetSelectedIndex() const
     {
         return m_selectedIndex;
+    }
+
+    bool Menu::IsUIUpdateNeeded() const
+    {
+        return m_isUIupdateNeeded;
     }
 
     void Menu::UpdateOptionsAnchorPointPositions()

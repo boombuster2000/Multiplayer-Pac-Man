@@ -15,6 +15,7 @@ namespace Components {
 		int m_selectedIndex;
 		int m_spacing;
 		Alignment m_alignment;
+		bool m_isUIupdateNeeded;
 
 	public:
 
@@ -32,6 +33,7 @@ namespace Components {
 		const MenuOption& GetSelectedOption() const;
 		int GetSelectedIndex() const;
 
+		bool IsUIUpdateNeeded() const;
 		void UpdateOptionsAnchorPointPositions();
 		virtual Vector2 GetSize() const override;
 		virtual void Render() const override;
