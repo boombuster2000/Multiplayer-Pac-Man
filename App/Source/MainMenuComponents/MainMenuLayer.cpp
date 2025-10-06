@@ -16,7 +16,6 @@ MainMenuLayer::MainMenuLayer()
 }
 
 
-
 MainMenuLayer::~MainMenuLayer()
 {
 

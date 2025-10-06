@@ -4,8 +4,14 @@ add_executable(Pac-Man)
 # Specify source files for the executable
 target_sources(Pac-Man
     PRIVATE
-        Source/MainMenuLayer.cpp
-        Source/MainMenuLayer.h
+        Source/MainMenuComponents/MainMenuLayer.cpp
+        Source/MainMenuComponents/MainMenuLayer.h
+
+        Source/GameComponents/GameLayer.cpp
+        Source/GameComponents/GameLayer.h
+        Source/GameComponents/Game.cpp
+        Source/GameComponents/Game.h
+
         Source/Main.cpp
 )
 

@@ -7,10 +7,6 @@ namespace Core {
 
 	static Application* s_Application = nullptr;
 
-	static void GLFWErrorCallback(int error, const char* description)
-	{
-		std::cerr << "[GLFW Error]: " << description << std::endl;
-	}
 
 	Application::Application(const ApplicationSpecification& specification)
 		: m_Specification(specification)
