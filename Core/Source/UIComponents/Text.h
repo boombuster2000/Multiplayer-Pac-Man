@@ -6,7 +6,7 @@
 #include "RenderableObject.h"
 #include "TextStyle.h"
 
-namespace Components {
+namespace UIComponents {
 
 	class Text : public RenderableObject
 	{

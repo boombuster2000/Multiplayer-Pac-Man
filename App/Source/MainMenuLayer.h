@@ -5,13 +5,13 @@
 #include "Core/Layer.h"
 #include "raylib.h"
 #include <vector>
-#include "Components/Menu.h"
+#include "UIComponents/Menu.h"
 
 class MainMenuLayer : public Core::Layer
 {
 
 private:
-	Components::Menu m_menu;
+	UIComponents::Menu m_menu;
 
 public:
 	MainMenuLayer();

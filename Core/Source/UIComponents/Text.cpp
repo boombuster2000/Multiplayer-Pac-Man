@@ -1,6 +1,6 @@
 #include "Text.h"
 
-namespace Components {
+namespace UIComponents {
 
 
     Text::Text(std::string text, TextStyle textStyle, Vector2 anchorPointPosition, AnchorPoint anchorPoint, bool visible)

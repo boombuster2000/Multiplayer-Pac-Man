@@ -3,7 +3,7 @@
 #include "Enums.h"
 #include "raylib.h"
 
-namespace Components {
+namespace UIComponents {
 
 
     class RenderableObject

@@ -1,6 +1,6 @@
 #include "MenuOption.h"
 
-namespace Components {
+namespace UIComponents {
 
     MenuOption::MenuOption(std::string text,
             TextStyle selectedStyle,

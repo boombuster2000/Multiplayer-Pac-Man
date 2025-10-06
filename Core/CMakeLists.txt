@@ -16,10 +16,10 @@ add_library(Core STATIC)
 
 target_sources(Core
     PRIVATE
-        Source/Components/Menu.cpp
-        Source/Components/MenuOption.cpp
-        Source/Components/RenderableObject.cpp
-        Source/Components/Text.cpp
+        Source/UIComponents/Menu.cpp
+        Source/UIComponents/MenuOption.cpp
+        Source/UIComponents/RenderableObject.cpp
+        Source/UIComponents/Text.cpp
 
         Source/Core/Application.cpp
     PUBLIC
@@ -27,11 +27,11 @@ target_sources(Core
         Source/Core/Layer.h
         Source/Core/Event.h
 
-        Source/Components/Enums.h
-        Source/Components/Menu.h
-        Source/Components/MenuOption.h
-        Source/Components/RenderableObject.h
-        Source/Components/Text.h
+        Source/UIComponents/Enums.h
+        Source/UIComponents/Menu.h
+        Source/UIComponents/MenuOption.h
+        Source/UIComponents/RenderableObject.h
+        Source/UIComponents/Text.h
 )
 
 target_include_directories(Core

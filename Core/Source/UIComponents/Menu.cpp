@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-namespace Components { 
+namespace UIComponents { 
     Menu::Menu(Vector2 anchorPointPosition, AnchorPoint anchorPoint, Alignment alignment, bool visible, int spacing)
         : RenderableObject(anchorPointPosition, visible, anchorPoint), m_selectedIndex(0), m_spacing(spacing), m_alignment(alignment), m_isUIupdateNeeded(true)
     {

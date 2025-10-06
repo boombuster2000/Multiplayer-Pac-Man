@@ -3,7 +3,7 @@
 #include "RenderableObject.h"
 #include <vector>
 
-namespace Components {
+namespace UIComponents {
 
     
 	class Menu : RenderableObject

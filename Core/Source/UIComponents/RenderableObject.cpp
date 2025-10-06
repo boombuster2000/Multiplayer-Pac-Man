@@ -1,7 +1,7 @@
 #include "RenderableObject.h"
 
 
-namespace Components {
+namespace UIComponents {
 
     RenderableObject::RenderableObject(Vector2 anchorPointPosition, bool visible, AnchorPoint anchorPoint)
         : m_anchorPointPosition(anchorPointPosition), m_visible(visible), m_anchorPoint(anchorPoint)

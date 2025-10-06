@@ -7,7 +7,7 @@
 #include <string>
 
 
-namespace Components {
+namespace UIComponents {
 
     
 	class MenuOption : public Text
