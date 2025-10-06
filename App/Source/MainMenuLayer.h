@@ -7,15 +7,15 @@
 #include <vector>
 #include "Components/Menu.h"
 
-class MenuLayer : public Core::Layer
+class MainMenuLayer : public Core::Layer
 {
 
 private:
 	Components::Menu m_menu;
 
 public:
-	MenuLayer();
-	virtual ~MenuLayer();
+	MainMenuLayer();
+	virtual ~MainMenuLayer();
 	
 
 	virtual void OnUpdate(float ts) override;

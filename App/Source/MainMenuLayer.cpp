@@ -1,9 +1,9 @@
-#include "MenuLayer.h"
+#include "MainMenuLayer.h"
 #include "Components/Enums.h"
 #include "Components/TextStyle.h"
 
 
-MenuLayer::MenuLayer()
+MainMenuLayer::MainMenuLayer()
 	: m_menu({ (float)GetScreenWidth()/2, (float)GetScreenHeight()/2 }, Components::AnchorPoint::MIDDLE, Components::Alignment::CENTER, true, 10)
 {
 
@@ -17,12 +17,12 @@ MenuLayer::MenuLayer()
 
 
 
-MenuLayer::~MenuLayer()
+MainMenuLayer::~MainMenuLayer()
 {
 
 }
 
-void MenuLayer::OnUpdate(float ts)
+void MainMenuLayer::OnUpdate(float ts)
 {
 	if (IsKeyPressed(KEY_DOWN))
 	{
@@ -44,7 +44,7 @@ void MenuLayer::OnUpdate(float ts)
 
 
 
-void MenuLayer::OnRender()
+void MainMenuLayer::OnRender()
 {
 	ClearBackground(WHITE);
 

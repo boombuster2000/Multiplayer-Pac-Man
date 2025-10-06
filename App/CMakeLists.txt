@@ -4,8 +4,8 @@ add_executable(Pac-Man)
 # Specify source files for the executable
 target_sources(Pac-Man
     PRIVATE
-        Source/MenuLayer.cpp
-        Source/MenuLayer.h
+        Source/MainMenuLayer.cpp
+        Source/MainMenuLayer.h
         Source/Main.cpp
 )
 
