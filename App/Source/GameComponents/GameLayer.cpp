@@ -1,6 +1,7 @@
 #include "GameLayer.h"
 #include "raylib.h"
 
+
 GameLayer::GameLayer()
 : m_game(Game())
 {

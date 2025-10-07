@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Layer.h"
+#include "Core/TexturesManager.h"
 #include "Game.h"
 
 
