@@ -6,16 +6,18 @@
 namespace Core {
 
 	static Application* s_Application = nullptr;
+	static std::shared_ptr<TexturesManager> s_TexturesManager = nullptr;
 
 
 	Application::Application(const ApplicationSpecification& specification)
 		: m_Specification(specification)
 	{
 		s_Application = this;
-
+		s_TexturesManager = std::make_shared<TexturesManager>();
+		
 		InitWindow(specification.Width, specification.Height, specification.Name.c_str());
         SetTargetFPS(specification.targetFPS);
-	}
+	} 
 
 	Application::~Application()
 	{
@@ -23,7 +25,12 @@ namespace Core {
 		s_Application = nullptr;
 	}
 
-	void Application::Run()
+    std::shared_ptr<TexturesManager> Application::GetTexturesManager()
+    {
+        return s_TexturesManager;
+    }
+
+    void Application::Run()
 	{
 		m_Running = true;
 

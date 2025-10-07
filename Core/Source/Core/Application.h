@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Layer.h"
+#include "TexturesManager.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -19,14 +20,16 @@ namespace Core {
 	class Application
 	{
     private:
-        ApplicationSpecification m_Specification;
-        bool m_Running = false;
+		ApplicationSpecification m_Specification;
+		bool m_Running = false;
 
         std::vector<std::unique_ptr<Layer>> m_LayerStack;
-
+	
 	public:
 		Application(const ApplicationSpecification& specification = ApplicationSpecification());
 		~Application();
+
+		static std::shared_ptr<TexturesManager> GetTexturesManager();
 
 		void Run();
 		void Stop();
@@ -37,7 +40,6 @@ namespace Core {
 			static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
 			m_LayerStack.push_back(std::make_unique<TLayer>());
 		}
-
 
 		static Application& Get();
         
