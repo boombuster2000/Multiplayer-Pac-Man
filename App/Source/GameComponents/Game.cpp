@@ -1,41 +1,28 @@
 #include "Game.h"
 #include "raylib.h"
+#include "Core/Application.h"
 
 Game::Game()
-    : m_board{{
-        {{'#', '#', '#', '#', '#', '#', '#', '#'}},
-        {{'#', ' ', ' ', ' ', ' ', ' ', ' ', '#'}},
-        {{'#', ' ', ' ', '#', ' ', '#', ' ', '#'}},
-        {{'#', ' ', ' ', '#', ' ', '#', ' ', '#'}},
-        {{'#', ' ', '#', '#', ' ', '#', ' ', '#'}},
-        {{'#', ' ', ' ', '#', '#', '#', ' ', '#'}},
-        {{'#', ' ', ' ', '#', ' ', ' ', ' ', '#'}},
-        {{'#', '#', '#', '#', '#', '#', '#', '#'}}
-    }}
-{}
+    : m_board({{
+        {{Tile::Type::Wall, Tile::Type::Wall, Tile::Type::Wall, Tile::Type::Wall, Tile::Type::Wall, Tile::Type::Wall, Tile::Type::Wall, Tile::Type::Wall}},
+        {{Tile::Type::Wall, Tile::Type::Path, Tile::Type::Path, Tile::Type::Path, Tile::Type::Path, Tile::Type::Path, Tile::Type::Path, Tile::Type::Wall}},
+        {{Tile::Type::Wall, Tile::Type::Path, Tile::Type::Path, Tile::Type::Wall, Tile::Type::Path, Tile::Type::Wall, Tile::Type::Path, Tile::Type::Wall}},
+        {{Tile::Type::Wall, Tile::Type::Path, Tile::Type::Path, Tile::Type::Wall, Tile::Type::Path, Tile::Type::Wall, Tile::Type::Path, Tile::Type::Wall}},
+        {{Tile::Type::Wall, Tile::Type::Path, Tile::Type::Wall, Tile::Type::Wall, Tile::Type::Path, Tile::Type::Wall, Tile::Type::Path, Tile::Type::Wall}},
+        {{Tile::Type::Wall, Tile::Type::Path, Tile::Type::Path, Tile::Type::Wall, Tile::Type::Wall, Tile::Type::Wall, Tile::Type::Path, Tile::Type::Wall}},
+        {{Tile::Type::Wall, Tile::Type::Path, Tile::Type::Path, Tile::Type::Wall, Tile::Type::Path, Tile::Type::Path, Tile::Type::Path, Tile::Type::Wall}},
+        {{Tile::Type::Wall, Tile::Type::Wall, Tile::Type::Wall, Tile::Type::Wall, Tile::Type::Wall, Tile::Type::Wall, Tile::Type::Wall, Tile::Type::Wall}}
+    }})
+{
+
+    Core::Application::GetTexturesManager()->AddTexture("wall", "./Resources/Textures/Wall.png");
+    Core::Application::GetTexturesManager()->AddTexture("path", "./Resources/Textures/Path.png");
+}
 
 Game::~Game() = default;
 
 void Game::Render() const
 {
     Vector2 cursor = {0,0};
-
-    for (const auto& row : m_board)
-    {
-        for (const auto& tile : row)
-        {
-            if (tile == ' ')
-            {
-                DrawRectangleV(cursor, {50,50}, GRAY);
-            }
-            else if (tile == '#')
-            {
-                DrawRectangleV(cursor, {50,50}, BLACK);
-            }
-            cursor.x += 50;
-        }
-
-        cursor.x = 0;
-        cursor.y += 50;
-    }
+    m_board.Render();
 }

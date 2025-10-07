@@ -1,10 +1,12 @@
-
 #pragma once
-#include <array>
+#include "Tile.h"
+#include "Board.h"
+#include "Core/TexturesManager.h"
+
 class Game
 {
     private:
-    std::array<std::array<char, 8>, 8> m_board;
+    Board m_board;
 
     public:
     Game();
