@@ -22,10 +22,12 @@ target_sources(Core
         Source/UIComponents/Text.cpp
 
         Source/Core/Application.cpp
+        Source/Core/TexturesManager.cpp
     PUBLIC
         Source/Core/Application.h
         Source/Core/Layer.h
         Source/Core/Event.h
+        Source/Core/TexturesManager.h
 
         Source/UIComponents/Enums.h
         Source/UIComponents/Menu.h
