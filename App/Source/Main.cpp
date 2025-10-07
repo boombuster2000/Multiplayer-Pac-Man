@@ -1,6 +1,7 @@
 #include "Core/Application.h"
 
-#include "MainMenuLayer.h"
+#include "MainMenuComponents/MainMenuLayer.h"
+#include "GameComponents/GameLayer.h"
 
 int main()
 {
@@ -10,6 +11,7 @@ int main()
 	appSpec.Height = 720;
 
 	Core::Application application(appSpec);
-	application.PushLayer<MainMenuLayer>();
+
+	application.PushLayer<GameLayer>();
 	application.Run();
 }
