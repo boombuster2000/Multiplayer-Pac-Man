@@ -23,7 +23,7 @@ namespace UIComponents {
     //Gives top left position by default as a common reference points between objects for calculations
     Vector2 RenderableObject::GetPosition(AnchorPoint anchorpoint) const
     {
-  
+        using enum AnchorPoint;
         Vector2 size = GetSize();
         Vector2 position = m_drawPoint;
 
@@ -88,9 +88,41 @@ namespace UIComponents {
         return m_visible;
     }
 
+    void RenderableObject::Move(Direction direction, float step)
+    {
+        using enum Direction;
+
+        switch (direction)
+        {
+            case UP:
+                m_anchorPointPosition.y -= step;
+                break;
+
+            case DOWN:
+                m_anchorPointPosition.y += step;
+                break;
+
+            case LEFT:
+                m_anchorPointPosition.x -= step;
+                break;
+            
+            case RIGHT:
+                m_anchorPointPosition.x += step;
+                break;
+            
+            default:
+                break;
+        }
+
+        UpdateDrawPoint();
+    }
+
+
+
     // Calculates corrected top left position based on the anchor point so that the anchor point of object is at the position set by the user.
     void RenderableObject::UpdateDrawPoint()
     {
+        using enum AnchorPoint;
         Vector2 size = GetSize();
 
         m_drawPoint = m_anchorPointPosition;
