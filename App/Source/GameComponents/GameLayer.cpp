@@ -13,16 +13,16 @@ void GameLayer::OnUpdate(float ts)
 {
     using enum UIComponents::Direction;
 
-    if (IsKeyDown(KEY_W))
+    if (IsKeyPressed(KEY_W))
         m_pacman.QueueDirection(UP);
     
-    if (IsKeyDown(KEY_S))
+    if (IsKeyPressed(KEY_S))
         m_pacman.QueueDirection(DOWN);
     
-    if (IsKeyDown(KEY_A))
+    if (IsKeyPressed(KEY_A))
         m_pacman.QueueDirection(LEFT);
 
-    if (IsKeyDown(KEY_D))
+    if (IsKeyPressed(KEY_D))
         m_pacman.QueueDirection(RIGHT);
 
     m_pacman.Update();
