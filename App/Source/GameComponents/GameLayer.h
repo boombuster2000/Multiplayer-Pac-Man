@@ -1,14 +1,16 @@
 #pragma once
 #include "Core/Layer.h"
 #include "Core/TexturesManager.h"
-#include "Game.h"
+#include "Board.h"
+#include "PacMan.h"
 
 
 class GameLayer : public Core::Layer
 {
 
 private:
-    Game m_game;
+    Board m_board;
+    PacMan m_pacman;
 
     
 public:
