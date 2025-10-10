@@ -9,12 +9,14 @@ target_sources(Pac-Man
 
         Source/GameComponents/GameLayer.cpp
         Source/GameComponents/GameLayer.h
-        Source/GameComponents/Game.cpp
-        Source/GameComponents/Game.h
         Source/GameComponents/Tile.cpp
         Source/GameComponents/Tile.h
         Source/GameComponents/Board.cpp
         Source/GameComponents/Board.h
+        Source/GameComponents/PacMan.cpp
+        Source/GameComponents/PacMan.h
+
+
 
         Source/Main.cpp
 )
@@ -31,8 +33,21 @@ target_link_libraries(Pac-Man
         Core
 )
 
-add_custom_command(TARGET Pac-Man POST_BUILD
+# Define the source and destination resource directories
+set(RESOURCE_SRC_DIR ${CMAKE_SOURCE_DIR}/resources)
+set(RESOURCE_DST_DIR $<TARGET_FILE_DIR:Pac-Man>/resources)
+
+# Recursively collect all resource files
+file(GLOB_RECURSE RESOURCE_FILES "${RESOURCE_SRC_DIR}/*")
+
+# Create a custom target for copying resources
+add_custom_target(copy_resources ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/Resources       # source path (root/resources)
-        $<TARGET_FILE_DIR:Pac-Man>/Resources     # destination (next to exe)
+        ${RESOURCE_SRC_DIR}
+        ${RESOURCE_DST_DIR}
+    DEPENDS ${RESOURCE_FILES}  # re-run if any resource changes
+    COMMENT "Copying resource files..."
 )
+
+# Ensure the resources are copied before building Ball
+add_dependencies(Pac-Man copy_resources)
