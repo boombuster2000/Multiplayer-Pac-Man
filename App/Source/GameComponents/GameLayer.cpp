@@ -9,22 +9,25 @@ GameLayer::GameLayer()
 {
 }
 
-void GameLayer::OnUpdate(float ts)
+void GameLayer::HandleKeyPresses()
 {
     using enum UIComponents::Direction;
-
     if (IsKeyPressed(KEY_W))
-        m_pacman.QueueDirection(UP);
+        m_pacman.SetDirection(UP);
     
     if (IsKeyPressed(KEY_S))
-        m_pacman.QueueDirection(DOWN);
+        m_pacman.SetDirection(DOWN);
     
     if (IsKeyPressed(KEY_A))
-        m_pacman.QueueDirection(LEFT);
+        m_pacman.SetDirection(LEFT);
 
     if (IsKeyPressed(KEY_D))
-        m_pacman.QueueDirection(RIGHT);
+        m_pacman.SetDirection(RIGHT);
+}
 
+void GameLayer::OnUpdate(float ts)
+{
+    HandleKeyPresses();
     m_pacman.Update();
 }
 

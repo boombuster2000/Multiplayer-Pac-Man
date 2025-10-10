@@ -12,14 +12,13 @@ class PacMan : public UIComponents::RenderableObject
     Vector2 m_size;
     float m_speed;
     UIComponents::Direction m_currentDirection;
-    UIComponents::Direction m_queuedDirection;
 
 
     public:
     PacMan(Vector2 spawnPosition, Vector2 size, float speed);
     ~PacMan() = default;
 
-    void QueueDirection(UIComponents::Direction direction);
+    void SetDirection(UIComponents::Direction direction);
     void Update();
 
     virtual Vector2 GetSize() const override;
