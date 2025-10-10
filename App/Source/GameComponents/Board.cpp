@@ -1,15 +1,59 @@
 #include "Board.h"
+#include "Core/Application.h"
 
-Board::Board(std::array<std::array<Tile::Type, 8>, 8> board)
+Board::Board()
+    : m_board{}
+    , m_boardDimensions({8,8})
 {
-    for (int i = 0; i < 8; i++)
+    for (auto& row : m_board)
     {
-        for (int j = 0; j < 8; j++)
+        for (auto& tile : row)
         {
-            m_board[i][j] = Tile(board[i][j]);
+            tile = Tile(Tile::Type::Path);
         }
     }
+
+    AddBoundaries();
+
+    SetTile({5,2}, Tile::Type::Wall);
+    SetTile({5,3}, Tile::Type::Wall);
+    SetTile({4,2}, Tile::Type::Wall);
+
+    SetTile({2,5}, Tile::Type::Wall);
+    SetTile({2,4}, Tile::Type::Wall);
+    SetTile({2,3}, Tile::Type::Wall);
+    SetTile({2,2}, Tile::Type::Wall);
+
+    SetTile({3,5}, Tile::Type::Wall);
+    SetTile({4,5}, Tile::Type::Wall);
+    SetTile({5,5}, Tile::Type::Wall);
+
+    SetTile({3,4}, Tile::Type::Wall);
+
+    
+
 }
+
+void Board::SetTile(Vector2 position, Tile::Type type)
+{
+    m_board[position.y][position.x].SetType(type);
+}
+
+void Board::AddBoundaries()
+{
+    for (int x = 0; x<m_boardDimensions.x; x++)
+    {    
+        m_board[0][x].SetType(Tile::Type::Wall);
+        m_board[m_boardDimensions.y-1][x].SetType(Tile::Type::Wall);
+    }  
+    
+    for (int y = 0; y<m_boardDimensions.y; y++)
+    {    
+        m_board[y][0].SetType(Tile::Type::Wall);
+        m_board[y][m_boardDimensions.x-1].SetType(Tile::Type::Wall);
+    }
+}
+
 
 void Board::Render() const
 {
