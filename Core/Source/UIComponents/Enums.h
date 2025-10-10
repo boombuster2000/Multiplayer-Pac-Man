@@ -2,7 +2,7 @@
 
 namespace UIComponents
 {
-    enum AnchorPoint
+    enum class AnchorPoint : int
     {
         TOP_LEFT,
         TOP_MIDDLE,
@@ -17,10 +17,18 @@ namespace UIComponents
         BOTTOM_RIGHT
     };
     
-    enum Alignment
+    enum class Alignment : int
     {
         LEFT,
         CENTER,
+        RIGHT
+    };
+
+    enum class Direction : int
+    {
+        UP,
+        DOWN,
+        LEFT,
         RIGHT
     };
 }
