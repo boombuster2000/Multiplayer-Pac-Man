@@ -7,7 +7,7 @@ namespace UIComponents {
             TextStyle unselectedStyle,
             bool visible,
             bool isSelected
-    ): Text(text, unselectedStyle, {0,0}, TOP_LEFT, visible),
+    ): Text(text, unselectedStyle, {0,0}, AnchorPoint::TOP_LEFT, visible),
        m_selectedStyle(selectedStyle), m_unselectedStyle(unselectedStyle), m_isSelected(isSelected)
     {
     }
