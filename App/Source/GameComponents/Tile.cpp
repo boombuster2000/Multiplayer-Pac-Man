@@ -11,6 +11,11 @@ Tile::Type Tile::GetType() const
     return m_type;
 }
 
+void Tile::SetType(Type type)
+{
+    m_type = type;
+}
+
 void Tile::Render(Vector2 position, Vector2 size) const
 {
     std::shared_ptr<Texture2D> pathTexture = Core::Application::GetTexturesManager()->GetTexture("path");
@@ -23,18 +28,6 @@ void Tile::Render(Vector2 position, Vector2 size) const
     else if (m_type == Type::Path)
     {
         DrawTextureEx(*pathTexture, position, 0, size.y/pathTexture->height, WHITE);
-    }
-    else if (m_type == Type::Pellet)
-    {
-        DrawRectangleV(position, size, YELLOW);
-    }
-    else if (m_type == Type::PowerPellet)
-    {
-        DrawRectangleV(position, size, ORANGE);
-    }
-    else if (m_type == Type::Empty)
-    {
-        DrawRectangleV(position, size, WHITE);
     }
 
 }
