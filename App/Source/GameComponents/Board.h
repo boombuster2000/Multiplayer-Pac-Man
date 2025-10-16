@@ -2,22 +2,24 @@
 #include "Tile.h"
 #include <array>
 #include "raylib.h"
+#include "UIComponents/Grid.h"
+#include "DataTypes/Vector2Ex.h"
 
 class Board
 {
-    private:
-    Vector2 m_tileDimensions;
-    Vector2 m_boardDimensions;
-    std::array<std::array<Tile, 8>, 8> m_board;
+private:
+    Vector2Ex<int> m_tileDimensions;
+    Vector2Ex<int> m_boardDimensions;
+    UIComponents::Grid<Tile> m_grid;
 
-    
-    public:
+public:
     Board();
 
-    void SetTile(Vector2 position, Tile::Type type);
+    void SetTile(Vector2Ex<int> position, Tile::Type type);
+    Vector2Ex<int> ConvertPositionToIndex(Vector2Ex<int> position);
 
-    void Render() const;
+    void Render(Vector2Ex<int> offset = {0, 0}) const;
 
-    private:
+private:
     void AddBoundaries();
 };
