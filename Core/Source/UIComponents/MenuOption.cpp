@@ -1,14 +1,14 @@
 #include "MenuOption.h"
 
-namespace UIComponents {
+namespace UIComponents
+{
 
     MenuOption::MenuOption(std::string text,
-            TextStyle selectedStyle,
-            TextStyle unselectedStyle,
-            bool visible,
-            bool isSelected
-    ): Text(text, unselectedStyle, {0,0}, AnchorPoint::TOP_LEFT, visible),
-       m_selectedStyle(selectedStyle), m_unselectedStyle(unselectedStyle), m_isSelected(isSelected)
+                           TextStyle selectedStyle,
+                           TextStyle unselectedStyle,
+                           bool visible,
+                           bool isSelected) : Text(text, unselectedStyle, {0, 0}, AnchorPoint::TOP_LEFT, visible),
+                                              m_selectedStyle(selectedStyle), m_unselectedStyle(unselectedStyle), m_isSelected(isSelected)
     {
     }
 
@@ -20,7 +20,7 @@ namespace UIComponents {
         {
             SetStyle(m_selectedStyle);
         }
-        else 
+        else
         {
             SetStyle(m_unselectedStyle);
         }
