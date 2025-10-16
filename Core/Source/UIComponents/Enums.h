@@ -16,7 +16,7 @@ namespace UIComponents
         BOTTOM_MIDDLE,
         BOTTOM_RIGHT
     };
-    
+
     enum class Alignment : int
     {
         LEFT,
@@ -32,4 +32,3 @@ namespace UIComponents
         RIGHT
     };
 }
-
