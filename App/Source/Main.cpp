@@ -6,8 +6,8 @@
 void LoadAllTextures()
 {
 	Core::Application::GetTexturesManager()->AddTexture("wall", "./Resources/Textures/Wall.png");
-    Core::Application::GetTexturesManager()->AddTexture("path", "./Resources/Textures/Path.png");
-    Core::Application::GetTexturesManager()->AddTexture("pac-man", "./Resources/Textures/Pac-Man.png");
+	Core::Application::GetTexturesManager()->AddTexture("path", "./Resources/Textures/Path.png");
+	Core::Application::GetTexturesManager()->AddTexture("pac-man", "./Resources/Textures/Pac-Man.png");
 }
 
 int main()
