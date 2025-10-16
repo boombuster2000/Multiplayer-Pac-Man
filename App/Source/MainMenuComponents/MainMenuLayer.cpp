@@ -2,23 +2,20 @@
 #include "UIComponents/Enums.h"
 #include "UIComponents/TextStyle.h"
 
-
 MainMenuLayer::MainMenuLayer()
-	: m_menu({ (float)GetScreenWidth()/2, (float)GetScreenHeight()/2 }, UIComponents::AnchorPoint::MIDDLE, UIComponents::Alignment::CENTER, true, 10)
+	: m_menu({GetScreenWidth() / 2, GetScreenHeight() / 2}, UIComponents::AnchorPoint::MIDDLE, UIComponents::Alignment::CENTER, true, 10)
 {
 
-	UIComponents::TextStyle unselectedStyle = { 50, BLACK };
-	UIComponents::TextStyle selectedStyle = { 60, RED };
-	
+	UIComponents::TextStyle unselectedStyle = {50, BLACK};
+	UIComponents::TextStyle selectedStyle = {60, RED};
+
 	m_menu.AddOption(UIComponents::MenuOption("Start Game", selectedStyle, unselectedStyle, true, true));
 	m_menu.AddOption(UIComponents::MenuOption("Options", selectedStyle, unselectedStyle, true, false));
 	m_menu.AddOption(UIComponents::MenuOption("Exit", selectedStyle, unselectedStyle, true, false));
 }
 
-
 MainMenuLayer::~MainMenuLayer()
 {
-
 }
 
 void MainMenuLayer::OnUpdate(float ts)
@@ -36,12 +33,7 @@ void MainMenuLayer::OnUpdate(float ts)
 	{
 		m_menu.UpdateOptionsAnchorPointPositions();
 	}
-
 }
-
-
-
-
 
 void MainMenuLayer::OnRender()
 {
