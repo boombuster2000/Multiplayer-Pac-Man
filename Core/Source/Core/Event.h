@@ -1,10 +1,10 @@
 #pragma once
 
-namespace Core {
+namespace Core
+{
 
 	class Event
 	{
-
 	};
 
 }
