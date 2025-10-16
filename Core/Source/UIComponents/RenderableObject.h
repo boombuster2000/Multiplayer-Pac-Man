@@ -2,42 +2,41 @@
 
 #include "Enums.h"
 #include "raylib.h"
+#include "DataTypes/Vector2Ex.h"
 
-namespace UIComponents {
-
+namespace UIComponents
+{
 
     class RenderableObject
-	{
+    {
 
     private:
-    Vector2 m_drawPoint;
-    Vector2 m_anchorPointPosition;
-    AnchorPoint m_anchorPoint;
-    bool m_visible;
-    
+        Vector2Ex<int> m_drawPoint;
+        Vector2Ex<int> m_anchorPointPosition;
+        AnchorPoint m_anchorPoint;
+        bool m_visible;
+
     protected:
-    void UpdateDrawPoint();
-    
+        void UpdateDrawPoint();
+
     public:
-    
-    RenderableObject(Vector2 anchorPointPosition, bool visible = true, AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT);
-    virtual ~RenderableObject() = default;
-    
-    virtual void SetAnchorPointPosition(Vector2 position); // Sets anchor point position
-    //virtual Vector2 GetPosition() const; // Returns top left position
-    virtual Vector2 GetPosition(AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT) const;
+        RenderableObject(Vector2Ex<int> anchorPointPosition, AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT, bool visible = true);
+        virtual ~RenderableObject() = default;
 
-    virtual void SetAnchorPoint(AnchorPoint anchorPoint);
-    virtual AnchorPoint GetAnchorPoint() const;
-    
-    virtual void SetVisibility(bool visible);
-    virtual bool IsVisible() const;
-    
-    virtual void Move(Direction direction, float step = 1);
+        virtual void SetAnchorPointPosition(Vector2Ex<int> position); // Sets anchor point position
+        // virtual Vector2 GetPosition() const; // Returns top left position
+        virtual Vector2Ex<int> GetPosition(AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT) const;
 
-    virtual Vector2 GetSize() const = 0;
-    virtual void Render() const = 0;
-        
-	};
+        virtual void SetAnchorPoint(AnchorPoint anchorPoint);
+        virtual AnchorPoint GetAnchorPoint() const;
+
+        virtual void SetVisibility(bool visible);
+        virtual bool IsVisible() const;
+
+        virtual void Move(Direction direction, float step = 1);
+
+        virtual Vector2Ex<int> GetSize() const = 0;
+        virtual void Render(Vector2Ex<int> offset) const = 0;
+    };
 
 }
