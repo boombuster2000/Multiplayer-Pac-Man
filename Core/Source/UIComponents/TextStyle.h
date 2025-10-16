@@ -2,7 +2,8 @@
 
 #include "raylib.h"
 
-namespace UIComponents {
+namespace UIComponents
+{
 
     struct TextStyle
     {
