@@ -1,31 +1,30 @@
 #include "RenderableObject.h"
 
+namespace UIComponents
+{
 
-namespace UIComponents {
-
-    RenderableObject::RenderableObject(Vector2 anchorPointPosition, bool visible, AnchorPoint anchorPoint)
+    RenderableObject::RenderableObject(Vector2Ex<int> anchorPointPosition, AnchorPoint anchorPoint, bool visible)
         : m_anchorPointPosition(anchorPointPosition), m_visible(visible), m_anchorPoint(anchorPoint)
     {
     }
 
-    void RenderableObject::SetAnchorPointPosition(Vector2 position)
+    void RenderableObject::SetAnchorPointPosition(Vector2Ex<int> position)
     {
         m_anchorPointPosition = position;
         UpdateDrawPoint(); // offsets top left position so that anchor point position is at user set position.
     }
 
-
-    //Vector2 RenderableObject::GetPosition() const
+    // Vector2 RenderableObject::GetPosition() const
     //{
-    //    return m_position;
-    //}
+    //     return m_position;
+    // }
 
-    //Gives top left position by default as a common reference points between objects for calculations
-    Vector2 RenderableObject::GetPosition(AnchorPoint anchorpoint) const
+    // Gives top left position by default as a common reference points between objects for calculations
+    Vector2Ex<int> RenderableObject::GetPosition(AnchorPoint anchorpoint) const
     {
         using enum AnchorPoint;
-        Vector2 size = GetSize();
-        Vector2 position = m_drawPoint;
+        Vector2Ex<int> size = GetSize();
+        Vector2Ex<int> position = m_drawPoint;
 
         switch (anchorpoint)
         {
@@ -94,36 +93,34 @@ namespace UIComponents {
 
         switch (direction)
         {
-            case UP:
-                m_anchorPointPosition.y -= step;
-                break;
+        case UP:
+            m_anchorPointPosition.y -= step;
+            break;
 
-            case DOWN:
-                m_anchorPointPosition.y += step;
-                break;
+        case DOWN:
+            m_anchorPointPosition.y += step;
+            break;
 
-            case LEFT:
-                m_anchorPointPosition.x -= step;
-                break;
-            
-            case RIGHT:
-                m_anchorPointPosition.x += step;
-                break;
-            
-            default:
-                break;
+        case LEFT:
+            m_anchorPointPosition.x -= step;
+            break;
+
+        case RIGHT:
+            m_anchorPointPosition.x += step;
+            break;
+
+        default:
+            break;
         }
 
         UpdateDrawPoint();
     }
 
-
-
     // Calculates corrected top left position based on the anchor point so that the anchor point of object is at the position set by the user.
     void RenderableObject::UpdateDrawPoint()
     {
         using enum AnchorPoint;
-        Vector2 size = GetSize();
+        Vector2Ex<int> size = GetSize();
 
         m_drawPoint = m_anchorPointPosition;
 
@@ -163,7 +160,6 @@ namespace UIComponents {
         default:
             break;
         }
-
     }
 
 }
