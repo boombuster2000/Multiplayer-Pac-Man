@@ -19,7 +19,7 @@ void Tile::SetType(Type type)
 void Tile::Render(Vector2Ex<int> offset) const
 {
     Vector2Ex<int> position = GetPosition();
-    Vector2Ex<int> size = GetSize();
+    Vector2Ex<int> size = GetDimensions();
     std::shared_ptr<Texture2D> pathTexture = Core::Application::GetTexturesManager()->GetTexture("path");
     std::shared_ptr<Texture2D> wallTexture = Core::Application::GetTexturesManager()->GetTexture("wall");
 

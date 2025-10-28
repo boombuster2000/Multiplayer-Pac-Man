@@ -43,7 +43,7 @@ namespace UIComponents
     {
         return m_style.color;
     }
-    Vector2Ex<int> Text::GetSize() const
+    Vector2Ex<int> Text::GetDimensions() const
     {
         return MeasureTextEx(GetFontDefault(), m_text.c_str(), static_cast<float>(m_style.fontSize), 1.0f);
     }

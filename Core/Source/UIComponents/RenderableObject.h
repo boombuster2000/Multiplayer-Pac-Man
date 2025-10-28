@@ -3,6 +3,7 @@
 #include "Enums.h"
 #include "raylib.h"
 #include "DataTypes/Vector2Ex.h"
+#include "DataTypes/Bounds.h"
 
 namespace UIComponents
 {
@@ -35,7 +36,9 @@ namespace UIComponents
 
         virtual void Move(Direction direction, float step = 1);
 
-        virtual Vector2Ex<int> GetSize() const = 0;
+        virtual Bounds GetHitbox() const;
+
+        virtual Vector2Ex<int> GetDimensions() const = 0;
         virtual void Render(Vector2Ex<int> offset) const = 0;
     };
 

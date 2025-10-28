@@ -34,7 +34,7 @@ namespace UIComponents
 
 		bool IsUIUpdateNeeded() const;
 		void UpdateOptionsAnchorPointPositions();
-		virtual Vector2Ex<int> GetSize() const override;
+		virtual Vector2Ex<int> GetDimensions() const override;
 		virtual void Render(Vector2Ex<int> offset = {0, 0}) const override;
 	};
 

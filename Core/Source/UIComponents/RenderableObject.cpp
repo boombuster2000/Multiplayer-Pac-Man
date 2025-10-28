@@ -23,7 +23,7 @@ namespace UIComponents
     Vector2Ex<int> RenderableObject::GetPosition(AnchorPoint anchorpoint) const
     {
         using enum AnchorPoint;
-        Vector2Ex<int> size = GetSize();
+        Vector2Ex<int> size = GetDimensions();
         Vector2Ex<int> position = m_drawPoint;
 
         switch (anchorpoint)
@@ -116,11 +116,16 @@ namespace UIComponents
         UpdateDrawPoint();
     }
 
+    Bounds RenderableObject::GetHitbox() const
+    {
+        return Bounds(GetDimensions(), GetPosition());
+    }
+
     // Calculates corrected top left position based on the anchor point so that the anchor point of object is at the position set by the user.
     void RenderableObject::UpdateDrawPoint()
     {
         using enum AnchorPoint;
-        Vector2Ex<int> size = GetSize();
+        Vector2Ex<int> size = GetDimensions();
 
         m_drawPoint = m_anchorPointPosition;
 

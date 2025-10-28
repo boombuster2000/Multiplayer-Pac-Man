@@ -18,7 +18,7 @@ namespace UIComponents
         {
             Vector2Ex<int> newOptionPosition = GetPosition();
             MenuOption &lastOption = m_options.back();
-            newOptionPosition.y = lastOption.GetPosition().y + lastOption.GetSize().y + m_spacing; // Move text down
+            newOptionPosition.y = lastOption.GetPosition().y + lastOption.GetDimensions().y + m_spacing; // Move text down
 
             option.SetAnchorPointPosition(newOptionPosition);
             m_options.push_back(option);
@@ -139,20 +139,20 @@ namespace UIComponents
 
                 const MenuOption &lastOption = m_options[i - 1];
 
-                newOptionPosition.y = lastOption.GetPosition().y + lastOption.GetSize().y + m_spacing; // Move text down
+                newOptionPosition.y = lastOption.GetPosition().y + lastOption.GetDimensions().y + m_spacing; // Move text down
                 m_options[i].SetAnchorPointPosition(newOptionPosition);
             }
         }
     }
 
-    Vector2Ex<int> Menu::GetSize() const
+    Vector2Ex<int> Menu::GetDimensions() const
     {
         int width = 0;
         int height = 0;
 
         for (const auto &option : m_options)
         {
-            Vector2Ex<int> optionSize = option.GetSize();
+            Vector2Ex<int> optionSize = option.GetDimensions();
             if (optionSize.x > width)
                 width = optionSize.x;
             height += optionSize.y + m_spacing;

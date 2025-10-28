@@ -33,7 +33,7 @@ namespace UIComponents
         void SetStyle(TextStyle style);
         TextStyle GetStyle() const;
 
-        virtual Vector2Ex<int> GetSize() const override;
+        virtual Vector2Ex<int> GetDimensions() const override;
         virtual void Render(Vector2Ex<int> offset = {0, 0}) const override;
     };
 
