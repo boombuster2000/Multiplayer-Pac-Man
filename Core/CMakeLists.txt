@@ -20,9 +20,12 @@ target_sources(Core
         Source/UIComponents/MenuOption.cpp
         Source/UIComponents/RenderableObject.cpp
         Source/UIComponents/Text.cpp
+        Source/UIComponents/GridTile.cpp
 
         Source/Core/Application.cpp
         Source/Core/TexturesManager.cpp
+
+        Source/DataTypes/Bounds.cpp
     PUBLIC
         Source/Core/Application.h
         Source/Core/Layer.h
@@ -34,6 +37,11 @@ target_sources(Core
         Source/UIComponents/MenuOption.h
         Source/UIComponents/RenderableObject.h
         Source/UIComponents/Text.h
+        Source/UIComponents/Grid.h
+        Source/UIComponents/GridTile.h
+
+        Source/DataTypes/Vector2Ex.h
+        Source/DataTypes/Bounds.h
 )
 
 target_include_directories(Core
