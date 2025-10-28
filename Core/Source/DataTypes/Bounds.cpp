@@ -7,31 +7,19 @@ Bounds::Bounds(Vector2Ex<int> dimensions, Vector2Ex<int> position)
 
 bool Bounds::IsPointInBounds(const Vector2Ex<int> &pos) const
 {
-    if (pos.x > this->position.x && pos.x < this->position.x + this->dimensions.x)
-        if (pos.y < this->position.y && pos.y > this->position.y + this->dimensions.y)
-            return true;
-
-    return false;
+    return (pos.x >= position.x &&
+            pos.x <= position.x + dimensions.x &&
+            pos.y >= position.y &&
+            pos.y <= position.y + dimensions.y);
 }
 
 bool Bounds::IsBoundsTouching(const Bounds &a, const Bounds &b)
 {
+    const bool xOverlap = a.position.x < b.position.x + b.dimensions.x &&
+                          a.position.x + a.dimensions.x > b.position.x;
 
-    // TopLeft
-    if (b.IsPointInBounds(a.position))
-        return true;
+    const bool yOverlap = a.position.y < b.position.y + b.dimensions.y &&
+                          a.position.y + a.dimensions.y > b.position.y;
 
-    // TopRight
-    if (b.IsPointInBounds(Vector2Ex<int>(a.position.x + a.dimensions.x, a.position.y)))
-        return true;
-
-    // BottomLeft
-    if (b.IsPointInBounds(Vector2Ex<int>(a.position.x, a.position.y + a.dimensions.y)))
-        return true;
-
-    // BottomRight
-    if (b.IsPointInBounds(Vector2Ex<int>(a.position.x + a.dimensions.x, a.position.y + a.dimensions.y)))
-        return true;
-
-    return false;
+    return xOverlap && yOverlap;
 }
