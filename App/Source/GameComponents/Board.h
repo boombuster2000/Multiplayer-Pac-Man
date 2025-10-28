@@ -5,20 +5,18 @@
 #include "UIComponents/Grid.h"
 #include "DataTypes/Vector2Ex.h"
 
-class Board
+class Board : public UIComponents::Grid<Tile>
 {
 private:
     Vector2Ex<int> m_tileDimensions;
     Vector2Ex<int> m_boardDimensions;
-    UIComponents::Grid<Tile> m_grid;
 
 public:
     Board();
 
-    void SetTile(Vector2Ex<int> position, Tile::Type type);
-    Vector2Ex<int> ConvertPositionToIndex(Vector2Ex<int> position);
-
-    void Render(Vector2Ex<int> offset = {0, 0}) const;
+    void SetTileType(const Vector2Ex<int> &index, const Tile::Type &type);
+    Tile &GetTile(const Vector2Ex<int> &index);
+    const Tile &GetTile(const Vector2Ex<int> &index) const;
 
 private:
     void AddBoundaries();
