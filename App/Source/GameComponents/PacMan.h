@@ -13,14 +13,22 @@ private:
     Vector2Ex<int> m_dimensions;
     float m_speed;
     UIComponents::Direction m_currentDirection;
+    UIComponents::Direction m_queuedDirection;
 
 public:
     PacMan(Vector2Ex<int> spawnPosition, Vector2Ex<int> dimensions, float speed);
     ~PacMan() = default;
 
-    void SetDirection(UIComponents::Direction direction);
-    void Update();
+    UIComponents::Direction GetCurrentDirection() const;
+    UIComponents::Direction GetQueuedDirection() const;
 
-    virtual Vector2Ex<int> GetSize() const override;
+    void QueueDirection(UIComponents::Direction direction);
+    void ApplyQueuedDirection();
+
+    void SetPosition(const Vector2Ex<int> position);
+    void UpdatePosition();
+    Vector2Ex<int> GetNextPosition(UIComponents::Direction direction) const;
+
+    virtual Vector2Ex<int> GetDimensions() const override;
     virtual void Render(Vector2Ex<int> offset = {0, 0}) const override;
 };
