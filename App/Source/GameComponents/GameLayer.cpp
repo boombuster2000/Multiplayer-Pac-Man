@@ -52,7 +52,7 @@ bool GameLayer::ShouldPacmanMove(const UIComponents::Direction direction) const
 
 GameLayer::GameLayer()
     : m_board(Board()),
-      m_pacman(m_board.GetPositionFromIndex(Vector2Ex<int>(1, 1)), Vector2Ex<int>(50, 50), 3)
+      m_pacman(m_board.GetPositionFromIndex(Vector2Ex<int>(1, 1)), Vector2Ex<int>(50, 50), 5)
 {
 }
 
