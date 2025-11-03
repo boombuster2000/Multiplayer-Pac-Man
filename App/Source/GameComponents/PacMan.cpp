@@ -75,6 +75,40 @@ Vector2Ex<int> PacMan::GetDimensions() const
 
 void PacMan::Render(Vector2Ex<int> offset) const
 {
-    const float scale = (float)m_dimensions.y / (float)m_texture->height;
-    DrawTextureEx(*m_texture, GetPosition() + offset, 0, scale, WHITE);
+    using enum UIComponents::Direction;
+    using enum UIComponents::AnchorPoint;
+
+    const float scale = static_cast<float>(m_dimensions.y) / static_cast<float>(m_texture->height);
+    int rotation = 0;
+
+    switch (m_currentDirection)
+    {
+    case UP:
+        rotation = -90;
+        break;
+    case DOWN:
+        rotation = 90;
+        break;
+    case LEFT:
+        rotation = 180;
+        break;
+    case RIGHT:
+        rotation = 0;
+        break;
+    }
+
+    // Define source and destination rectangles
+    Rectangle srcRect = {0.0f, 0.0f, static_cast<float>(m_texture->width), static_cast<float>(m_texture->height)};
+    Rectangle destRect = {
+        static_cast<float>(GetPosition(MIDDLE).x + offset.x),
+        static_cast<float>(GetPosition(MIDDLE).y + offset.y),
+        m_texture->width * scale,
+        m_texture->height * scale};
+
+    // Center of rotation (pivot)
+    Vector2 origin = {
+        (m_texture->width * scale) / 2.0f,
+        (m_texture->height * scale) / 2.0f};
+
+    DrawTexturePro(*m_texture, srcRect, destRect, origin, rotation, WHITE);
 }
