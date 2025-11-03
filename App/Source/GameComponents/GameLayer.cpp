@@ -7,20 +7,12 @@
 #include <stdexcept>
 #include <array>
 
-// GameLayer.cpp
-
-// GameLayer.cpp
-
 bool GameLayer::ShouldPacmanMove(const UIComponents::Direction direction) const
 {
     using namespace UIComponents;
     using enum Direction;
 
     const Vector2Ex<int> nextPosition = m_pacman.GetNextPosition(direction);
-    const Rectangle nextPacmanHitbox = {static_cast<float>(nextPosition.x),
-                                        static_cast<float>(nextPosition.y),
-                                        static_cast<float>(m_pacman.GetDimensions().x),
-                                        static_cast<float>(m_pacman.GetDimensions().y)};
 
     const int offset = 1; // Small offset to check corners within the hitbox
     Vector2Ex<int> cornersToCheck[2];
