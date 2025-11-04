@@ -16,27 +16,28 @@ bool GameLayer::ShouldPacmanMove(const UIComponents::Direction direction) const
 
     const int offset = 1; // Small offset to check corners within the hitbox
     Vector2Ex<int> cornersToCheck[2];
+    const Vector2Ex<int> pacmanDimensions = m_pacman.GetDimensions();
 
     switch (direction)
     {
     case UP:
         cornersToCheck[0] = nextPosition + Vector2Ex<int>(offset, offset);
-        cornersToCheck[1] = nextPosition + Vector2Ex<int>(m_pacman.GetDimensions().x, 0) + Vector2Ex<int>(-offset, offset);
+        cornersToCheck[1] = nextPosition + Vector2Ex<int>(pacmanDimensions.x, 0) + Vector2Ex<int>(-offset, offset);
         break;
 
     case DOWN:
-        cornersToCheck[0] = nextPosition + Vector2Ex<int>(0, m_pacman.GetDimensions().y) + Vector2Ex<int>(offset, -offset);
-        cornersToCheck[1] = nextPosition + m_pacman.GetDimensions() + Vector2Ex<int>(-offset, -offset);
+        cornersToCheck[0] = nextPosition + Vector2Ex<int>(0, pacmanDimensions.y) + Vector2Ex<int>(offset, -offset);
+        cornersToCheck[1] = nextPosition + pacmanDimensions + Vector2Ex<int>(-offset, -offset);
         break;
 
     case LEFT:
         cornersToCheck[0] = nextPosition + Vector2Ex<int>(1, 1);
-        cornersToCheck[1] = nextPosition + Vector2Ex<int>(0, m_pacman.GetDimensions().y) + Vector2Ex<int>(offset, -offset);
+        cornersToCheck[1] = nextPosition + Vector2Ex<int>(0, pacmanDimensions.y) + Vector2Ex<int>(offset, -offset);
         break;
 
     case RIGHT:
-        cornersToCheck[0] = nextPosition + Vector2Ex<int>(m_pacman.GetDimensions().x, 0) + Vector2Ex<int>(-offset, offset);
-        cornersToCheck[1] = nextPosition + m_pacman.GetDimensions() + Vector2Ex<int>(-offset, -offset);
+        cornersToCheck[0] = nextPosition + Vector2Ex<int>(pacmanDimensions.x, 0) + Vector2Ex<int>(-offset, offset);
+        cornersToCheck[1] = nextPosition + pacmanDimensions + Vector2Ex<int>(-offset, -offset);
         break;
     }
 
