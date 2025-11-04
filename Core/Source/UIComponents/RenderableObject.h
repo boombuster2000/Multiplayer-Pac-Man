@@ -12,30 +12,57 @@ namespace UIComponents
     {
 
     private:
-        Vector2Ex<int> m_drawPoint;
-        Vector2Ex<int> m_anchorPointPosition;
-        AnchorPoint m_anchorPoint;
+        /// @brief The position of the origin in the 2d space.
+        Vector2Ex<int> m_worldOrigin;
+
+        /// @brief The position inside the object where it's drawn from and rotated around.
+        Vector2Ex<int> m_objectOrigin;
+
+        /// @brief Whether the object is visible or not.
         bool m_visible;
 
     protected:
-        void UpdateDrawPoint();
+        // void UpdateDrawPoint();
 
     public:
         RenderableObject(Vector2Ex<int> anchorPointPosition, AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT, bool visible = true);
         virtual ~RenderableObject() = default;
 
-        virtual void SetAnchorPointPosition(Vector2Ex<int> position); // Sets anchor point position
-        // virtual Vector2 GetPosition() const; // Returns top left position
-        virtual Vector2Ex<int> GetPosition(AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT) const;
+        /// @return Returns the position of the orgin in the object (not in the 2d space).
+        virtual Vector2Ex<int> GetObjectOrigin() const;
 
-        virtual void SetAnchorPoint(AnchorPoint anchorPoint);
-        virtual AnchorPoint GetAnchorPoint() const;
+        /// @return Returns the position of the origin in the 2d space.
+        virtual Vector2Ex<int> GetWorldOrigin() const;
 
+        /// @brief Sets the position of the origin in the object (not in the 2d space).
+        /// @param anchorPoint Common points in the object from which the position for the origin can be calculated from.
+        virtual void SetOrigin(AnchorPoint anchorPoint);
+
+        /// @brief Sets the position of the origin in the object (not in the 2d space).
+        /// @param origin A position representing the origin position in the object.
+        virtual void SetOrigin(Vector2Ex<int> origin);
+
+        /// @return Returns the position anchorpoints of the object in the 2d space.
+        virtual Vector2Ex<int> GetPositionAtAnchor(AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT) const;
+
+        /// @brief Sets the position of the origin in the 2d space.
+        /// @param position The position of the origin in the 2d space.
+        virtual void SetPosition(Vector2Ex<int> position);
+
+        /// @brief Sets the visibility of the object.
+        /// @param visible True for visible, false for invisible.
         virtual void SetVisibility(bool visible);
+
+        /// @return Returns whether the object is visible or not.
         virtual bool IsVisible() const;
 
+        /// @brief Moves the object in a direction by a step amount.
+        /// @param direction The direction to move the object in.
+        /// @param step The amount to change the position by.
         virtual void Move(Direction direction, float step = 1);
 
+        /// @brief
+        /// @return
         virtual Bounds GetHitbox() const;
 
         virtual Vector2Ex<int> GetDimensions() const = 0;
