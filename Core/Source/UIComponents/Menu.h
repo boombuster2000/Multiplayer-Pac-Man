@@ -7,7 +7,7 @@
 namespace UIComponents
 {
 
-	class Menu : RenderableObject
+	class Menu : public RenderableObject
 	{
 
 	private:
@@ -16,6 +16,7 @@ namespace UIComponents
 		int m_selectedIndex;
 		int m_spacing;
 		Alignment m_alignment;
+		AnchorPoint m_anchorPoint;
 		bool m_isUIupdateNeeded;
 
 	public:

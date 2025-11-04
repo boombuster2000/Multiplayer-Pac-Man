@@ -5,7 +5,6 @@ PacMan::PacMan(Vector2Ex<int> spawnPosition, Vector2Ex<int> dimensions, float sp
     : RenderableObject(spawnPosition), m_texture(Core::Application::GetTexturesManager()->GetTexture("pac-man")),
       m_spawnPosition(spawnPosition), m_dimensions(dimensions), m_speed(speed), m_currentDirection(RIGHT), m_queuedDirection(RIGHT)
 {
-    UpdateDrawPoint();
 }
 
 UIComponents::Direction PacMan::GetCurrentDirection() const
@@ -30,7 +29,7 @@ void PacMan::ApplyQueuedDirection()
 
 void PacMan::SetPosition(const Vector2Ex<int> position)
 {
-    SetAnchorPointPosition(position);
+    RenderableObject::SetPosition(position);
 }
 
 void PacMan::UpdatePosition()
@@ -41,7 +40,7 @@ void PacMan::UpdatePosition()
 Vector2Ex<int> PacMan::GetNextPosition(UIComponents::Direction direction) const
 {
     using enum UIComponents::Direction;
-    Vector2Ex<int> nextPosition = GetPosition();
+    Vector2Ex<int> nextPosition = GetPositionAtAnchor();
 
     switch (direction)
     {
@@ -97,18 +96,18 @@ void PacMan::Render(Vector2Ex<int> offset) const
         break;
     }
 
+    const Vector2Ex<int> centerPosition = GetPositionAtAnchor(MIDDLE);
+
     // Define source and destination rectangles
     Rectangle srcRect = {0.0f, 0.0f, static_cast<float>(m_texture->width), static_cast<float>(m_texture->height)};
     Rectangle destRect = {
-        static_cast<float>(GetPosition(MIDDLE).x + offset.x),
-        static_cast<float>(GetPosition(MIDDLE).y + offset.y),
+        static_cast<float>(centerPosition.x + offset.x),
+        static_cast<float>(centerPosition.y + offset.y),
         m_texture->width * scale,
         m_texture->height * scale};
 
     // Center of rotation (pivot)
-    Vector2 origin = {
-        (m_texture->width * scale) / 2.0f,
-        (m_texture->height * scale) / 2.0f};
+    Vector2 origin = {(m_texture->width * scale) / 2.0f, (m_texture->height * scale) / 2.0f};
 
     DrawTexturePro(*m_texture, srcRect, destRect, origin, rotation, WHITE);
 }

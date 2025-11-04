@@ -9,13 +9,12 @@ namespace UIComponents
         SetText(text);
         SetFontSize(textStyle.fontSize);
         SetColor(textStyle.color);
-        UpdateDrawPoint();
+        SetOrigin(anchorPoint);
     }
 
     void Text::SetText(std::string text)
     {
         m_text = text;
-        UpdateDrawPoint();
     }
 
     std::string Text::GetText() const
@@ -26,7 +25,6 @@ namespace UIComponents
     void Text::SetFontSize(int fontSize)
     {
         m_style.fontSize = fontSize;
-        UpdateDrawPoint();
     }
 
     int Text::GetFontSize() const
@@ -51,7 +49,6 @@ namespace UIComponents
     void Text::SetStyle(TextStyle style)
     {
         m_style = style;
-        UpdateDrawPoint();
     }
 
     TextStyle Text::GetStyle() const
@@ -63,10 +60,15 @@ namespace UIComponents
     {
         if (IsVisible())
         {
-            const Vector2Ex<int> &position = GetPosition();
-            DrawTextEx(GetFontDefault(), m_text.c_str(), position + offset, m_style.fontSize, 1, m_style.color);
-
-            // DrawText(m_text.c_str(), static_cast<int>(position.x) + offset.x, static_cast<int>(position.y) + offset.y, m_style.fontSize, m_style.color);
+            const Vector2Ex<int> &position = GetWorldOrigin();
+            DrawTextPro(GetFontDefault(),
+                        m_text.c_str(),
+                        Vector2{static_cast<float>(position.x + offset.x), static_cast<float>(position.y + offset.y)},
+                        GetObjectOrigin(),
+                        0.0f,
+                        static_cast<float>(m_style.fontSize),
+                        1.0f,
+                        m_style.color);
         }
     }
 

@@ -5,35 +5,20 @@
 namespace UIComponents
 {
     Menu::Menu(Vector2Ex<int> anchorPointPosition, AnchorPoint anchorPoint, Alignment alignment, bool visible, int spacing)
-        : RenderableObject(anchorPointPosition, anchorPoint, visible), m_selectedIndex(0), m_spacing(spacing), m_alignment(alignment), m_isUIupdateNeeded(true)
+        : RenderableObject(anchorPointPosition, anchorPoint, visible), m_selectedIndex(0), m_spacing(spacing), m_alignment(alignment), m_anchorPoint(anchorPoint), m_isUIupdateNeeded(true)
     {
-        UpdateDrawPoint();
-        m_options = std::vector<MenuOption>();
     }
 
     void Menu::AddOption(MenuOption option)
     {
-
-        if (!m_options.empty())
+        // If this is the first option, mark it as selected.
+        if (m_options.empty())
         {
-            Vector2Ex<int> newOptionPosition = GetPosition();
-            MenuOption &lastOption = m_options.back();
-            newOptionPosition.y = lastOption.GetPosition().y + lastOption.GetDimensions().y + m_spacing; // Move text down
-
-            option.SetAnchorPointPosition(newOptionPosition);
-            m_options.push_back(option);
-        }
-        else
-        {
-            m_options.push_back(option);
-
-            Vector2Ex<int> newOptionPosition = GetPosition();
-            MenuOption &newOption = m_options.back();
-            newOption.SetAnchorPointPosition(newOptionPosition);
-            newOption.SetSelected(true);
+            option.SetSelected(true);
         }
 
-        m_isUIupdateNeeded = true;
+        m_options.push_back(option);
+        m_isUIupdateNeeded = true; // Let the update function handle all positioning.
     }
 
     void Menu::DeleteOption(int index)
@@ -104,45 +89,49 @@ namespace UIComponents
 
     void Menu::UpdateOptionsAnchorPointPositions()
     {
-        UpdateDrawPoint();
-        Vector2Ex<int> drawPoint = GetPosition();
+        if (m_options.empty())
+            return;
 
-        for (int i = 0; i < m_options.size(); i++)
+		SetOrigin(m_anchorPoint);
+
+        // 1. Determine the alignment anchor for all options based on the menu's alignment
+        AnchorPoint alignmentAnchor;
+        switch (m_alignment)
         {
-            if (i == 0)
-            {
-                m_options[i].SetAnchorPointPosition(drawPoint);
-            }
-            else
-            {
-                switch (m_alignment)
-                {
-                case Alignment::LEFT:
-                    m_options[i].SetAnchorPoint(AnchorPoint::TOP_LEFT);
-                    break;
-
-                case Alignment::CENTER:
-                    m_options[i].SetAnchorPoint(AnchorPoint::TOP_MIDDLE);
-                    break;
-
-                case Alignment::RIGHT:
-                    m_options[i].SetAnchorPoint(AnchorPoint::TOP_RIGHT);
-                    break;
-
-                default:
-                    break;
-                }
-
-                Vector2Ex<int> newOptionPosition = (m_alignment == Alignment::LEFT) ? m_options[0].GetPosition() : (m_alignment == Alignment::CENTER) ? m_options[0].GetPosition(AnchorPoint::TOP_MIDDLE)
-                                                                                                               : (m_alignment == Alignment::RIGHT)    ? m_options[0].GetPosition(AnchorPoint::TOP_RIGHT)
-                                                                                                                                                      : m_options[0].GetPosition();
-
-                const MenuOption &lastOption = m_options[i - 1];
-
-                newOptionPosition.y = lastOption.GetPosition().y + lastOption.GetDimensions().y + m_spacing; // Move text down
-                m_options[i].SetAnchorPointPosition(newOptionPosition);
-            }
+        case Alignment::CENTER:
+            alignmentAnchor = AnchorPoint::TOP_MIDDLE;
+            break;
+        case Alignment::RIGHT:
+            alignmentAnchor = AnchorPoint::TOP_RIGHT;
+            break;
+        case Alignment::LEFT:
+        default:
+            alignmentAnchor = AnchorPoint::TOP_LEFT;
+            break;
         }
+
+        // 2. Get the menu's starting world position for that alignment anchor
+        Vector2Ex<int> currentPosition = GetPositionAtAnchor(alignmentAnchor);
+
+        // 3. Loop through all options to set their origin and calculate their final position
+        for (size_t i = 0; i < m_options.size(); ++i)
+        {
+            // Set the option's internal object origin to match the menu's alignment
+            m_options[i].SetOrigin(alignmentAnchor);
+
+            // For options after the first one, calculate the new vertical position
+            if (i > 0)
+            {
+                const auto &lastOption = m_options[i - 1];
+                // The new Y is the previous option's top-left Y + its height + spacing
+                currentPosition.y = lastOption.GetPositionAtAnchor().y + lastOption.GetDimensions().y + m_spacing;
+            }
+
+            // Set the world position of the option's origin
+            m_options[i].SetPosition(currentPosition);
+        }
+
+        m_isUIupdateNeeded = false;
     }
 
     Vector2Ex<int> Menu::GetDimensions() const
