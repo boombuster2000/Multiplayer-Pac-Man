@@ -61,14 +61,11 @@ namespace UIComponents
         default:
             break;
         }
-
-        // UpdateDrawPoint();
     }
 
     void RenderableObject::SetOrigin(Vector2Ex<int> origin)
     {
         m_objectOrigin = origin;
-        // UpdateDrawPoint();
     }
 
     // Gives top left position by default as a common reference points between objects for calculations
@@ -121,7 +118,6 @@ namespace UIComponents
     void RenderableObject::SetPosition(Vector2Ex<int> position)
     {
         m_worldOrigin = position;
-        // UpdateDrawPoint(); // offsets top left position so that anchor point position is at user set position.
     }
 
     void RenderableObject::SetVisibility(bool visible)
@@ -159,59 +155,11 @@ namespace UIComponents
         default:
             break;
         }
-
-        // UpdateDrawPoint();
     }
 
     Bounds RenderableObject::GetHitbox() const
     {
         return Bounds(GetDimensions(), GetPositionAtAnchor());
     }
-
-    // Calculates corrected top left position based on the anchor point so that the anchor point of object is at the position set by the user.
-    // void RenderableObject::UpdateDrawPoint()
-    // {
-    //     using enum AnchorPoint;
-    //     Vector2Ex<int> size = GetDimensions();
-
-    //     m_drawPoint = m_worldOrigin;
-
-    //     switch (m_anchorPoint)
-    //     {
-    //     case TOP_LEFT:
-    //         // No changes needed
-    //         break;
-    //     case TOP_MIDDLE:
-    //         m_drawPoint.x -= size.x / 2;
-    //         break;
-    //     case TOP_RIGHT:
-    //         m_drawPoint.x -= size.x;
-    //         break;
-    //     case MIDDLE_LEFT:
-    //         m_drawPoint.y -= size.y / 2;
-    //         break;
-    //     case MIDDLE:
-    //         m_drawPoint.x -= size.x / 2;
-    //         m_drawPoint.y -= size.y / 2;
-    //         break;
-    //     case MIDDLE_RIGHT:
-    //         m_drawPoint.x -= size.x;
-    //         m_drawPoint.y -= size.y / 2;
-    //         break;
-    //     case BOTTOM_LEFT:
-    //         m_drawPoint.y -= size.y;
-    //         break;
-    //     case BOTTOM_MIDDLE:
-    //         m_drawPoint.x -= size.x / 2;
-    //         m_drawPoint.y -= size.y;
-    //         break;
-    //     case BOTTOM_RIGHT:
-    //         m_drawPoint.x -= size.x;
-    //         m_drawPoint.y -= size.y;
-    //         break;
-    //     default:
-    //         break;
-    //     }
-    // }
 
 }
