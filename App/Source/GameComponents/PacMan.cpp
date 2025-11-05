@@ -3,7 +3,7 @@
 
 PacMan::PacMan(Vector2Ex<int> spawnPosition, Vector2Ex<int> dimensions, float speed)
     : RenderableObject(spawnPosition), m_texture(Core::Application::GetTexturesManager()->GetTexture("pac-man")),
-      m_spawnPosition(spawnPosition), m_dimensions(dimensions), m_speed(speed), m_currentDirection(RIGHT), m_queuedDirection(RIGHT)
+      m_spawnPosition(spawnPosition), m_dimensions(dimensions), m_speed(speed), m_currentDirection(LEFT), m_queuedDirection(m_currentDirection)
 {
 }
 
