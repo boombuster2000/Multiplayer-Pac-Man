@@ -7,16 +7,22 @@
 
 template <typename T>
 concept NumberLike = requires(T a, T b) {
+    // Unary operators
+    { -a } -> std::convertible_to<T>;
+    { a++ } -> std::convertible_to<T>;
+    { ++a } -> std::convertible_to<T>;
+    { a-- } -> std::convertible_to<T>;
+    { --a } -> std::convertible_to<T>;
+
+    // Binary operators
     { a + b } -> std::convertible_to<T>;
     { a - b } -> std::convertible_to<T>;
     { a * b } -> std::convertible_to<T>;
     { a / b } -> std::convertible_to<T>;
-    { std::sqrt(a) } -> std::convertible_to<T>;
     { a == b } -> std::convertible_to<bool>;
-    { a++ } -> std::convertible_to<T>;
-    { ++a } -> std::convertible_to<T>;
-    { b-- } -> std::convertible_to<T>;
-    { --b } -> std::convertible_to<T>;
+
+    // Functions
+    { std::sqrt(a) } -> std::convertible_to<T>;
 };
 
 template <NumberLike T>
@@ -67,9 +73,63 @@ public:
         return {x / o.x, y / o.y};
     }
 
-    constexpr Vector2Ex operator/(const int &o) const
+    // Assignment operators
+    constexpr Vector2Ex &operator+=(const Vector2Ex &o)
     {
-        return {x / o, y / o};
+        x += o.x;
+        y += o.y;
+        return *this;
+    }
+
+    constexpr Vector2Ex &operator-=(const Vector2Ex &o)
+    {
+        x -= o.x;
+        y -= o.y;
+        return *this;
+    }
+
+    constexpr Vector2Ex &operator*=(const Vector2Ex &o)
+    {
+        x *= o.x;
+        y *= o.y;
+        return *this;
+    }
+
+    constexpr Vector2Ex &operator/=(const Vector2Ex &o)
+    {
+        x /= o.x;
+        y /= o.y;
+        return *this;
+    }
+
+    // Unary minus
+    constexpr Vector2Ex operator-() const
+    {
+        return {-x, -y};
+    }
+
+    // Comparison operators
+    constexpr bool operator==(const Vector2Ex &o) const
+    {
+        return x == o.x && y == o.y;
+    }
+
+    constexpr bool operator!=(const Vector2Ex &o) const
+    {
+        return !(*this == o);
+    }
+
+    // Scalar operators
+    template <NumberLike U>
+    constexpr Vector2Ex operator*(const U &scalar) const
+    {
+        return {static_cast<T>(x * scalar), static_cast<T>(y * scalar)};
+    }
+
+    template <NumberLike U>
+    constexpr Vector2Ex operator/(const U &scalar) const
+    {
+        return {static_cast<T>(x / scalar), static_cast<T>(y / scalar)};
     }
 
     // get Vector offsets funcs
