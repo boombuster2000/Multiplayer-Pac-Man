@@ -8,8 +8,8 @@
 class Board : public UIComponents::Grid<Tile>
 {
 private:
-    Vector2Ex<int> m_tileDimensions;
-    Vector2Ex<int> m_boardDimensions;
+    Vector2Ex<float> m_tileDimensions;
+    Vector2Ex<float> m_boardDimensions;
 
 public:
     Board();

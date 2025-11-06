@@ -5,13 +5,13 @@
 Board::Board()
     : Grid(UIComponents::Grid<Tile>(
           Vector2Ex<size_t>(8, 8),
-          Vector2Ex<int>(50, 50),
-          Vector2Ex<int>(10, 10),
+          Vector2Ex<float>(50, 50),
+          Vector2Ex<float>(10, 10),
           UIComponents::AnchorPoint::TOP_LEFT,
-          Vector2Ex<int>(0, 0),
+          Vector2Ex<float>(0, 0),
           Tile::Type::Path,
-          Vector2Ex<int>(0, 0),
-          Vector2Ex<int>(50, 50))),
+          Vector2Ex<float>(0, 0),
+          Vector2Ex<float>(50, 50))),
       m_boardDimensions(8, 8)
 {
     AddBoundaries();

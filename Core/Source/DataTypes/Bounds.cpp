@@ -1,11 +1,11 @@
 #include "Bounds.h"
 
-Bounds::Bounds(Vector2Ex<int> dimensions, Vector2Ex<int> position)
+Bounds::Bounds(Vector2Ex<float> dimensions, Vector2Ex<float> position)
     : dimensions(dimensions), position(position)
 {
 }
 
-bool Bounds::IsPointInBounds(const Vector2Ex<int> &pos) const
+bool Bounds::IsPointInBounds(const Vector2Ex<float> &pos) const
 {
     return (pos.x >= position.x &&
             pos.x <= position.x + dimensions.x &&

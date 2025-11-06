@@ -14,13 +14,13 @@ namespace UIComponents
 		std::vector<MenuOption> m_options;
 
 		int m_selectedIndex;
-		int m_spacing;
+		float m_spacing;
 		Alignment m_alignment;
 		AnchorPoint m_anchorPoint;
 		bool m_isUIupdateNeeded;
 
 	public:
-		Menu(Vector2Ex<int> anchorPointPosition, AnchorPoint AnchorPoint, Alignment alignment, bool visible, int spacing);
+		Menu(Vector2Ex<float> anchorPointPosition, AnchorPoint AnchorPoint, Alignment alignment, bool visible, float spacing);
 		~Menu() = default;
 
 		void AddOption(MenuOption option);
@@ -35,8 +35,8 @@ namespace UIComponents
 
 		bool IsUIUpdateNeeded() const;
 		void UpdateOptionsAnchorPointPositions();
-		virtual Vector2Ex<int> GetDimensions() const override;
-		virtual void Render(Vector2Ex<int> offset = {0, 0}) const override;
+		virtual Vector2Ex<float> GetDimensions() const override;
+		virtual void Render(Vector2Ex<float> offset = {0, 0}) const override;
 	};
 
 }

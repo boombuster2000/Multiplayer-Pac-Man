@@ -4,7 +4,7 @@
 
 namespace UIComponents
 {
-    Menu::Menu(Vector2Ex<int> anchorPointPosition, AnchorPoint anchorPoint, Alignment alignment, bool visible, int spacing)
+    Menu::Menu(Vector2Ex<float> anchorPointPosition, AnchorPoint anchorPoint, Alignment alignment, bool visible, float spacing)
         : RenderableObject(anchorPointPosition, anchorPoint, visible), m_selectedIndex(0), m_spacing(spacing), m_alignment(alignment), m_anchorPoint(anchorPoint), m_isUIupdateNeeded(true)
     {
     }
@@ -92,7 +92,7 @@ namespace UIComponents
         if (m_options.empty())
             return;
 
-		SetOrigin(m_anchorPoint);
+        SetOrigin(m_anchorPoint);
 
         // 1. Determine the alignment anchor for all options based on the menu's alignment
         AnchorPoint alignmentAnchor;
@@ -111,7 +111,7 @@ namespace UIComponents
         }
 
         // 2. Get the menu's starting world position for that alignment anchor
-        Vector2Ex<int> currentPosition = GetPositionAtAnchor(alignmentAnchor);
+        Vector2Ex<float> currentPosition = GetPositionAtAnchor(alignmentAnchor);
 
         // 3. Loop through all options to set their origin and calculate their final position
         for (size_t i = 0; i < m_options.size(); ++i)
@@ -134,14 +134,14 @@ namespace UIComponents
         m_isUIupdateNeeded = false;
     }
 
-    Vector2Ex<int> Menu::GetDimensions() const
+    Vector2Ex<float> Menu::GetDimensions() const
     {
-        int width = 0;
-        int height = 0;
+        float width = 0;
+        float height = 0;
 
         for (const auto &option : m_options)
         {
-            Vector2Ex<int> optionSize = option.GetDimensions();
+            Vector2Ex<float> optionSize = option.GetDimensions();
             if (optionSize.x > width)
                 width = optionSize.x;
             height += optionSize.y + m_spacing;
@@ -153,7 +153,7 @@ namespace UIComponents
         return {width, height};
     }
 
-    void Menu::Render(Vector2Ex<int> offset) const
+    void Menu::Render(Vector2Ex<float> offset) const
     {
         if (!IsVisible())
             return;

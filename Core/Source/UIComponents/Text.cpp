@@ -3,7 +3,7 @@
 namespace UIComponents
 {
 
-    Text::Text(std::string text, TextStyle textStyle, Vector2Ex<int> anchorPointPosition, AnchorPoint anchorPoint, bool visible)
+    Text::Text(std::string text, TextStyle textStyle, Vector2Ex<float> anchorPointPosition, AnchorPoint anchorPoint, bool visible)
         : RenderableObject(anchorPointPosition, anchorPoint, visible)
     {
         SetText(text);
@@ -22,12 +22,12 @@ namespace UIComponents
         return m_text;
     }
 
-    void Text::SetFontSize(int fontSize)
+    void Text::SetFontSize(float fontSize)
     {
         m_style.fontSize = fontSize;
     }
 
-    int Text::GetFontSize() const
+    float Text::GetFontSize() const
     {
         return m_style.fontSize;
     }
@@ -41,9 +41,9 @@ namespace UIComponents
     {
         return m_style.color;
     }
-    Vector2Ex<int> Text::GetDimensions() const
+    Vector2Ex<float> Text::GetDimensions() const
     {
-        return MeasureTextEx(GetFontDefault(), m_text.c_str(), static_cast<float>(m_style.fontSize), 1.0f);
+        return MeasureTextEx(GetFontDefault(), m_text.c_str(), m_style.fontSize, 1.0f);
     }
 
     void Text::SetStyle(TextStyle style)
@@ -56,17 +56,17 @@ namespace UIComponents
         return m_style;
     }
 
-    void Text::Render(Vector2Ex<int> offset) const
+    void Text::Render(Vector2Ex<float> offset) const
     {
         if (IsVisible())
         {
-            const Vector2Ex<int> &position = GetWorldOrigin();
+            const Vector2Ex<float> position = GetWorldOrigin() + offset;
             DrawTextPro(GetFontDefault(),
                         m_text.c_str(),
-                        Vector2{static_cast<float>(position.x + offset.x), static_cast<float>(position.y + offset.y)},
+                        position,
                         GetObjectOrigin(),
                         0.0f,
-                        static_cast<float>(m_style.fontSize),
+                        m_style.fontSize,
                         1.0f,
                         m_style.color);
         }

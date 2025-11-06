@@ -1,7 +1,7 @@
 #include "Tile.h"
 #include "Core/Application.h"
 
-Tile::Tile(Type type, Vector2Ex<int> position, Vector2Ex<int> dimensions)
+Tile::Tile(Type type, Vector2Ex<float> position, Vector2Ex<float> dimensions)
     : GridTile(dimensions, position), m_type(type)
 {
 }
@@ -16,19 +16,19 @@ void Tile::SetType(Type type)
     m_type = type;
 }
 
-void Tile::Render(Vector2Ex<int> offset) const
+void Tile::Render(Vector2Ex<float> offset) const
 {
-    Vector2Ex<int> position = GetPositionAtAnchor();
-    Vector2Ex<int> size = GetDimensions();
+    Vector2Ex<float> position = GetPositionAtAnchor();
+    Vector2Ex<float> size = GetDimensions();
     std::shared_ptr<Texture2D> pathTexture = Core::Application::GetTexturesManager()->GetTexture("path");
     std::shared_ptr<Texture2D> wallTexture = Core::Application::GetTexturesManager()->GetTexture("wall");
 
     if (m_type == Type::Wall)
     {
-        DrawTextureEx(*wallTexture, position, 0, (float)size.y / (float)wallTexture->height, WHITE);
+        DrawTextureEx(*wallTexture, position, 0, size.y / (float)wallTexture->height, WHITE);
     }
     else if (m_type == Type::Path)
     {
-        DrawTextureEx(*pathTexture, position, 0, (float)size.y / (float)pathTexture->height, WHITE);
+        DrawTextureEx(*pathTexture, position, 0, size.y / (float)pathTexture->height, WHITE);
     }
 }

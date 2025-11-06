@@ -9,13 +9,13 @@ namespace UIComponents
     {
 
     private:
-        Vector2Ex<int> m_dimensions;
+        Vector2Ex<float> m_dimensions;
 
     public:
-        GridTile(Vector2Ex<int> dimensions, Vector2Ex<int> position);
+        GridTile(Vector2Ex<float> dimensions, Vector2Ex<float> position);
         ~GridTile() = default;
 
-        virtual Vector2Ex<int> GetDimensions() const override;
-        virtual void Render(Vector2Ex<int> offset = {0, 0}) const override;
+        virtual Vector2Ex<float> GetDimensions() const override;
+        virtual void Render(Vector2Ex<float> offset = {0, 0}) const override;
     };
 }

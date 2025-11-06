@@ -7,7 +7,7 @@ namespace UIComponents
 
     struct TextStyle
     {
-        int fontSize;
+        float fontSize;
         Color color;
     };
 }

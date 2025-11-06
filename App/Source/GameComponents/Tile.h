@@ -26,10 +26,10 @@ private:
     PelletType m_pelletType;
 
 public:
-    Tile(Type type, Vector2Ex<int> postion, Vector2Ex<int> dimensions);
+    Tile(Type type, Vector2Ex<float> postion, Vector2Ex<float> dimensions);
 
     Type GetType() const;
     void SetType(Type type);
 
-    virtual void Render(Vector2Ex<int> offset = {0, 0}) const override;
+    virtual void Render(Vector2Ex<float> offset = {0, 0}) const override;
 };

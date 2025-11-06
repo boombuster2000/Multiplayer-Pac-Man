@@ -20,8 +20,8 @@ namespace UIComponents
 
     private:
         using GridType = std::vector<std::vector<T>>;
-        Vector2Ex<int> m_tileDimensions;
-        Vector2Ex<int> m_spacing;
+        Vector2Ex<float> m_tileDimensions;
+        Vector2Ex<float> m_spacing;
 
     protected:
         GridType m_grid;
@@ -29,10 +29,10 @@ namespace UIComponents
     public:
         template <typename... Args>
         Grid(Vector2Ex<size_t> arraySize,
-             Vector2Ex<int> tileDimensions,
-             Vector2Ex<int> anchorPointPosition,
+             Vector2Ex<float> tileDimensions,
+             Vector2Ex<float> anchorPointPosition,
              UIComponents::AnchorPoint anchorPoint,
-             Vector2Ex<int> spacing,
+             Vector2Ex<float> spacing,
              Args &&...tileArgs)
             : RenderableObject(anchorPointPosition, anchorPoint),
               m_tileDimensions(tileDimensions),
@@ -49,13 +49,12 @@ namespace UIComponents
                 for (int x = 0; x < arraySize.x; x++)
                 {
                     row.emplace_back(std::forward<Args>(tileArgs)...);
-                    row[x].SetPosition(Vector2Ex<int>(anchorPointPosition.x + (x * tileDimensions.x) + (x * spacing.x),
-                                                      anchorPointPosition.y + (y * tileDimensions.y) + (y * spacing.y)));
+                    row[x].SetPosition(Vector2Ex<float>(anchorPointPosition.x + (x * tileDimensions.x) + (x * spacing.x),
+                                                        anchorPointPosition.y + (y * tileDimensions.y) + (y * spacing.y)));
                 }
 
                 m_grid.emplace_back(std::move(row));
             }
-
         }
 
         ~Grid() = default;
@@ -74,7 +73,7 @@ namespace UIComponents
         }
 
         // Rendering and size
-        Vector2Ex<int> GetDimensions() const override
+        Vector2Ex<float> GetDimensions() const override
         {
             if (m_grid.empty() || m_grid.front().empty())
                 return {0, 0};
@@ -82,20 +81,20 @@ namespace UIComponents
             size_t num_cols = m_grid.front().size();
             size_t num_rows = m_grid.size();
 
-            int width = num_cols * m_tileDimensions.x + (num_cols > 0 ? (num_cols - 1) * m_spacing.x : 0);
-            int height = num_rows * m_tileDimensions.y + (num_rows > 0 ? (num_rows - 1) * m_spacing.y : 0);
+            float width = num_cols * m_tileDimensions.x + (num_cols > 0 ? (num_cols - 1) * m_spacing.x : 0);
+            float height = num_rows * m_tileDimensions.y + (num_rows > 0 ? (num_rows - 1) * m_spacing.y : 0);
             return {width, height};
         }
 
-        Vector2Ex<int> GetTileDimensions() const
+        Vector2Ex<float> GetTileDimensions() const
         {
             return m_tileDimensions;
         }
 
-        Vector2Ex<int> GetRelativeIndexFromPosition(const Vector2Ex<int> &position) const
+        Vector2Ex<int> GetRelativeIndexFromPosition(const Vector2Ex<float> &position) const
         {
-            Vector2Ex<int> topLeft = GetPositionAtAnchor();
-            Vector2Ex<int> relativePos = position - topLeft;
+            Vector2Ex<float> topLeft = GetPositionAtAnchor();
+            Vector2Ex<float> relativePos = position - topLeft;
 
             if (m_tileDimensions.x == 0 || m_tileDimensions.y == 0)
                 return {0, 0};
@@ -112,7 +111,7 @@ namespace UIComponents
             return {x_index, y_index};
         }
 
-        Vector2Ex<int> GetPositionFromIndex(const Vector2Ex<int> &index) const
+        Vector2Ex<float> GetPositionFromIndex(const Vector2Ex<int> &index) const
         {
             if (!IsValidIndex(index))
                 throw std::out_of_range("Not valid index.");
@@ -131,13 +130,13 @@ namespace UIComponents
             return m_grid[index.y][index.x];
         }
 
-        T &GetTileFromPosition(const Vector2Ex<int> &position)
+        T &GetTileFromPosition(const Vector2Ex<float> &position)
         {
             const Vector2Ex<int> index = GetRelativeIndexFromPosition(position);
             return m_grid[index.y][index.x];
         }
 
-        const T &GetTileFromPosition(const Vector2Ex<int> &position) const
+        const T &GetTileFromPosition(const Vector2Ex<float> &position) const
         {
             const Vector2Ex<int> index = GetRelativeIndexFromPosition(position);
             return m_grid[index.y][index.x];
@@ -167,7 +166,7 @@ namespace UIComponents
             return true;
         }
 
-        virtual void Render(Vector2Ex<int> offset = {0, 0}) const override
+        virtual void Render(Vector2Ex<float> offset = {0, 0}) const override
         {
             for (const auto &row : m_grid)
                 for (const auto &tile : row)

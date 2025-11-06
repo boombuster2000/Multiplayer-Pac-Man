@@ -9,14 +9,14 @@ class PacMan : public UIComponents::RenderableObject
 private:
     using enum UIComponents::Direction;
     std::shared_ptr<Texture2D> m_texture;
-    Vector2Ex<int> m_spawnPosition;
-    Vector2Ex<int> m_dimensions;
+    Vector2Ex<float> m_spawnPosition;
+    Vector2Ex<float> m_dimensions;
     float m_speed;
     UIComponents::Direction m_currentDirection;
     UIComponents::Direction m_queuedDirection;
 
 public:
-    PacMan(Vector2Ex<int> spawnPosition, Vector2Ex<int> dimensions, float speed);
+    PacMan(Vector2Ex<float> spawnPosition, Vector2Ex<float> dimensions, float speed);
     ~PacMan() = default;
 
     UIComponents::Direction GetCurrentDirection() const;
@@ -25,10 +25,10 @@ public:
     void QueueDirection(UIComponents::Direction direction);
     void ApplyQueuedDirection();
 
-    void SetPosition(const Vector2Ex<int> position);
+    void SetPosition(const Vector2Ex<float> position);
     void UpdatePosition();
-    Vector2Ex<int> GetNextPosition(UIComponents::Direction direction) const;
+    Vector2Ex<float> GetNextPosition(UIComponents::Direction direction) const;
 
-    virtual Vector2Ex<int> GetDimensions() const override;
-    virtual void Render(Vector2Ex<int> offset = {0, 0}) const override;
+    virtual Vector2Ex<float> GetDimensions() const override;
+    virtual void Render(Vector2Ex<float> offset = {0, 0}) const override;
 };

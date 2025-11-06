@@ -16,6 +16,7 @@ int main()
 	appSpec.Name = "Pac-Man";
 	appSpec.Width = 1280;
 	appSpec.Height = 720;
+	appSpec.targetFPS = 120;
 
 	Core::Application application(appSpec);
 	LoadAllTextures();

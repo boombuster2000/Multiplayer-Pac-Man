@@ -3,17 +3,17 @@
 namespace UIComponents
 {
 
-    RenderableObject::RenderableObject(Vector2Ex<int> anchorPointPosition, AnchorPoint anchorPoint, bool visible)
-        : m_worldOrigin(anchorPointPosition), m_objectOrigin(Vector2Ex<int>(0, 0)), m_visible(visible)
+    RenderableObject::RenderableObject(Vector2Ex<float> anchorPointPosition, AnchorPoint anchorPoint, bool visible)
+        : m_worldOrigin(anchorPointPosition), m_objectOrigin(Vector2Ex<float>(0, 0)), m_visible(visible)
     {
     }
 
-    Vector2Ex<int> RenderableObject::GetObjectOrigin() const
+    Vector2Ex<float> RenderableObject::GetObjectOrigin() const
     {
         return m_objectOrigin;
     }
 
-    Vector2Ex<int> RenderableObject::GetWorldOrigin() const
+    Vector2Ex<float> RenderableObject::GetWorldOrigin() const
     {
         return m_worldOrigin;
     }
@@ -21,59 +21,59 @@ namespace UIComponents
     void RenderableObject::SetOrigin(AnchorPoint anchorPoint)
     {
         using enum AnchorPoint;
-        const Vector2Ex<int> &dimensions = GetDimensions();
+        const Vector2Ex<float> &dimensions = GetDimensions();
 
-        const int width = dimensions.x;
-        const int height = dimensions.y;
+        const float width = dimensions.x;
+        const float height = dimensions.y;
 
-        const int halfWidth = width / 2;
-        const int halfHeight = height / 2;
+        const float halfWidth = width / 2;
+        const float halfHeight = height / 2;
 
         switch (anchorPoint)
         {
         case TOP_LEFT:
-            m_objectOrigin = Vector2Ex<int>(0, 0);
+            m_objectOrigin = Vector2Ex<float>(0, 0);
             break;
         case TOP_MIDDLE:
-            m_objectOrigin = Vector2Ex<int>(halfWidth, 0);
+            m_objectOrigin = Vector2Ex<float>(halfWidth, 0);
             break;
         case TOP_RIGHT:
-            m_objectOrigin = Vector2Ex<int>(width, 0);
+            m_objectOrigin = Vector2Ex<float>(width, 0);
             break;
         case MIDDLE_LEFT:
-            m_objectOrigin = Vector2Ex<int>(0, halfHeight);
+            m_objectOrigin = Vector2Ex<float>(0, halfHeight);
             break;
         case MIDDLE:
-            m_objectOrigin = Vector2Ex<int>(halfWidth, halfHeight);
+            m_objectOrigin = Vector2Ex<float>(halfWidth, halfHeight);
             break;
         case MIDDLE_RIGHT:
-            m_objectOrigin = Vector2Ex<int>(width, halfHeight);
+            m_objectOrigin = Vector2Ex<float>(width, halfHeight);
             break;
         case BOTTOM_LEFT:
-            m_objectOrigin = Vector2Ex<int>(0, height);
+            m_objectOrigin = Vector2Ex<float>(0, height);
             break;
         case BOTTOM_MIDDLE:
-            m_objectOrigin = Vector2Ex<int>(halfWidth, height);
+            m_objectOrigin = Vector2Ex<float>(halfWidth, height);
             break;
         case BOTTOM_RIGHT:
-            m_objectOrigin = Vector2Ex<int>(width, height);
+            m_objectOrigin = Vector2Ex<float>(width, height);
             break;
         default:
             break;
         }
     }
 
-    void RenderableObject::SetOrigin(Vector2Ex<int> origin)
+    void RenderableObject::SetOrigin(Vector2Ex<float> origin)
     {
         m_objectOrigin = origin;
     }
 
     // Gives top left position by default as a common reference points between objects for calculations
-    Vector2Ex<int> RenderableObject::GetPositionAtAnchor(AnchorPoint anchorpoint) const
+    Vector2Ex<float> RenderableObject::GetPositionAtAnchor(AnchorPoint anchorpoint) const
     {
         using enum AnchorPoint;
-        const Vector2Ex<int> &dimensions = GetDimensions();
-        Vector2Ex<int> position = m_worldOrigin - m_objectOrigin;
+        const Vector2Ex<float> &dimensions = GetDimensions();
+        Vector2Ex<float> position = m_worldOrigin - m_objectOrigin;
 
         switch (anchorpoint)
         {
@@ -115,7 +115,7 @@ namespace UIComponents
         return position;
     }
 
-    void RenderableObject::SetPosition(Vector2Ex<int> position)
+    void RenderableObject::SetPosition(Vector2Ex<float> position)
     {
         m_worldOrigin = position;
     }
