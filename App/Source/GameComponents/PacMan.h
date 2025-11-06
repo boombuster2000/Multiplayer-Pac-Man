@@ -27,7 +27,7 @@ public:
 
     void SetPosition(const Vector2Ex<float> position);
     void UpdatePosition();
-    Vector2Ex<float> GetNextPosition(UIComponents::Direction direction) const;
+    Vector2Ex<float> GetNextPosition(const UIComponents::Direction &direction, const float &deltaTime) const;
 
     virtual Vector2Ex<float> GetDimensions() const override;
     virtual void Render(Vector2Ex<float> offset = {0, 0}) const override;
