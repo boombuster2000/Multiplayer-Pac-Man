@@ -4,3 +4,4 @@
 *.afdesign
 .vs
 .env
+.cmake_cache
