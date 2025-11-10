@@ -34,7 +34,7 @@ Vector2Ex<float> GameLayer::GetNextValidPacmanPosition(const UIComponents::Direc
             intermediatePosition = currentPosition + (movementDelta / steps) * step;
 
         Vector2Ex<float> cornersToCheck[2];
-        const Vector2Ex<float> pacmanDimensions = m_pacman.GetDimensions();
+        const Vector2Ex<float> pacmanDimensions = m_pacman.GetDimensions() - Vector2Ex<float>(1, 1); // The pixel after is the next tile.
 
         switch (direction)
         {
@@ -62,11 +62,6 @@ Vector2Ex<float> GameLayer::GetNextValidPacmanPosition(const UIComponents::Direc
         bool hasHitWall = false;
         for (auto corner : cornersToCheck)
         {
-            // This is done because the tile top right corner position is the exact same as the top left corner position of the next tile.
-            if (direction == LEFT)
-                corner.x -= 1;
-            else if (direction == UP)
-                corner.y -= 1;
 
             const Tile &tileAtCorner = m_board.GetTileFromPosition(corner);
             if (tileAtCorner.GetType() == Tile::Type::Wall)
@@ -87,7 +82,7 @@ Vector2Ex<float> GameLayer::GetNextValidPacmanPosition(const UIComponents::Direc
 
 GameLayer::GameLayer()
     : m_board(Board()),
-      m_pacman(m_board.GetPositionFromIndex(Vector2Ex<int>(1, 1)) + Vector2Ex<float>(1, 1), Vector2Ex<float>(48, 48), 5)
+      m_pacman(m_board.GetPositionFromIndex(Vector2Ex<int>(1, 1)), Vector2Ex<float>(50, 50), 5)
 {
 }
 

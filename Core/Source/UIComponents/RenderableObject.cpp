@@ -72,7 +72,7 @@ namespace UIComponents
     Vector2Ex<float> RenderableObject::GetPositionAtAnchor(AnchorPoint anchorpoint) const
     {
         using enum AnchorPoint;
-        const Vector2Ex<float> &dimensions = GetDimensions();
+        const Vector2Ex<float> &dimensions = GetDimensions() - Vector2Ex<float>(1, 1); // This is the pixel before the next tile.;
         Vector2Ex<float> position = m_worldOrigin - m_objectOrigin;
 
         switch (anchorpoint)
