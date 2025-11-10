@@ -14,14 +14,14 @@ private:
     UIComponents::Direction m_queuedDirection;
 
 private:
-    Vector2Ex<float> GetNextValidPacmanPosition(const UIComponents::Direction direction) const;
+    Vector2Ex<float> GetNextValidPacmanPosition(const UIComponents::Direction direction, const float &deltaTime) const;
 
 public:
     GameLayer();
     virtual ~GameLayer() = default;
 
     void HandleKeyPresses();
-    void HandleCollisions();
+    void HandleCollisions(const float &deltaTime);
 
     virtual void OnUpdate(float ts) override;
     virtual void OnRender() override;
