@@ -29,6 +29,8 @@ public:
     void UpdatePosition();
     Vector2Ex<float> GetNextPosition(const UIComponents::Direction &direction, const float &deltaTime) const;
 
+    float GetSpeed() const;
+
     virtual Vector2Ex<float> GetDimensions() const override;
     virtual void Render(Vector2Ex<float> offset = {0, 0}) const override;
 };

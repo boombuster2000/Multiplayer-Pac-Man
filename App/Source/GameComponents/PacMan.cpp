@@ -67,6 +67,11 @@ Vector2Ex<float> PacMan::GetNextPosition(const UIComponents::Direction &directio
     return nextPosition;
 }
 
+float PacMan::GetSpeed() const
+{
+    return m_speed;
+}
+
 Vector2Ex<float> PacMan::GetDimensions() const
 {
     return m_dimensions;
