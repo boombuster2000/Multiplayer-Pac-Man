@@ -72,7 +72,8 @@ namespace UIComponents
     Vector2Ex<float> RenderableObject::GetPositionAtAnchor(AnchorPoint anchorpoint) const
     {
         using enum AnchorPoint;
-        const Vector2Ex<float> &dimensions = GetDimensions();
+        // Done manually because a dot appears when moving up and left.
+        const Vector2Ex<float> &dimensions = GetDimensions(); // - Vector2Ex<float>(1, 1); // This is the pixel before the next tile.;
         Vector2Ex<float> position = m_worldOrigin - m_objectOrigin;
 
         switch (anchorpoint)
@@ -84,7 +85,7 @@ namespace UIComponents
             position.x += dimensions.x / 2;
             break;
         case TOP_RIGHT:
-            position.x += dimensions.x;
+            position.x += dimensions.x - 1;
             break;
         case MIDDLE_LEFT:
             position.y += dimensions.y / 2;
@@ -94,19 +95,19 @@ namespace UIComponents
             position.y += dimensions.y / 2;
             break;
         case MIDDLE_RIGHT:
-            position.x += dimensions.x;
+            position.x += dimensions.x - 1;
             position.y += dimensions.y / 2;
             break;
         case BOTTOM_LEFT:
-            position.y += dimensions.y;
+            position.y += dimensions.y - 1;
             break;
         case BOTTOM_MIDDLE:
             position.x += dimensions.x / 2;
-            position.y += dimensions.y;
+            position.y += dimensions.y - 1;
             break;
         case BOTTOM_RIGHT:
-            position.x += dimensions.x;
-            position.y += dimensions.y;
+            position.x += dimensions.x - 1;
+            position.y += dimensions.y - 1;
             break;
         default:
             break;

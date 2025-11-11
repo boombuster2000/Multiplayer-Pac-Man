@@ -7,15 +7,12 @@
 #include <stdexcept>
 #include <array>
 
-Vector2Ex<float> GameLayer::GetNextValidPacmanPosition(const UIComponents::Direction direction) const
+Vector2Ex<float> GameLayer::GetNextValidPacmanPosition(const Vector2Ex<float> &start, const Vector2Ex<float> &end, const UIComponents::Direction &direction) const
 {
     using namespace UIComponents;
     using enum Direction;
 
-    const Vector2Ex<float> currentPosition = m_pacman.GetPositionAtAnchor();
-    const Vector2Ex<float> nextPosition = m_pacman.GetNextPosition(direction);
-
-    const Vector2Ex<float> movementDelta = nextPosition - currentPosition;
+    const Vector2Ex<float> movementDelta = end - start;
 
     float steps;
 
@@ -24,62 +21,62 @@ Vector2Ex<float> GameLayer::GetNextValidPacmanPosition(const UIComponents::Direc
     else
         steps = std::abs(movementDelta.x);
 
-    Vector2Ex<float> nextValidPosition = currentPosition;
-    for (float step = 0; step <= steps; step++)
+    Vector2Ex<float> nextValidPosition = start;
+    if (steps > 0)
     {
-        Vector2Ex<float> intermediatePosition;
-        if (steps == 0)
-            intermediatePosition = currentPosition;
-        else
-            intermediatePosition = currentPosition + (movementDelta / steps) * step;
-
-        Vector2Ex<float> cornersToCheck[2];
-        const Vector2Ex<float> pacmanDimensions = m_pacman.GetDimensions();
-
-        switch (direction)
+        float remaining_steps = steps;
+        while (remaining_steps > 0)
         {
-        case UP:
-            cornersToCheck[0] = intermediatePosition;
-            cornersToCheck[1] = intermediatePosition + Vector2Ex<float>(pacmanDimensions.x, 0);
-            break;
+            float step_size = std::min(remaining_steps, 1.0f);
+            float current_total_step = steps - remaining_steps + step_size;
 
-        case DOWN:
-            cornersToCheck[0] = intermediatePosition + Vector2Ex<float>(0, pacmanDimensions.y);
-            cornersToCheck[1] = intermediatePosition + Vector2Ex<float>(pacmanDimensions.x, pacmanDimensions.y);
-            break;
+            Vector2Ex<float> intermediatePosition = start + (movementDelta / steps) * current_total_step;
 
-        case LEFT:
-            cornersToCheck[0] = intermediatePosition;
-            cornersToCheck[1] = intermediatePosition + Vector2Ex<float>(0, pacmanDimensions.y);
-            break;
+            Vector2Ex<float> cornersToCheck[2];
+            const Vector2Ex<float> pacmanDimensions = m_pacman.GetDimensions() - Vector2Ex<float>(1, 1); // The pixel after is the next tile.
 
-        case RIGHT:
-            cornersToCheck[0] = intermediatePosition + Vector2Ex<float>(pacmanDimensions.x, 0);
-            cornersToCheck[1] = intermediatePosition + Vector2Ex<float>(pacmanDimensions.x, pacmanDimensions.y);
-            break;
-        }
-
-        bool hasHitWall = false;
-        for (auto corner : cornersToCheck)
-        {
-            // This is done because the tile top right corner position is the exact same as the top left corner position of the next tile.
-            if (direction == LEFT)
-                corner.x -= 1;
-            else if (direction == UP)
-                corner.y -= 1;
-
-            const Tile &tileAtCorner = m_board.GetTileFromPosition(corner);
-            if (tileAtCorner.GetType() == Tile::Type::Wall)
+            switch (direction)
             {
-                hasHitWall = true;
+            case UP:
+                cornersToCheck[0] = intermediatePosition;
+                cornersToCheck[1] = intermediatePosition + Vector2Ex<float>(pacmanDimensions.x, 0);
+                break;
+
+            case DOWN:
+                cornersToCheck[0] = intermediatePosition + Vector2Ex<float>(0, pacmanDimensions.y);
+                cornersToCheck[1] = intermediatePosition + Vector2Ex<float>(pacmanDimensions.x, pacmanDimensions.y);
+                break;
+
+            case LEFT:
+                cornersToCheck[0] = intermediatePosition;
+                cornersToCheck[1] = intermediatePosition + Vector2Ex<float>(0, pacmanDimensions.y);
+                break;
+
+            case RIGHT:
+                cornersToCheck[0] = intermediatePosition + Vector2Ex<float>(pacmanDimensions.x, 0);
+                cornersToCheck[1] = intermediatePosition + Vector2Ex<float>(pacmanDimensions.x, pacmanDimensions.y);
                 break;
             }
-        }
 
-        if (hasHitWall)
-            return nextValidPosition;
-        else
-            nextValidPosition = intermediatePosition;
+            bool hasHitWall = false;
+            for (auto corner : cornersToCheck)
+            {
+
+                const Tile &tileAtCorner = m_board.GetTileFromPosition(corner);
+                if (tileAtCorner.GetType() == Tile::Type::Wall)
+                {
+                    hasHitWall = true;
+                    break;
+                }
+            }
+
+            if (hasHitWall)
+                return nextValidPosition;
+            else
+                nextValidPosition = intermediatePosition;
+
+            remaining_steps -= step_size;
+        }
     }
 
     return nextValidPosition;
@@ -87,7 +84,7 @@ Vector2Ex<float> GameLayer::GetNextValidPacmanPosition(const UIComponents::Direc
 
 GameLayer::GameLayer()
     : m_board(Board()),
-      m_pacman(m_board.GetPositionFromIndex(Vector2Ex<int>(1, 1)) + Vector2Ex<float>(1, 1), Vector2Ex<float>(48, 48), 5)
+      m_pacman(m_board.GetPositionFromIndex(Vector2Ex<int>(1, 1)), Vector2Ex<float>(50, 50), 400)
 {
 }
 
@@ -107,22 +104,26 @@ void GameLayer::HandleKeyPresses()
         m_pacman.QueueDirection(RIGHT);
 }
 
-void GameLayer::HandleCollisions()
+void GameLayer::HandleCollisions(const float &deltaTime)
 {
 
     const Vector2Ex<float> currentPosition = m_pacman.GetPositionAtAnchor();
-    const Vector2Ex<float> nextQueuedPosition = GetNextValidPacmanPosition(m_pacman.GetQueuedDirection());
+    const Vector2Ex<float> nextPosition = m_pacman.GetNextPosition(m_pacman.GetCurrentDirection(), deltaTime);
+    const Vector2Ex<float> nextQueuedPosition = m_pacman.GetNextPositionWithStep(m_pacman.GetQueuedDirection(), 1.0f);
+    const Vector2Ex<float> validNextQueuedPosition = GetNextValidPacmanPosition(currentPosition, nextQueuedPosition, m_pacman.GetQueuedDirection());
 
-    if (currentPosition != nextQueuedPosition)
+    if (currentPosition != validNextQueuedPosition)
         m_pacman.ApplyQueuedDirection();
 
-    m_pacman.SetPosition(GetNextValidPacmanPosition(m_pacman.GetCurrentDirection()));
+    const Vector2Ex<float> validNextPosition = GetNextValidPacmanPosition(currentPosition, nextPosition, m_pacman.GetCurrentDirection());
+    m_pacman.SetPosition(validNextPosition);
 }
 
 void GameLayer::OnUpdate(float ts)
 {
+
     HandleKeyPresses();
-    HandleCollisions();
+    HandleCollisions(ts);
 }
 
 void GameLayer::OnRender()

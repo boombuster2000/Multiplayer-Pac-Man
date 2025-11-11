@@ -37,7 +37,7 @@ void PacMan::UpdatePosition()
     Move(m_currentDirection, m_speed);
 }
 
-Vector2Ex<float> PacMan::GetNextPosition(UIComponents::Direction direction) const
+Vector2Ex<float> PacMan::GetNextPosition(const UIComponents::Direction &direction, const float &deltaTime) const
 {
     using enum UIComponents::Direction;
     Vector2Ex<float> nextPosition = GetPositionAtAnchor();
@@ -45,19 +45,19 @@ Vector2Ex<float> PacMan::GetNextPosition(UIComponents::Direction direction) cons
     switch (direction)
     {
     case UP:
-        nextPosition.y -= m_speed;
+        nextPosition.y -= m_speed * deltaTime;
         break;
 
     case DOWN:
-        nextPosition.y += m_speed;
+        nextPosition.y += m_speed * deltaTime;
         break;
 
     case LEFT:
-        nextPosition.x -= m_speed;
+        nextPosition.x -= m_speed * deltaTime;
         break;
 
     case RIGHT:
-        nextPosition.x += m_speed;
+        nextPosition.x += m_speed * deltaTime;
         break;
 
     default:
@@ -65,6 +65,41 @@ Vector2Ex<float> PacMan::GetNextPosition(UIComponents::Direction direction) cons
     }
 
     return nextPosition;
+}
+
+Vector2Ex<float> PacMan::GetNextPositionWithStep(const UIComponents::Direction &direction, const float step) const
+{
+    using enum UIComponents::Direction;
+    Vector2Ex<float> nextPosition = GetPositionAtAnchor();
+
+    switch (direction)
+    {
+    case UP:
+        nextPosition.y -= step;
+        break;
+
+    case DOWN:
+        nextPosition.y += step;
+        break;
+
+    case LEFT:
+        nextPosition.x -= step;
+        break;
+
+    case RIGHT:
+        nextPosition.x += step;
+        break;
+
+    default:
+        break;
+    }
+
+    return nextPosition;
+}
+
+float PacMan::GetSpeed() const
+{
+    return m_speed;
 }
 
 Vector2Ex<float> PacMan::GetDimensions() const
