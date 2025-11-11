@@ -16,7 +16,8 @@ namespace Core
 		s_TexturesManager = std::make_shared<TexturesManager>();
 
 		InitWindow(specification.Width, specification.Height, specification.Name.c_str());
-		SetTargetFPS(specification.targetFPS);
+		if (specification.targetFPS > 0)
+			SetTargetFPS(specification.targetFPS);
 	}
 
 	Application::~Application()
@@ -54,6 +55,9 @@ namespace Core
 			// NOTE: rendering can be done elsewhere (eg. render thread)
 			for (const std::unique_ptr<Layer> &layer : m_LayerStack)
 				layer->OnRender();
+
+			if (m_Specification.drawFPS)
+				DrawFPS(GetScreenWidth() - 100, 10);
 
 			EndDrawing();
 		}

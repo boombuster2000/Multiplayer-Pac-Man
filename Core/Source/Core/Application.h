@@ -16,6 +16,7 @@ namespace Core
 		uint32_t Width = 1280;
 		uint32_t Height = 720;
 		int targetFPS = 60;
+		bool drawFPS = true;
 	};
 
 	class Application
