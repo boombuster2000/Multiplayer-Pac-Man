@@ -28,6 +28,7 @@ public:
     void SetPosition(const Vector2Ex<float> position);
     void UpdatePosition();
     Vector2Ex<float> GetNextPosition(const UIComponents::Direction &direction, const float &deltaTime) const;
+    Vector2Ex<float> GetNextPositionWithStep(const UIComponents::Direction &direction, const float step) const;
 
     float GetSpeed() const;
 

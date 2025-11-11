@@ -67,6 +67,36 @@ Vector2Ex<float> PacMan::GetNextPosition(const UIComponents::Direction &directio
     return nextPosition;
 }
 
+Vector2Ex<float> PacMan::GetNextPositionWithStep(const UIComponents::Direction &direction, const float step) const
+{
+    using enum UIComponents::Direction;
+    Vector2Ex<float> nextPosition = GetPositionAtAnchor();
+
+    switch (direction)
+    {
+    case UP:
+        nextPosition.y -= step;
+        break;
+
+    case DOWN:
+        nextPosition.y += step;
+        break;
+
+    case LEFT:
+        nextPosition.x -= step;
+        break;
+
+    case RIGHT:
+        nextPosition.x += step;
+        break;
+
+    default:
+        break;
+    }
+
+    return nextPosition;
+}
+
 float PacMan::GetSpeed() const
 {
     return m_speed;
