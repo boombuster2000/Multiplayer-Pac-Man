@@ -1,4 +1,4 @@
-﻿# Define App as an executable
+# Define App as an executable
 add_executable(Pac-Man)
 
 # Specify source files for the executable
@@ -33,21 +33,4 @@ target_link_libraries(Pac-Man
         Core
 )
 
-# Define the source and destination resource directories
-set(RESOURCE_SRC_DIR ${CMAKE_SOURCE_DIR}/resources)
-set(RESOURCE_DST_DIR $<TARGET_FILE_DIR:Pac-Man>/resources)
 
-# Recursively collect all resource files
-file(GLOB_RECURSE RESOURCE_FILES "${RESOURCE_SRC_DIR}/*")
-
-# Create a custom target for copying resources
-add_custom_target(copy_resources ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${RESOURCE_SRC_DIR}
-        ${RESOURCE_DST_DIR}
-    DEPENDS ${RESOURCE_FILES}  # re-run if any resource changes
-    COMMENT "Copying resource files..."
-)
-
-# Ensure the resources are copied before building Ball
-add_dependencies(Pac-Man copy_resources)
