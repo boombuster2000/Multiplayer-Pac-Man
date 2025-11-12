@@ -14,7 +14,8 @@ private:
     UIComponents::Direction m_queuedDirection;
 
 private:
-    Vector2Ex<float> GetNextValidPacmanPosition(const Vector2Ex<float> &start, const Vector2Ex<float> &end, const UIComponents::Direction &direction) const;
+    bool CanMoveInDirection(const Vector2Ex<float> &position, const UIComponents::Direction &direction) const;
+    Vector2Ex<float> GetNextValidPacmanPosition(Vector2Ex<float> start, Vector2Ex<float> end, UIComponents::Direction direction);
 
 public:
     GameLayer();
