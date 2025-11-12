@@ -11,6 +11,15 @@ FetchContent_Declare(
 # Actually fetch + make Raylib available
 FetchContent_MakeAvailable(raylib)
 
+
+FetchContent_Declare(
+    nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG v3.12.0  # Pick a release tag (e.g., 5.0, master)
+)
+
+FetchContent_MakeAvailable(nlohmann_json)
+
 # --- Define Core Library ---
 add_library(Core STATIC)
 
@@ -51,4 +60,5 @@ target_include_directories(Core
 target_link_libraries(Core
     PUBLIC
         raylib
+        nlohmann_json
 )
