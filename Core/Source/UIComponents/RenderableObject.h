@@ -20,9 +20,6 @@ namespace UIComponents
         /// @brief Whether the object is visible or not.
         bool m_visible;
 
-    protected:
-        // void UpdateDrawPoint();
-
     public:
         RenderableObject(Vector2Ex<float> anchorPointPosition, AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT, bool visible = true);
         virtual ~RenderableObject() = default;
