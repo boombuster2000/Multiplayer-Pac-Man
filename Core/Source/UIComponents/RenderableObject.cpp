@@ -158,9 +158,4 @@ namespace UIComponents
         }
     }
 
-    Bounds RenderableObject::GetHitbox() const
-    {
-        return Bounds(GetDimensions(), GetPositionAtAnchor());
-    }
-
 }

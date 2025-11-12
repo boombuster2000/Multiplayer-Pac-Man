@@ -3,7 +3,6 @@
 #include "Enums.h"
 #include "raylib.h"
 #include "DataTypes/Vector2Ex.h"
-#include "DataTypes/Bounds.h"
 
 namespace UIComponents
 {
@@ -60,10 +59,6 @@ namespace UIComponents
         /// @param direction The direction to move the object in.
         /// @param step The amount to change the position by.
         virtual void Move(Direction direction, float step = 1);
-
-        /// @brief
-        /// @return
-        virtual Bounds GetHitbox() const;
 
         virtual Vector2Ex<float> GetDimensions() const = 0;
         virtual void Render(Vector2Ex<float> offset) const = 0;

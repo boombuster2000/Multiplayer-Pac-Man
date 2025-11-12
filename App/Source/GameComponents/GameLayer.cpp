@@ -1,11 +1,10 @@
-#include "GameLayer.h"
-#include "raylib.h"
-#include "Core/Application.h"
-#include "DataTypes/Bounds.h"
-
 #include <iostream>
 #include <stdexcept>
 #include <array>
+
+#include "GameLayer.h"
+#include "raylib.h"
+#include "Core/Application.h"
 
 bool GameLayer::CanMoveInDirection(const Vector2Ex<float> &position, const UIComponents::Direction &direction) const
 {

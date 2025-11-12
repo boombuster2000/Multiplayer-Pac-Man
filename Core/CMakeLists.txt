@@ -25,7 +25,6 @@ target_sources(Core
         Source/Core/Application.cpp
         Source/Core/TexturesManager.cpp
 
-        Source/DataTypes/Bounds.cpp
     PUBLIC
         Source/Core/Application.h
         Source/Core/Layer.h
@@ -41,7 +40,6 @@ target_sources(Core
         Source/UIComponents/GridTile.h
 
         Source/DataTypes/Vector2Ex.h
-        Source/DataTypes/Bounds.h
 )
 
 target_include_directories(Core
