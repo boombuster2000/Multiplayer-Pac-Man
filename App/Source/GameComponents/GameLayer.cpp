@@ -63,7 +63,7 @@ Vector2Ex<float> GameLayer::GetNextValidPacmanPosition(
 
     if (queuedDir != direction)
     {
-        const Vector2Ex<float> queuedVec = m_pacman.DirectionToVector(queuedDir);
+        const Vector2Ex<float> queuedVec = Vector2Ex<float>::GetDirectionVector(queuedDir);
         const Vector2Ex<float> peekPosition = start + queuedVec;
 
         if (CanMoveInDirection(peekPosition, queuedDir))
@@ -99,7 +99,7 @@ Vector2Ex<float> GameLayer::GetNextValidPacmanPosition(
         if (queuedDir != direction)
         {
 
-            Vector2Ex<float> peekPosition = intermediatePosition + m_pacman.DirectionToVector(queuedDir);
+            Vector2Ex<float> peekPosition = intermediatePosition + Vector2Ex<float>::GetDirectionVector(queuedDir);
             if (CanMoveInDirection(peekPosition, queuedDir))
             {
                 m_pacman.ApplyQueuedDirection();
@@ -108,7 +108,7 @@ Vector2Ex<float> GameLayer::GetNextValidPacmanPosition(
                 start = intermediatePosition;
 
                 // Redirect remaining movement distance in new direction
-                end = start + (m_pacman.DirectionToVector(direction) * remaining_steps);
+                end = start + (Vector2Ex<float>::GetDirectionVector(direction) * remaining_steps);
 
                 return GetNextValidPacmanPosition(start, end, direction);
             }
@@ -152,11 +152,6 @@ void GameLayer::HandleCollisions(const float &deltaTime)
 
     const Vector2Ex<float> currentPosition = m_pacman.GetPositionAtAnchor();
     const Vector2Ex<float> nextPosition = m_pacman.GetNextPosition(m_pacman.GetCurrentDirection(), deltaTime);
-    // const Vector2Ex<float> nextQueuedPosition = m_pacman.GetNextPositionWithStep(m_pacman.GetQueuedDirection(), 1.0f);
-    // const Vector2Ex<float> validNextQueuedPosition = GetNextValidPacmanPosition(currentPosition, nextQueuedPosition, m_pacman.GetQueuedDirection());
-
-    // if (currentPosition != validNextQueuedPosition)
-    //     m_pacman.ApplyQueuedDirection();
 
     const Vector2Ex<float> validNextPosition = GetNextValidPacmanPosition(currentPosition, nextPosition, m_pacman.GetCurrentDirection());
     m_pacman.SetPosition(validNextPosition);
