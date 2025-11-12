@@ -49,6 +49,13 @@ target_sources(Core
         Source/UIComponents/GridTile.h
 
         Source/DataTypes/Vector2Ex.h
+
+        Source/Serialization/Enums_json.hpp
+        Source/Serialization/Grid_json.hpp
+        Source/Serialization/GridTile_json.hpp
+        Source/Serialization/JsonConverters.hpp 
+        Source/Serialization/RenderableObject_json.hpp
+        Source/Serialization/Vector2Ex_json.hpp
 )
 
 target_include_directories(Core
