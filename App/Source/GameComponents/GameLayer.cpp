@@ -144,6 +144,9 @@ void GameLayer::HandleKeyPresses()
 
     if (IsKeyPressed(KEY_D))
         m_pacman.QueueDirection(RIGHT);
+
+    if (IsKeyPressed(KEY_F1))
+        m_board.SaveToFile("./Boards/default.json");
 }
 
 void GameLayer::HandleCollisions(const float &deltaTime)

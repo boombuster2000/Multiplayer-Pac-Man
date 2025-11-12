@@ -2,6 +2,13 @@
 #include "Core/Application.h"
 #include "UIComponents/Enums.h"
 
+#include <nlohmann/json.hpp>
+#include "Serialization/JsonConverters.hpp"
+#include <fstream>
+#include <stdexcept> // For std::runtime_error
+
+using json = nlohmann::json;
+
 Board::Board()
     : Grid(UIComponents::Grid<Tile>(
           Vector2Ex<size_t>(8, 8),
@@ -34,6 +41,22 @@ Board::Board()
 void Board::SetTileType(const Vector2Ex<int> &index, const Tile::Type &type)
 {
     Grid::GetTile(index).SetType(type);
+}
+
+void Board::SaveToFile(const std::string &filename) const
+{
+    json j = *this;
+
+    std::ofstream file(filename);
+    if (file.is_open())
+    {
+        file << j.dump(4);
+        file.close();
+    }
+}
+
+Board Board::LoadFromFile(const std::string &filename)
+{
 }
 
 void Board::AddBoundaries()
