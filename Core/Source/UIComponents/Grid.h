@@ -22,8 +22,8 @@ namespace UIComponents
         using GridType = std::vector<std::vector<T>>;
         Vector2Ex<float> m_tileDimensions;
         Vector2Ex<float> m_spacing;
+        Vector2Ex<size_t> m_gridSize;
 
-    protected:
         GridType m_grid;
 
     public:
@@ -36,7 +36,8 @@ namespace UIComponents
              Args &&...tileArgs)
             : RenderableObject(anchorPointPosition, anchorPoint),
               m_tileDimensions(tileDimensions),
-              m_spacing(spacing)
+              m_spacing(spacing),
+              m_gridSize(arraySize)
         {
 
             m_grid.reserve(arraySize.y);
@@ -91,6 +92,16 @@ namespace UIComponents
             return m_tileDimensions;
         }
 
+        Vector2Ex<float> GetSpacing() const
+        {
+            return m_spacing;
+        }
+
+        Vector2Ex<size_t> GetGridSize() const
+        {
+            return m_gridSize;
+        }
+
         Vector2Ex<int> GetRelativeIndexFromPosition(const Vector2Ex<float> &position) const
         {
             Vector2Ex<float> topLeft = GetPositionAtAnchor();
@@ -120,6 +131,15 @@ namespace UIComponents
         }
 
         // Accessors
+        T &GetTile(const int y, const int x)
+        {
+            return m_grid[y][x];
+        }
+        const T &GetTile(const int y, const int x) const
+        {
+            return m_grid[y][x];
+        }
+
         T &GetTile(const Vector2Ex<int> &index)
         {
             return m_grid[index.y][index.x];

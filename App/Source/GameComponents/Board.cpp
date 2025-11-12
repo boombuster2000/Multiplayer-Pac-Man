@@ -11,8 +11,7 @@ Board::Board()
           Vector2Ex<float>(0, 0),
           Tile::Type::Path,
           Vector2Ex<float>(0, 0),
-          Vector2Ex<float>(50, 50))),
-      m_boardDimensions(8, 8)
+          Vector2Ex<float>(50, 50)))
 {
     AddBoundaries();
 
@@ -34,20 +33,22 @@ Board::Board()
 
 void Board::SetTileType(const Vector2Ex<int> &index, const Tile::Type &type)
 {
-    m_grid[index.y][index.x].SetType(type);
+    Grid::GetTile(index).SetType(type);
 }
 
 void Board::AddBoundaries()
 {
-    for (int x = 0; x < m_boardDimensions.x; x++)
+    const Vector2Ex<size_t>& boardSize = GetGridSize();
+
+    for (int x = 0; x < boardSize.x; x++)
     {
-        m_grid[0][x].SetType(Tile::Type::Wall);
-        m_grid[m_boardDimensions.y - 1][x].SetType(Tile::Type::Wall);
+        GetTile(0,x).SetType(Tile::Type::Wall);
+        GetTile(boardSize.y - 1,x).SetType(Tile::Type::Wall);
     }
 
-    for (int y = 0; y < m_boardDimensions.y; y++)
+    for (int y = 0; y < boardSize.y; y++)
     {
-        m_grid[y][0].SetType(Tile::Type::Wall);
-        m_grid[y][m_boardDimensions.x - 1].SetType(Tile::Type::Wall);
+        GetTile(y,0).SetType(Tile::Type::Wall);
+        GetTile(y,boardSize.x - 1).SetType(Tile::Type::Wall);
     }
 }
