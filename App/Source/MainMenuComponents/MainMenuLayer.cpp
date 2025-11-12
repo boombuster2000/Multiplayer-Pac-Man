@@ -3,7 +3,7 @@
 #include "UIComponents/TextStyle.h"
 
 MainMenuLayer::MainMenuLayer()
-	: m_menu({GetScreenWidth() / 2, GetScreenHeight() / 2}, UIComponents::AnchorPoint::MIDDLE, UIComponents::Alignment::CENTER, true, 10)
+	: m_menu({(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2}, UIComponents::AnchorPoint::MIDDLE, UIComponents::Alignment::CENTER, true, 10)
 {
 
 	UIComponents::TextStyle unselectedStyle = {50, BLACK};
