@@ -132,7 +132,25 @@ public:
         return {static_cast<T>(x / scalar), static_cast<T>(y / scalar)};
     }
 
-    // get Vector offsets funcs
+    static Vector2Ex<T> GetDirectionVector(const UIComponents::Direction &direction)
+    {
+        using enum UIComponents::Direction;
+        using namespace UIComponents;
+
+        switch (direction)
+        {
+        case UP:
+            return {0, -1};
+        case DOWN:
+            return {0, 1};
+        case LEFT:
+            return {-1, 0};
+        case RIGHT:
+            return {1, 0};
+        default:
+            return {0, 0}; // neutral / no movement
+        }
+    }
 
     Vector2Ex<T> GetShiftedVector(const UIComponents::Direction &directionOffset, const Vector2Ex<T> &offset) const
     {
