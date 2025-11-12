@@ -3,7 +3,7 @@
 
 PacMan::PacMan(Vector2Ex<float> spawnPosition, Vector2Ex<float> dimensions, float speed)
     : RenderableObject(spawnPosition), m_texture(Core::Application::GetTexturesManager()->GetTexture("pac-man")),
-      m_spawnPosition(spawnPosition), m_dimensions(dimensions), m_speed(speed), m_currentDirection(LEFT), m_queuedDirection(m_currentDirection)
+      m_spawnPosition(spawnPosition), m_dimensions(dimensions), m_speed(speed), m_rotation(0), m_lastPosition(spawnPosition), m_currentDirection(LEFT), m_queuedDirection(m_currentDirection)
 {
 }
 
@@ -20,21 +20,21 @@ UIComponents::Direction PacMan::GetQueuedDirection() const
 void PacMan::QueueDirection(UIComponents::Direction direction)
 {
     m_queuedDirection = direction;
+
+    if (IsStationary())
+        SetRotation(m_queuedDirection);
 }
 
 void PacMan::ApplyQueuedDirection()
 {
     m_currentDirection = m_queuedDirection;
+    SetRotation(m_currentDirection);
 }
 
 void PacMan::SetPosition(const Vector2Ex<float> position)
 {
+    m_lastPosition = GetWorldOrigin();
     RenderableObject::SetPosition(position);
-}
-
-void PacMan::UpdatePosition()
-{
-    Move(m_currentDirection, m_speed);
 }
 
 Vector2Ex<float> PacMan::GetNextPosition(const UIComponents::Direction &direction, const float &deltaTime) const
@@ -113,23 +113,6 @@ void PacMan::Render(Vector2Ex<float> offset) const
     using enum UIComponents::AnchorPoint;
 
     const float scale = m_dimensions.y / static_cast<float>(m_texture->height);
-    float rotation = 0;
-
-    switch (m_currentDirection)
-    {
-    case UP:
-        rotation = -90;
-        break;
-    case DOWN:
-        rotation = 90;
-        break;
-    case LEFT:
-        rotation = 180;
-        break;
-    case RIGHT:
-        rotation = 0;
-        break;
-    }
 
     const Vector2Ex<float> centerPosition = GetPositionAtAnchor(MIDDLE);
 
@@ -148,5 +131,5 @@ void PacMan::Render(Vector2Ex<float> offset) const
     // Center of rotation (pivot)
     Vector2 origin = {(textureWidth * scale) / 2.0f, (textureHeight * scale) / 2.0f};
 
-    DrawTexturePro(*m_texture, srcRect, destRect, origin, rotation, WHITE);
+    DrawTexturePro(*m_texture, srcRect, destRect, origin, m_rotation, WHITE);
 }
