@@ -4,11 +4,12 @@ namespace UIComponents
 {
 
     MenuOption::MenuOption(std::string text,
-                           TextStyle selectedStyle,
-                           TextStyle unselectedStyle,
-                           bool visible,
-                           bool isSelected) : Text(text, unselectedStyle, {0, 0}, AnchorPoint::TOP_LEFT, visible),
-                                              m_selectedStyle(selectedStyle), m_unselectedStyle(unselectedStyle), m_isSelected(isSelected)
+        TextStyle selectedStyle,
+        TextStyle unselectedStyle,
+        bool visible,
+        bool isSelected,
+        std::function<void()> callback) : Text(text, unselectedStyle, {0, 0}, AnchorPoint::TOP_LEFT, visible),
+        m_selectedStyle(selectedStyle), m_unselectedStyle(unselectedStyle), m_isSelected(isSelected), m_callback(callback)
     {
     }
 
@@ -31,4 +32,11 @@ namespace UIComponents
         return m_isSelected;
     }
 
+    void MenuOption::Select()
+    {
+        if (m_callback)
+        {
+            m_callback();
+        }
+    }
 }

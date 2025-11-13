@@ -5,6 +5,7 @@
 #include "Enums.h"
 #include "RenderableObject.h"
 #include <string>
+#include <functional>
 
 namespace UIComponents
 {
@@ -16,18 +17,21 @@ namespace UIComponents
         bool m_isSelected;
         TextStyle m_selectedStyle;
         TextStyle m_unselectedStyle;
+        std::function<void()> m_callback;
 
     public:
         MenuOption(std::string text,
                    TextStyle selectedStyle,
                    TextStyle unselectedStyle,
                    bool visible,
-                   bool isSelected);
+                   bool isSelected,
+                   std::function<void()> callback = nullptr);
 
         ~MenuOption() = default;
 
         void SetSelected(bool selected);
         bool IsSelected() const;
+        void Select();
     };
 
 }
