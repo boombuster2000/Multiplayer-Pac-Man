@@ -24,8 +24,7 @@ namespace UIComponents {
         from_json(j, static_cast<RenderableObject &>(tile));
 
         if (j.contains("dimensions"))
-            tile = GridTile(j.at("dimensions").get<Vector2Ex<float>>(),
-                            j.at("worldOrigin").get<Vector2Ex<float>>());
+            tile.SetDimensions(j.at("dimensions").get<Vector2Ex<float>>());
     }
 
 }

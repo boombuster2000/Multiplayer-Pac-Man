@@ -24,7 +24,11 @@ namespace UIComponents {
         {
             json jsonRow = json::array();
             for (const auto &tile : row)
-                jsonRow.push_back(tile);
+            {
+                json tile_j;
+                to_json(tile_j, tile);
+                jsonRow.push_back(tile_j);
+            }
             gridArray.push_back(jsonRow);
         }
 
@@ -40,14 +44,16 @@ namespace UIComponents {
     {
         static_assert(std::is_base_of<GridTile, T>::value,
                     "T must derive from UIComponents::GridTile");
+        
+        from_json(j, static_cast<RenderableObject &>(grid));
 
         auto gridSize = j.at("gridSize").get<Vector2Ex<size_t>>();
         auto tileDim = j.at("tileDimensions").get<Vector2Ex<float>>();
-        auto anchor = j.at("worldOrigin").get<Vector2Ex<float>>();
         auto spacing = j.at("spacing").get<Vector2Ex<float>>();
 
-        // Reconstruct grid
-        grid = Grid<T>(gridSize, tileDim, anchor, UIComponents::AnchorPoint::TOP_LEFT, spacing);
+        grid.SetGridSize(gridSize);
+        grid.SetTileDimensions(tileDim);
+        grid.SetSpacing(spacing);
 
         const auto &tiles = j.at("tiles");
         for (size_t y = 0; y < tiles.size(); ++y)
