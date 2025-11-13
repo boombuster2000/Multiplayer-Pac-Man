@@ -29,6 +29,7 @@ namespace UIComponents
 
 		void SelectNext();
 		void SelectPrevious();
+		void ConfirmSelection();
 
 		const MenuOption &GetSelectedOption() const;
 		int GetSelectedIndex() const;
