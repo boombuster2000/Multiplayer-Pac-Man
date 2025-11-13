@@ -1,6 +1,11 @@
 #include "UIComponents/GridTile.h"
 #include "DataTypes/Vector2Ex.h"
 
+UIComponents::GridTile::GridTile()
+    : RenderableObject(), m_dimensions(Vector2Ex<float>(0, 0))
+{
+}
+
 UIComponents::GridTile::GridTile(Vector2Ex<float> dimensions, Vector2Ex<float> position)
     : RenderableObject(position), m_dimensions(dimensions)
 {
@@ -9,6 +14,11 @@ UIComponents::GridTile::GridTile(Vector2Ex<float> dimensions, Vector2Ex<float> p
 Vector2Ex<float> UIComponents::GridTile::GetDimensions() const
 {
     return m_dimensions;
+}
+
+void UIComponents::GridTile::SetDimensions(const Vector2Ex<float>& dimensions)
+{
+    m_dimensions = dimensions;
 }
 
 void UIComponents::GridTile::Render(Vector2Ex<float> offset) const

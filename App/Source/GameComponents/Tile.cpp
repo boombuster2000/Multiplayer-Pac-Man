@@ -1,6 +1,11 @@
 #include "Tile.h"
 #include "Core/Application.h"
 
+Tile::Tile()
+:GridTile(), m_type(Tile::Type::None)
+{
+}
+
 Tile::Tile(Type type, Vector2Ex<float> position, Vector2Ex<float> dimensions)
     : GridTile(dimensions, position), m_type(type)
 {

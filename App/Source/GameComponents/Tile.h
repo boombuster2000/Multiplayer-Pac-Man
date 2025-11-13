@@ -12,20 +12,15 @@ public:
     {
         Wall,
         Path,
+        None,
     };
 
-    enum class PelletType : int
-    {
-        Pellet,
-        PowerPellet,
-        None
-    };
 
 private:
     Type m_type;
-    PelletType m_pelletType;
 
 public:
+    Tile();
     Tile(Type type, Vector2Ex<float> postion, Vector2Ex<float> dimensions);
 
     Type GetType() const;

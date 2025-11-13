@@ -28,6 +28,16 @@ namespace UIComponents
 
     public:
         template <typename... Args>
+        Grid()
+        : RenderableObject(),
+        m_tileDimensions(Vector2Ex<float>(0,0)),
+        m_spacing(Vector2Ex<float>(0,0)),
+        m_gridSize(Vector2Ex<size_t>(0,0)),
+        m_grid(GridType())
+        {
+        }
+
+        template <typename... Args>
         Grid(Vector2Ex<size_t> arraySize,
              Vector2Ex<float> tileDimensions,
              Vector2Ex<float> anchorPointPosition,
@@ -73,7 +83,7 @@ namespace UIComponents
             m_grid[y][x] = object;
         }
 
-        // Rendering and size
+        // Getters and Setters
         Vector2Ex<float> GetDimensions() const override
         {
             if (m_grid.empty() || m_grid.front().empty())
@@ -92,14 +102,35 @@ namespace UIComponents
             return m_tileDimensions;
         }
 
+        void SetTileDimensions(const Vector2Ex<float>& dimensions)
+        {
+            m_tileDimensions = dimensions;
+        }
+
         Vector2Ex<float> GetSpacing() const
         {
             return m_spacing;
         }
 
+        void SetSpacing(const Vector2Ex<float>& spacing)
+        {
+            m_spacing = spacing;
+        }
+
         Vector2Ex<size_t> GetGridSize() const
         {
             return m_gridSize;
+        }
+
+        void SetGridSize(const Vector2Ex<size_t>& gridSize)
+        {
+            m_gridSize = gridSize;
+
+            m_grid.resize(gridSize.y);
+            for (auto& row : m_grid)
+            {
+                row.resize(gridSize.x);
+            }
         }
 
         Vector2Ex<int> GetRelativeIndexFromPosition(const Vector2Ex<float> &position) const
@@ -135,6 +166,7 @@ namespace UIComponents
         {
             return m_grid[y][x];
         }
+        
         const T &GetTile(const int y, const int x) const
         {
             return m_grid[y][x];

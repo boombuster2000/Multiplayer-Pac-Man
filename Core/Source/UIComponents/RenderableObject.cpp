@@ -2,6 +2,10 @@
 
 namespace UIComponents
 {
+    RenderableObject::RenderableObject()
+    : m_worldOrigin(Vector2Ex<float>(0,0)), m_objectOrigin(Vector2Ex<float>(0, 0)), m_visible(true)
+    {
+    }
 
     RenderableObject::RenderableObject(Vector2Ex<float> anchorPointPosition, AnchorPoint anchorPoint, bool visible)
         : m_worldOrigin(anchorPointPosition), m_objectOrigin(Vector2Ex<float>(0, 0)), m_visible(visible)
