@@ -69,6 +69,14 @@ namespace UIComponents
         m_isUIupdateNeeded = true;
     }
 
+    void Menu::ConfirmSelection()
+    {
+		if (m_options.empty())
+			return;
+
+		m_options[m_selectedIndex].Select();
+	}
+
     const MenuOption &Menu::GetSelectedOption() const
     {
         if (m_options.empty())
