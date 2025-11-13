@@ -21,6 +21,6 @@ int main()
 	Core::Application application(appSpec);
 	LoadAllTextures();
 
-	application.PushLayer<MainMenuLayer>();
+	Core::Application::QueuePush<MainMenuLayer>();
 	application.Run();
 }
