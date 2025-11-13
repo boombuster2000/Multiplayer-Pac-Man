@@ -15,6 +15,8 @@ target_sources(Pac-Man
         Source/GameComponents/Board.h
         Source/GameComponents/PacMan.cpp
         Source/GameComponents/PacMan.h
+        Source/GameComponents/Tile_json.hpp
+        Source/GameComponents/TileType_json.hpp
 
 
 
