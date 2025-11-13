@@ -2,6 +2,7 @@
 #include "UIComponents/Enums.h"
 #include "UIComponents/TextStyle.h"
 #include "Core/Application.h"
+#include "Core/InputManager.h"
 #include "GameComponents/GameLayer.h"
 #include <iostream>
 
@@ -28,15 +29,17 @@ MainMenuLayer::~MainMenuLayer()
 
 void MainMenuLayer::OnUpdate(float ts)
 {
-	if (IsKeyPressed(KEY_DOWN))
+	auto inputManager = Core::Application::GetInputManager();
+
+	if (inputManager->IsAction("move_down", Core::InputState::PRESSED))
 	{
 		m_menu.SelectNext();
 	}
-	else if (IsKeyPressed(KEY_UP))
+	else if (inputManager->IsAction("move_up", Core::InputState::PRESSED))
 	{
 		m_menu.SelectPrevious();
 	}
-	else if (IsKeyPressed(KEY_ENTER))
+	else if (inputManager->IsAction("confirm", Core::InputState::PRESSED))
 	{
 		m_menu.ConfirmSelection();
 	}

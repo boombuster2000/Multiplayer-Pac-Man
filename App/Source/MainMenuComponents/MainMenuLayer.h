@@ -12,6 +12,7 @@ class MainMenuLayer : public Core::Layer
 
 private:
 	UIComponents::Menu m_menu;
+	bool m_joystickAxisUsed = false;
 
 public:
 	MainMenuLayer();

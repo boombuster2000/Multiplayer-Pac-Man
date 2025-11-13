@@ -5,6 +5,7 @@
 #include "GameLayer.h"
 #include "raylib.h"
 #include "Core/Application.h"
+#include "Core/InputManager.h"
 #include "MainMenuComponents/MainMenuLayer.h"
 
 bool GameLayer::CanMoveInDirection(const Vector2Ex<float> &position, const UIComponents::Direction &direction) const
@@ -134,22 +135,24 @@ GameLayer::GameLayer()
 void GameLayer::HandleKeyPresses()
 {
     using enum UIComponents::Direction;
-    if (IsKeyPressed(KEY_W))
+	auto inputManager = Core::Application::GetInputManager();
+
+    if (inputManager->IsAction("move_up", Core::InputState::PRESSED))
         m_pacman.QueueDirection(UP);
 
-    if (IsKeyPressed(KEY_S))
+    if (inputManager->IsAction("move_down", Core::InputState::PRESSED))
         m_pacman.QueueDirection(DOWN);
 
-    if (IsKeyPressed(KEY_A))
+    if (inputManager->IsAction("move_left", Core::InputState::PRESSED))
         m_pacman.QueueDirection(LEFT);
 
-    if (IsKeyPressed(KEY_D))
+    if (inputManager->IsAction("move_right", Core::InputState::PRESSED))
         m_pacman.QueueDirection(RIGHT);
 
     if (IsKeyPressed(KEY_F1))
         m_board.SaveToFile("./Boards/default.json");
 
-    if (IsKeyPressed(KEY_Q))
+    if (inputManager->IsAction("quit", Core::InputState::PRESSED))
         Core::Application::QueueTransition<GameLayer, MainMenuLayer>();
 }
 
