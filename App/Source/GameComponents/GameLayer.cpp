@@ -5,6 +5,7 @@
 #include "GameLayer.h"
 #include "raylib.h"
 #include "Core/Application.h"
+#include "MainMenuComponents/MainMenuLayer.h"
 
 bool GameLayer::CanMoveInDirection(const Vector2Ex<float> &position, const UIComponents::Direction &direction) const
 {
@@ -147,6 +148,9 @@ void GameLayer::HandleKeyPresses()
 
     if (IsKeyPressed(KEY_F1))
         m_board.SaveToFile("./Boards/default.json");
+
+    if (IsKeyPressed(KEY_Q))
+        Core::Application::QueueTransition<GameLayer, MainMenuLayer>();
 }
 
 void GameLayer::HandleCollisions(const float &deltaTime)
