@@ -33,12 +33,14 @@ target_sources(Core
 
         Source/Core/Application.cpp
         Source/Core/TexturesManager.cpp
+        Source/Core/InputManager.cpp
 
     PUBLIC
         Source/Core/Application.h
         Source/Core/Layer.h
         Source/Core/Event.h
         Source/Core/TexturesManager.h
+        Source/Core/InputManager.h
 
         Source/UIComponents/Enums.h
         Source/UIComponents/Menu.h
