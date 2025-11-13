@@ -26,9 +26,9 @@ namespace Core
 		s_InputManager->AddKeyboardAction("move_down", KEY_S);
 		s_InputManager->AddKeyboardAction("move_down", KEY_DOWN);
 		s_InputManager->AddKeyboardAction("move_left", KEY_A);
-		s_InputManager->AddKeyboardAction("move_left", KEY_RIGHT);
-		s_InputManager->AddKeyboardAction("move_right", KEY_D);
 		s_InputManager->AddKeyboardAction("move_left", KEY_LEFT);
+		s_InputManager->AddKeyboardAction("move_right", KEY_D);
+		s_InputManager->AddKeyboardAction("move_right", KEY_RIGHT);
 		s_InputManager->AddKeyboardAction("confirm", KEY_ENTER);
 		s_InputManager->AddKeyboardAction("quit", KEY_Q);
 
