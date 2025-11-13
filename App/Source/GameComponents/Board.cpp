@@ -20,22 +20,22 @@ Board::Board()
           Vector2Ex<float>(0, 0),
           Vector2Ex<float>(50, 50)))
 {
-    AddBoundaries();
+    // AddBoundaries();
 
-    SetTileType({5, 2}, Tile::Type::Wall);
-    SetTileType({5, 3}, Tile::Type::Wall);
-    SetTileType({4, 2}, Tile::Type::Wall);
+    // SetTileType({5, 2}, Tile::Type::Wall);
+    // SetTileType({5, 3}, Tile::Type::Wall);
+    // SetTileType({4, 2}, Tile::Type::Wall);
 
-    SetTileType({2, 5}, Tile::Type::Wall);
-    SetTileType({2, 4}, Tile::Type::Wall);
-    SetTileType({2, 3}, Tile::Type::Wall);
-    SetTileType({2, 2}, Tile::Type::Wall);
+    // SetTileType({2, 5}, Tile::Type::Wall);
+    // SetTileType({2, 4}, Tile::Type::Wall);
+    // SetTileType({2, 3}, Tile::Type::Wall);
+    // SetTileType({2, 2}, Tile::Type::Wall);
 
-    SetTileType({3, 5}, Tile::Type::Wall);
-    SetTileType({4, 5}, Tile::Type::Wall);
-    SetTileType({5, 5}, Tile::Type::Wall);
+    // SetTileType({3, 5}, Tile::Type::Wall);
+    // SetTileType({4, 5}, Tile::Type::Wall);
+    // SetTileType({5, 5}, Tile::Type::Wall);
 
-    SetTileType({3, 4}, Tile::Type::Wall);
+    // SetTileType({3, 4}, Tile::Type::Wall);
 }
 
 void Board::SetTileType(const Vector2Ex<int> &index, const Tile::Type &type)
@@ -57,6 +57,17 @@ void Board::SaveToFile(const std::string &filename) const
 
 Board Board::LoadFromFile(const std::string &filename)
 {
+    std::ifstream file(filename);
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Could not open file: " + filename);
+    }
+
+    json j;
+    file >> j;
+    file.close();
+    Board board = j.get<Board>();
+    return board;
 }
 
 void Board::AddBoundaries()
