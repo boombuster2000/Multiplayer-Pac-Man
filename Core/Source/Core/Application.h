@@ -2,6 +2,7 @@
 
 #include "Layer.h"
 #include "TexturesManager.h"
+#include "InputManager.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -11,6 +12,7 @@
 
 namespace Core
 {
+	class InputManager;
 
 	struct ApplicationSpecification
 	{
@@ -53,6 +55,7 @@ namespace Core
 		~Application();
 
 		static std::shared_ptr<TexturesManager> GetTexturesManager();
+		static std::shared_ptr<InputManager> GetInputManager();
 
 		void Run();
 		void Stop();

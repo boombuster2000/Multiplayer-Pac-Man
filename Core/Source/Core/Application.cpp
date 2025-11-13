@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "InputManager.h"
 #include <iostream>
 #include <raylib.h>
 #include <cassert>
@@ -9,6 +10,7 @@ namespace Core
 
 	static Application *s_Application = nullptr;
 	static std::shared_ptr<TexturesManager> s_TexturesManager = nullptr;
+	static std::shared_ptr<InputManager> s_InputManager = nullptr;
 	std::queue<LayerAction> Application::s_PendingActions;
 
 	Application::Application(const ApplicationSpecification &specification)
@@ -16,6 +18,31 @@ namespace Core
 	{
 		s_Application = this;
 		s_TexturesManager = std::make_shared<TexturesManager>();
+		s_InputManager = std::make_shared<InputManager>();
+
+		// Keyboard
+		s_InputManager->AddKeyboardAction("move_up", KEY_W);
+		s_InputManager->AddKeyboardAction("move_up", KEY_UP);
+		s_InputManager->AddKeyboardAction("move_down", KEY_S);
+		s_InputManager->AddKeyboardAction("move_down", KEY_DOWN);
+		s_InputManager->AddKeyboardAction("move_left", KEY_A);
+		s_InputManager->AddKeyboardAction("move_left", KEY_RIGHT);
+		s_InputManager->AddKeyboardAction("move_right", KEY_D);
+		s_InputManager->AddKeyboardAction("move_left", KEY_LEFT);
+		s_InputManager->AddKeyboardAction("confirm", KEY_ENTER);
+		s_InputManager->AddKeyboardAction("quit", KEY_Q);
+
+		// Gamepad
+		s_InputManager->AddGamepadButtonAction("move_up", GAMEPAD_BUTTON_LEFT_FACE_UP, 0);
+		s_InputManager->AddGamepadButtonAction("move_down", GAMEPAD_BUTTON_LEFT_FACE_DOWN, 0);
+		s_InputManager->AddGamepadButtonAction("move_left", GAMEPAD_BUTTON_LEFT_FACE_LEFT, 0);
+		s_InputManager->AddGamepadButtonAction("move_right", GAMEPAD_BUTTON_LEFT_FACE_RIGHT, 0);
+		s_InputManager->AddGamepadButtonAction("confirm", GAMEPAD_BUTTON_RIGHT_FACE_DOWN, 0);
+
+		s_InputManager->AddGamepadAxisAction("move_up", GAMEPAD_AXIS_LEFT_Y, 0, false);
+		s_InputManager->AddGamepadAxisAction("move_down", GAMEPAD_AXIS_LEFT_Y, 0, true);
+		s_InputManager->AddGamepadAxisAction("move_left", GAMEPAD_AXIS_LEFT_X, 0, false);
+		s_InputManager->AddGamepadAxisAction("move_right", GAMEPAD_AXIS_LEFT_X, 0, true);
 
 		InitWindow(specification.Width, specification.Height, specification.Name.c_str());
 		if (specification.targetFPS > 0)
@@ -33,6 +60,11 @@ namespace Core
 		return s_TexturesManager;
 	}
 
+	std::shared_ptr<InputManager> Application::GetInputManager()
+	{
+		return s_InputManager;
+	}
+
 	void Application::Run()
 	{
 		m_Running = true;
@@ -47,6 +79,8 @@ namespace Core
 				Stop();
 				break;
 			}
+
+			s_InputManager->Update();
 
 			ProcessPendingActions();
 
