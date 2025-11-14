@@ -18,6 +18,9 @@ target_sources(Pac-Man
         Source/GameComponents/Tile_json.hpp
         Source/GameComponents/TileType_json.hpp
 
+        Source/GameOptionsComponents/GameOptionsLayer.cpp
+        Source/GameOptionsComponents/GameOptionsLayer.h
+
 
 
         Source/Main.cpp
