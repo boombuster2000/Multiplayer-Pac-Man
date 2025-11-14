@@ -1,6 +1,6 @@
 #include "Core/Application.h"
-
 #include "MainMenuLayer/MainMenuLayer.h"
+#include "OverlayLayer/OverlayLayer.h"
 
 void LoadAllTextures()
 {
@@ -21,6 +21,7 @@ int main()
 	Core::Application application(appSpec);
 	LoadAllTextures();
 
+	Core::Application::QueuePush<OverlayLayer>();
 	Core::Application::QueuePush<MainMenuLayer>();
 	application.Run();
 }
