@@ -1,109 +1,105 @@
 #pragma once
 
+#include "InputManager.h"
 #include "Layer.h"
 #include "TexturesManager.h"
-#include "InputManager.h"
-#include <vector>
-#include <string>
+#include <functional>
 #include <memory>
 #include <queue>
-#include <functional>
+#include <string>
 #include <typeindex>
+#include <vector>
 
 namespace Core
 {
-	class InputManager;
+class InputManager;
 
-	struct ApplicationSpecification
-	{
-		std::string Name = "Raylib Application";
+struct ApplicationSpecification
+{
+    std::string Name = "Raylib Application";
 
-		uint32_t Width = 1280;
-		uint32_t Height = 720;
-		int targetFPS = 60;
-		KeyboardKey programExitKey = KEY_ESCAPE;
-	};
+    uint32_t Width = 1280;
+    uint32_t Height = 720;
+    int targetFPS = 60;
 
-	enum class LayerActionType
-	{
-		Push,
-		Pop,
-		Transition
-	};
+    KeyboardKey programExitKey = KEY_ESCAPE;
+};
 
-	struct LayerAction
-	{
-		LayerActionType Type;
-		std::type_index FromType = std::type_index(typeid(void));
-		std::function<std::unique_ptr<Layer>()> ToFactory = nullptr;
-	};
+enum class LayerActionType
+{
+    Push,
+    Pop,
+    Transition
+};
 
-	class Application
-	{
-	private:
-		ApplicationSpecification m_Specification;
-		bool m_Running = false;
+struct LayerAction
+{
+    LayerActionType Type;
+    std::type_index FromType = std::type_index(typeid(void));
+    std::unique_ptr<Layer> ToLayer = nullptr;
+};
 
-		std::vector<std::unique_ptr<Layer>> m_LayerStack;
+class Application
+{
+  private:
+    ApplicationSpecification m_Specification;
+    bool m_Running = false;
 
-		static std::queue<LayerAction> s_PendingActions;
+    std::vector<std::unique_ptr<Layer>> m_LayerStack;
 
-		void ProcessPendingActions();
+    static std::queue<LayerAction> s_PendingActions;
 
-	public:
-		Application(const ApplicationSpecification &specification = ApplicationSpecification());
-		~Application();
+    void ProcessPendingActions();
 
-		static std::shared_ptr<TexturesManager> GetTexturesManager();
-		static std::shared_ptr<InputManager> GetInputManager();
+  public:
+    Application(const ApplicationSpecification &specification = ApplicationSpecification());
+    ~Application();
 
-		void Run();
-		void Stop();
+    static std::shared_ptr<TexturesManager> GetTexturesManager();
+    static std::shared_ptr<InputManager> GetInputManager();
 
-		template <typename TLayer>
-		static void QueuePush()
-		{
-			static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
-			s_PendingActions.push({LayerActionType::Push,
-								   std::type_index(typeid(void)),
-								   []()
-								   { return std::make_unique<TLayer>(); }});
-		}
+    void Run();
+    void Stop();
 
-		template <typename TLayer>
-		static void QueuePop()
-		{
-			static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
-			s_PendingActions.push({LayerActionType::Pop, std::type_index(typeid(TLayer)), nullptr});
-		}
+    static void QueuePush(std::unique_ptr<Layer> layer);
 
-		template <typename TFrom, typename TTo>
-		static void QueueTransition()
-		{
-			static_assert(std::is_base_of_v<Layer, TFrom>, "TFrom must derive from Layer");
-			static_assert(std::is_base_of_v<Layer, TTo>, "TTo must derive from Layer");
+    static void QueuePop(std::type_index layerType);
 
-			s_PendingActions.push({LayerActionType::Transition,
-								   std::type_index(typeid(TFrom)),
-								   []()
-								   { return std::make_unique<TTo>(); }});
-		}
+    template <typename TLayer> static void QueuePop()
+    {
+        static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
+        QueuePop(std::type_index(typeid(TLayer)));
+    }
 
-		static Application &Get();
+    static void QueueTransition(std::type_index fromType, std::unique_ptr<Layer> toLayer);
 
-		template <typename TLayer>
-		TLayer *GetLayer()
-		{
-			static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
-			for (const auto &layer : m_LayerStack)
-			{
-				if (typeid(*layer) == typeid(TLayer))
-				{
-					return static_cast<TLayer *>(layer.get());
-				}
-			}
-			return nullptr;
-		}
-	};
+    static Application &Get();
 
+    template <typename TLayer> TLayer *GetLayer()
+    {
+        static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
+        for (const auto &layer : m_LayerStack)
+        {
+            if (typeid(*layer) == typeid(TLayer))
+            {
+                return static_cast<TLayer *>(layer.get());
+            }
+        }
+        return nullptr;
+    }
+};
+
+// Template implementations for Layer transition methods
+template <typename TLayer> void Layer::TransitionTo(std::unique_ptr<TLayer> layer)
+{
+    static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
+    Application::QueueTransition(GetTypeIndex(), std::move(layer));
 }
+
+template <typename TLayer> void Layer::Push(std::unique_ptr<TLayer> layer)
+{
+    static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
+    Application::QueuePush(std::move(layer));
+}
+
+} // namespace Core

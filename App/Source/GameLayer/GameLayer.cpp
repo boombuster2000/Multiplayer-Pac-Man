@@ -1,13 +1,14 @@
+#include "GameLayer.h"
+
+#include <array>
 #include <iostream>
 #include <stdexcept>
-#include <array>
 
-#include "GameLayer.h"
-#include "raylib.h"
 #include "Core/Application.h"
 #include "Core/InputManager.h"
-#include "MainMenuLayer/MainMenuLayer.h"
 #include "GameOptionsMenuLayer/GameOptionsMenuLayer.h"
+#include "MainMenuLayer/MainMenuLayer.h"
+#include "raylib.h"
 
 bool GameLayer::CanMoveInDirection(const Vector2Ex<float> &position, const UIComponents::Direction &direction) const
 {
@@ -45,18 +46,15 @@ bool GameLayer::CanMoveInDirection(const Vector2Ex<float> &position, const UICom
     return true;
 }
 
-Vector2Ex<float> GameLayer::GetNextValidPacmanPosition(
-    Vector2Ex<float> start,
-    Vector2Ex<float> end,
-    UIComponents::Direction direction)
+Vector2Ex<float> GameLayer::GetNextValidPacmanPosition(Vector2Ex<float> start, Vector2Ex<float> end,
+                                                       UIComponents::Direction direction)
 {
     using namespace UIComponents;
     const Vector2Ex<float> movementDelta = end - start;
 
     // Number of intermediate steps to check
-    float steps = (direction == Direction::UP || direction == Direction::DOWN)
-                      ? std::abs(movementDelta.y)
-                      : std::abs(movementDelta.x);
+    float steps = (direction == Direction::UP || direction == Direction::DOWN) ? std::abs(movementDelta.y)
+                                                                               : std::abs(movementDelta.x);
 
     Vector2Ex<float> nextValidPosition = start;
 
@@ -100,7 +98,6 @@ Vector2Ex<float> GameLayer::GetNextValidPacmanPosition(
         UIComponents::Direction queuedDir = m_pacman.GetQueuedDirection();
         if (queuedDir != direction)
         {
-
             Vector2Ex<float> peekPosition = intermediatePosition + Vector2Ex<float>::GetDirectionVector(queuedDir);
             if (CanMoveInDirection(peekPosition, queuedDir))
             {
@@ -133,6 +130,12 @@ GameLayer::GameLayer()
 {
 }
 
+GameLayer::GameLayer(const std::string &boardPath)
+    : m_board(Board::LoadFromFile(boardPath)),
+      m_pacman(m_board.GetPositionFromIndex(Vector2Ex<int>(1, 1)), Vector2Ex<float>(50, 50), 400)
+{
+}
+
 void GameLayer::HandleKeyPresses()
 {
     using enum UIComponents::Direction;
@@ -156,23 +159,22 @@ void GameLayer::HandleKeyPresses()
     if (inputManager->IsAction("pause", Core::InputState::PRESSED))
     {
         SuspendUpdate();
-        Core::Application::QueuePush<GameOptionsMenuLayer>();
+        Push(std::make_unique<GameOptionsMenuLayer>());
     }
 }
 
 void GameLayer::HandleCollisions(const float &deltaTime)
 {
-
     const Vector2Ex<float> currentPosition = m_pacman.GetPositionAtAnchor();
     const Vector2Ex<float> nextPosition = m_pacman.GetNextPosition(m_pacman.GetCurrentDirection(), deltaTime);
 
-    const Vector2Ex<float> validNextPosition = GetNextValidPacmanPosition(currentPosition, nextPosition, m_pacman.GetCurrentDirection());
+    const Vector2Ex<float> validNextPosition =
+        GetNextValidPacmanPosition(currentPosition, nextPosition, m_pacman.GetCurrentDirection());
     m_pacman.SetPosition(validNextPosition);
 }
 
 void GameLayer::OnUpdate(float ts)
 {
-
     HandleKeyPresses();
     HandleCollisions(ts);
 }
