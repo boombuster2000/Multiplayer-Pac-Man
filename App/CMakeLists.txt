@@ -1,31 +1,15 @@
 # Define App as an executable
 add_executable(Pac-Man)
 
+# Automatically find all source files
+file(GLOB_RECURSE APP_SOURCES "Source/*.cpp")
+file(GLOB_RECURSE APP_HEADERS "Source/*.h" "Source/*.hpp")
+
 # Specify source files for the executable
 target_sources(Pac-Man
     PRIVATE
-        Source/MainMenuLayer/MainMenuLayer.cpp
-        Source/MainMenuLayer/MainMenuLayer.h
-
-        Source/GameLayer/GameLayer.cpp
-        Source/GameLayer/GameLayer.h
-
-        Source/GameComponents/Tile.cpp
-        Source/GameComponents/Tile.h
-        Source/GameComponents/Board.cpp
-        Source/GameComponents/Board.h
-        Source/GameComponents/PacMan.cpp
-        Source/GameComponents/PacMan.h
-        Source/GameComponents/Tile_json.hpp
-        Source/GameComponents/TileType_json.hpp
-
-        Source/GameOptionsMenuLayer/GameOptionsMenuLayer.cpp
-        Source/GameOptionsMenuLayer/GameOptionsMenuLayer.h
-
-        Source/OverlayLayer/OverlayLayer.cpp
-        Source/OverlayLayer/OverlayLayer.h
-
-        Source/Main.cpp
+        ${APP_SOURCES}
+        ${APP_HEADERS}
 )
 
 # Add include directory for App-specific headers

@@ -23,41 +23,15 @@ FetchContent_MakeAvailable(nlohmann_json)
 # --- Define Core Library ---
 add_library(Core STATIC)
 
+# Automatically find all source files
+file(GLOB_RECURSE CORE_SOURCES "Source/*.cpp")
+file(GLOB_RECURSE CORE_HEADERS "Source/*.h" "Source/*.hpp")
+
 target_sources(Core
     PRIVATE
-        Source/UIComponents/Menu.cpp
-        Source/UIComponents/MenuOption.cpp
-        Source/UIComponents/RenderableObject.cpp
-        Source/UIComponents/Text.cpp
-        Source/UIComponents/GridTile.cpp
-
-        Source/Core/Application.cpp
-        Source/Core/TexturesManager.cpp
-        Source/Core/InputManager.cpp
-
+        ${CORE_SOURCES}
     PUBLIC
-        Source/Core/Application.h
-        Source/Core/Layer.h
-        Source/Core/Event.h
-        Source/Core/TexturesManager.h
-        Source/Core/InputManager.h
-
-        Source/UIComponents/Enums.h
-        Source/UIComponents/Menu.h
-        Source/UIComponents/MenuOption.h
-        Source/UIComponents/RenderableObject.h
-        Source/UIComponents/Text.h
-        Source/UIComponents/Grid.h
-        Source/UIComponents/GridTile.h
-
-        Source/DataTypes/Vector2Ex.h
-
-        Source/Serialization/Enums_json.hpp
-        Source/Serialization/Grid_json.hpp
-        Source/Serialization/GridTile_json.hpp
-        Source/Serialization/JsonConverters.hpp 
-        Source/Serialization/RenderableObject_json.hpp
-        Source/Serialization/Vector2Ex_json.hpp
+        ${CORE_HEADERS}
 )
 
 target_include_directories(Core
