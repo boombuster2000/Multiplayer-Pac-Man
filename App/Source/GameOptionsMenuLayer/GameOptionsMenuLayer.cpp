@@ -49,6 +49,15 @@ void GameOptionsMenuLayer::OnUpdate(float ts)
     {
         m_menu.ConfirmSelection();
     }
+    else if (inputManager->IsAction("pause", Core::InputState::PRESSED))
+    {
+        GameLayer *gameLayer = Core::Application::Get().GetLayer<GameLayer>();
+        if (gameLayer)
+        {
+            gameLayer->Resume();
+            Core::Application::QueuePop<GameOptionsMenuLayer>();
+        }
+    }
 
     if (m_menu.IsUIUpdateNeeded())
     {
