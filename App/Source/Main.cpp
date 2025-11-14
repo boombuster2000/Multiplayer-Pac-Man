@@ -17,6 +17,7 @@ int main()
 	appSpec.Width = 1280;
 	appSpec.Height = 720;
 	appSpec.targetFPS = 120;
+	appSpec.programExitKey = KEY_NULL;
 
 	Core::Application application(appSpec);
 	LoadAllTextures();
