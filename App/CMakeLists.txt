@@ -22,7 +22,8 @@ target_sources(Pac-Man
         Source/GameOptionsMenuLayer/GameOptionsMenuLayer.cpp
         Source/GameOptionsMenuLayer/GameOptionsMenuLayer.h
 
-
+        Source/OverlayLayer/OverlayLayer.cpp
+        Source/OverlayLayer/OverlayLayer.h
 
         Source/Main.cpp
 )
