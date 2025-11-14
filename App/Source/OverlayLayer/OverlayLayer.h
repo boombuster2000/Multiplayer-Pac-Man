@@ -4,7 +4,7 @@
 
 class OverlayLayer : public Core::Layer
 {
-public:
+  public:
     OverlayLayer();
     virtual void OnRender() override;
 };

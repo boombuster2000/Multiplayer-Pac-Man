@@ -1,9 +1,9 @@
 #pragma once
-#include <concepts>
-#include <cmath>
-#include <type_traits>
-#include "raylib.h"
 #include "UIComponents/Enums.h"
+#include "raylib.h"
+#include <cmath>
+#include <concepts>
+#include <type_traits>
 
 template <typename T>
 concept NumberLike = requires(T a, T b) {
@@ -17,7 +17,7 @@ concept NumberLike = requires(T a, T b) {
     // Binary operators
     { a + b } -> std::convertible_to<T>;
     { a - b } -> std::convertible_to<T>;
-    { a * b } -> std::convertible_to<T>;
+    { a *b } -> std::convertible_to<T>;
     { a / b } -> std::convertible_to<T>;
     { a == b } -> std::convertible_to<bool>;
 
@@ -25,22 +25,19 @@ concept NumberLike = requires(T a, T b) {
     { std::sqrt(a) } -> std::convertible_to<T>;
 };
 
-template <NumberLike T>
-class Vector2Ex
+template <NumberLike T> class Vector2Ex
 {
-public:
+  public:
     T x;
     T y;
 
-public:
+  public:
     // Constructors/Deconstructors
-    constexpr Vector2Ex(T x = 0, T y = 0)
-        : x(x), y(y)
+    constexpr Vector2Ex(T x = 0, T y = 0) : x(x), y(y)
     {
     }
 
-    constexpr Vector2Ex(const Vector2 &v)
-        : x(static_cast<T>(v.x)), y(static_cast<T>(v.y))
+    constexpr Vector2Ex(const Vector2 &v) : x(static_cast<T>(v.x)), y(static_cast<T>(v.y))
     {
     }
 
@@ -120,14 +117,12 @@ public:
     }
 
     // Scalar operators
-    template <NumberLike U>
-    constexpr Vector2Ex operator*(const U &scalar) const
+    template <NumberLike U> constexpr Vector2Ex operator*(const U &scalar) const
     {
         return {static_cast<T>(x * scalar), static_cast<T>(y * scalar)};
     }
 
-    template <NumberLike U>
-    constexpr Vector2Ex operator/(const U &scalar) const
+    template <NumberLike U> constexpr Vector2Ex operator/(const U &scalar) const
     {
         return {static_cast<T>(x / scalar), static_cast<T>(y / scalar)};
     }

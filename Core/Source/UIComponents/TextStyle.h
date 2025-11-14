@@ -5,9 +5,9 @@
 namespace UIComponents
 {
 
-    struct TextStyle
-    {
-        float fontSize;
-        Color color;
-    };
-}
+struct TextStyle
+{
+    float fontSize;
+    Color color;
+};
+} // namespace UIComponents

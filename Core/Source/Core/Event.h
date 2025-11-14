@@ -3,8 +3,8 @@
 namespace Core
 {
 
-	class Event
-	{
-	};
+class Event
+{
+};
 
-}
+} // namespace Core

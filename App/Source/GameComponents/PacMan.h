@@ -1,12 +1,12 @@
-#include <memory>
-#include "raylib.h"
-#include "UIComponents/RenderableObject.h"
-#include "UIComponents/Enums.h"
 #include "DataTypes/Vector2Ex.h"
+#include "UIComponents/Enums.h"
+#include "UIComponents/RenderableObject.h"
+#include "raylib.h"
+#include <memory>
 
 class PacMan : public UIComponents::RenderableObject
 {
-private:
+  private:
     using enum UIComponents::Direction;
     std::shared_ptr<Texture2D> m_texture;
     Vector2Ex<float> m_spawnPosition;
@@ -17,7 +17,7 @@ private:
     UIComponents::Direction m_currentDirection;
     UIComponents::Direction m_queuedDirection;
 
-private:
+  private:
     void SetRotation(const UIComponents::Direction &direction)
     {
         switch (direction)
@@ -39,7 +39,7 @@ private:
         }
     }
 
-public:
+  public:
     PacMan(Vector2Ex<float> spawnPosition, Vector2Ex<float> dimensions, float speed);
     ~PacMan() = default;
 

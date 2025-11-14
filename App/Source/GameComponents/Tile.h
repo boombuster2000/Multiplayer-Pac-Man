@@ -1,13 +1,13 @@
 #pragma once
-#include <memory>
-#include "raylib.h"
-#include "UIComponents/GridTile.h"
 #include "DataTypes/Vector2Ex.h"
+#include "UIComponents/GridTile.h"
+#include "raylib.h"
+#include <memory>
 
 class Tile : public UIComponents::GridTile
 {
 
-public:
+  public:
     enum class Type : int
     {
         Wall,
@@ -15,11 +15,10 @@ public:
         None,
     };
 
-
-private:
+  private:
     Type m_type;
 
-public:
+  public:
     Tile();
     Tile(Type type, Vector2Ex<float> postion, Vector2Ex<float> dimensions);
 

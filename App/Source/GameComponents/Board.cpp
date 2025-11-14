@@ -3,24 +3,17 @@
 
 #include "Board.h"
 #include "Core/Application.h"
-#include "UIComponents/Enums.h"
-#include "Tile_json.hpp"
 #include "Serialization/JsonConverters.hpp"
+#include "Tile_json.hpp"
+#include "UIComponents/Enums.h"
 #include <nlohmann/json.hpp>
-
 
 using json = nlohmann::json;
 
 Board::Board()
-    : Grid(UIComponents::Grid<Tile>(
-          Vector2Ex<size_t>(8, 8),
-          Vector2Ex<float>(50, 50),
-          Vector2Ex<float>(10, 10),
-          UIComponents::AnchorPoint::TOP_LEFT,
-          Vector2Ex<float>(0, 0),
-          Tile::Type::Path,
-          Vector2Ex<float>(0, 0),
-          Vector2Ex<float>(50, 50)))
+    : Grid(UIComponents::Grid<Tile>(Vector2Ex<size_t>(8, 8), Vector2Ex<float>(50, 50), Vector2Ex<float>(10, 10),
+                                    UIComponents::AnchorPoint::TOP_LEFT, Vector2Ex<float>(0, 0), Tile::Type::Path,
+                                    Vector2Ex<float>(0, 0), Vector2Ex<float>(50, 50)))
 {
     // AddBoundaries();
 
@@ -74,17 +67,17 @@ Board Board::LoadFromFile(const std::string &filename)
 
 void Board::AddBoundaries()
 {
-    const Vector2Ex<size_t>& boardSize = GetGridSize();
+    const Vector2Ex<size_t> &boardSize = GetGridSize();
 
     for (int x = 0; x < boardSize.x; x++)
     {
-        GetTile(0,x).SetType(Tile::Type::Wall);
-        GetTile(boardSize.y - 1,x).SetType(Tile::Type::Wall);
+        GetTile(0, x).SetType(Tile::Type::Wall);
+        GetTile(boardSize.y - 1, x).SetType(Tile::Type::Wall);
     }
 
     for (int y = 0; y < boardSize.y; y++)
     {
-        GetTile(y,0).SetType(Tile::Type::Wall);
-        GetTile(y,boardSize.x - 1).SetType(Tile::Type::Wall);
+        GetTile(y, 0).SetType(Tile::Type::Wall);
+        GetTile(y, boardSize.x - 1).SetType(Tile::Type::Wall);
     }
 }

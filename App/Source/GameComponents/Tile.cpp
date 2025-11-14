@@ -1,8 +1,7 @@
 #include "Tile.h"
 #include "Core/Application.h"
 
-Tile::Tile()
-:GridTile(), m_type(Tile::Type::None)
+Tile::Tile() : GridTile(), m_type(Tile::Type::None)
 {
 }
 

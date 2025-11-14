@@ -1,12 +1,12 @@
 #pragma once
-#include <string>
 #include "Tile.h"
 #include <nlohmann/json.hpp>
+#include <string>
 
 using json = nlohmann::json;
 
-inline void to_json(json &j, const Tile::Type&v) 
-{ 
+inline void to_json(json &j, const Tile::Type &v)
+{
     switch (v)
     {
     case Tile::Type::Wall:
@@ -21,10 +21,11 @@ inline void to_json(json &j, const Tile::Type&v)
     }
 }
 
-inline void from_json(const json &j, Tile::Type &v) {
-    
-    const auto& s = j.get<std::string>();
-    
+inline void from_json(const json &j, Tile::Type &v)
+{
+
+    const auto &s = j.get<std::string>();
+
     if (s == "Wall")
         v = Tile::Type::Wall;
 

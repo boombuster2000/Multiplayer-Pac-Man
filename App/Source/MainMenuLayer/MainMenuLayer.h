@@ -6,14 +6,14 @@
 class MainMenuLayer : public Core::Layer
 {
 
-private:
-	UIComponents::Menu m_menu;
-	bool m_joystickAxisUsed = false;
+  private:
+    UIComponents::Menu m_menu;
+    bool m_joystickAxisUsed = false;
 
-public:
-	MainMenuLayer();
-	virtual ~MainMenuLayer();
+  public:
+    MainMenuLayer();
+    virtual ~MainMenuLayer();
 
-	virtual void OnUpdate(float ts) override;
-	virtual void OnRender() override;
+    virtual void OnUpdate(float ts) override;
+    virtual void OnRender() override;
 };

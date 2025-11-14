@@ -5,10 +5,10 @@
 
 class GameOptionsMenuLayer : public Core::Layer
 {
-private:
+  private:
     UIComponents::Menu m_menu;
 
-public:
+  public:
     GameOptionsMenuLayer();
     virtual ~GameOptionsMenuLayer();
 
