@@ -103,9 +103,6 @@ namespace Core
 					layer->OnRender();
 			}
 
-			if (m_Specification.drawFPS)
-				DrawFPS(GetScreenWidth() - 100, 10);
-
 			EndDrawing();
 		}
 	}
