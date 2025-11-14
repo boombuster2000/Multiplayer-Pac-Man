@@ -22,6 +22,7 @@ namespace Core
 		uint32_t Height = 720;
 		int targetFPS = 60;
 		bool drawFPS = true;
+		KeyboardKey programExitKey = KEY_ESCAPE;
 	};
 
 	enum class LayerActionType
@@ -104,7 +105,6 @@ namespace Core
 			}
 			return nullptr;
 		}
-
 	};
 
 }

@@ -45,6 +45,8 @@ namespace Core
 		s_InputManager->AddGamepadAxisAction("move_right", GAMEPAD_AXIS_LEFT_X, 0, true);
 
 		InitWindow(specification.Width, specification.Height, specification.Name.c_str());
+		SetExitKey(specification.programExitKey);
+
 		if (specification.targetFPS > 0)
 			SetTargetFPS(specification.targetFPS);
 	}
@@ -86,13 +88,19 @@ namespace Core
 
 			// Main layer update here
 			for (const std::unique_ptr<Layer> &layer : m_LayerStack)
-				layer->OnUpdate(GetFrameTime());
+			{
+				if (layer->GetState() == Layer::State::Active)
+					layer->OnUpdate(GetFrameTime());
+			}
 
 			BeginDrawing();
 
 			// NOTE: rendering can be done elsewhere (eg. render thread)
 			for (const std::unique_ptr<Layer> &layer : m_LayerStack)
-				layer->OnRender();
+			{
+				if (layer->GetState() != Layer::State::Suspended_UpdateAndRender)
+					layer->OnRender();
+			}
 
 			if (m_Specification.drawFPS)
 				DrawFPS(GetScreenWidth() - 100, 10);
@@ -122,10 +130,10 @@ namespace Core
 			case LayerActionType::Pop:
 			{
 				auto it = std::find_if(m_LayerStack.begin(), m_LayerStack.end(),
-								   [&](const std::unique_ptr<Layer> &layer)
-								   {
-									   return std::type_index(typeid(*layer)) == action.FromType;
-								   });
+									   [&](const std::unique_ptr<Layer> &layer)
+									   {
+										   return std::type_index(typeid(*layer)) == action.FromType;
+									   });
 				if (it != m_LayerStack.end())
 					m_LayerStack.erase(it);
 			}
@@ -134,10 +142,10 @@ namespace Core
 			case LayerActionType::Transition:
 			{
 				auto it = std::find_if(m_LayerStack.begin(), m_LayerStack.end(),
-								   [&](const std::unique_ptr<Layer> &layer)
-								   {
-									   return std::type_index(typeid(*layer)) == action.FromType;
-								   });
+									   [&](const std::unique_ptr<Layer> &layer)
+									   {
+										   return std::type_index(typeid(*layer)) == action.FromType;
+									   });
 				if (it != m_LayerStack.end())
 					*it = action.ToFactory();
 			}
