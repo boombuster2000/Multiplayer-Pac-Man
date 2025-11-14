@@ -50,7 +50,5 @@ void MainMenuLayer::OnUpdate(float ts)
 
 void MainMenuLayer::OnRender()
 {
-	ClearBackground(WHITE);
-
 	m_menu.Render();
 }
