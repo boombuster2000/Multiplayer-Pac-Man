@@ -7,6 +7,7 @@
 #include "Core/Application.h"
 #include "Core/InputManager.h"
 #include "MainMenuComponents/MainMenuLayer.h"
+#include "GameOptionsComponents/GameOptionsLayer.h"
 
 bool GameLayer::CanMoveInDirection(const Vector2Ex<float> &position, const UIComponents::Direction &direction) const
 {
@@ -135,7 +136,7 @@ GameLayer::GameLayer()
 void GameLayer::HandleKeyPresses()
 {
     using enum UIComponents::Direction;
-	auto inputManager = Core::Application::GetInputManager();
+    auto inputManager = Core::Application::GetInputManager();
 
     if (inputManager->IsAction("move_up", Core::InputState::PRESSED))
         m_pacman.QueueDirection(UP);
@@ -154,6 +155,12 @@ void GameLayer::HandleKeyPresses()
 
     if (inputManager->IsAction("quit", Core::InputState::PRESSED))
         Core::Application::QueueTransition<GameLayer, MainMenuLayer>();
+
+    if (IsKeyPressed(KEY_ESCAPE))
+    {
+        SuspendUpdateAndRender();
+        Core::Application::QueuePush<GameOptionsLayer>();
+    }
 }
 
 void GameLayer::HandleCollisions(const float &deltaTime)
