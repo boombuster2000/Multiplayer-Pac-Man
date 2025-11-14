@@ -6,8 +6,8 @@
 #include "raylib.h"
 #include "Core/Application.h"
 #include "Core/InputManager.h"
-#include "MainMenuComponents/MainMenuLayer.h"
-#include "GameOptionsComponents/GameOptionsLayer.h"
+#include "MainMenuLayer/MainMenuLayer.h"
+#include "GameOptionsMenuLayer/GameOptionsMenuLayer.h"
 
 bool GameLayer::CanMoveInDirection(const Vector2Ex<float> &position, const UIComponents::Direction &direction) const
 {
@@ -159,7 +159,7 @@ void GameLayer::HandleKeyPresses()
     if (IsKeyPressed(KEY_ESCAPE))
     {
         SuspendUpdateAndRender();
-        Core::Application::QueuePush<GameOptionsLayer>();
+        Core::Application::QueuePush<GameOptionsMenuLayer>();
     }
 }
 

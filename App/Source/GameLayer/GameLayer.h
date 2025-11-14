@@ -2,8 +2,8 @@
 #include "Core/Layer.h"
 #include "Core/TexturesManager.h"
 #include "UIComponents/Enums.h"
-#include "Board.h"
-#include "PacMan.h"
+#include "GameComponents/Board.h"
+#include "GameComponents/PacMan.h"
 
 class GameLayer : public Core::Layer
 {

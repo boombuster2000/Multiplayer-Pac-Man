@@ -1,10 +1,10 @@
-#include "GameOptionsLayer.h"
-#include "GameComponents/GameLayer.h"
-#include "MainMenuComponents/MainMenuLayer.h"
+#include "GameOptionsMenuLayer.h"
+#include "GameLayer/GameLayer.h"
+#include "MainMenuLayer/MainMenuLayer.h"
 #include "Core/Application.h"
 #include "Core/InputManager.h"
 
-GameOptionsLayer::GameOptionsLayer()
+GameOptionsMenuLayer::GameOptionsMenuLayer()
     : m_menu({(float)GetScreenWidth() / 2,
               (float)GetScreenHeight() / 2},
              UIComponents::AnchorPoint::MIDDLE,
@@ -20,7 +20,7 @@ GameOptionsLayer::GameOptionsLayer()
                                     if (gameLayer)
                                     {
                                         gameLayer->Resume();
-                                        Core::Application::QueuePop<GameOptionsLayer>();
+                                        Core::Application::QueuePop<GameOptionsMenuLayer>();
                                     } }));
 
     m_menu.AddOption(MenuOption("Options", selectedStyle, unselectedStyle, true, false));
@@ -28,12 +28,12 @@ GameOptionsLayer::GameOptionsLayer()
     m_menu.AddOption(MenuOption("Return To Menu", selectedStyle, unselectedStyle, true, false, []()
                                 { 
                                     Core::Application::QueueTransition<GameLayer, MainMenuLayer>();
-                                Core::Application::QueuePop<GameOptionsLayer>(); }));
+                                Core::Application::QueuePop<GameOptionsMenuLayer>(); }));
 }
 
-GameOptionsLayer::~GameOptionsLayer() = default;
+GameOptionsMenuLayer::~GameOptionsMenuLayer() = default;
 
-void GameOptionsLayer::OnUpdate(float ts)
+void GameOptionsMenuLayer::OnUpdate(float ts)
 {
     auto inputManager = Core::Application::GetInputManager();
 
@@ -56,7 +56,7 @@ void GameOptionsLayer::OnUpdate(float ts)
     }
 }
 
-void GameOptionsLayer::OnRender()
+void GameOptionsMenuLayer::OnRender()
 {
     ClearBackground(WHITE);
     m_menu.Render();

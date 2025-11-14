@@ -1,7 +1,6 @@
 #include "Core/Application.h"
 
-#include "MainMenuComponents/MainMenuLayer.h"
-#include "GameComponents/GameLayer.h"
+#include "MainMenuLayer/MainMenuLayer.h"
 
 void LoadAllTextures()
 {

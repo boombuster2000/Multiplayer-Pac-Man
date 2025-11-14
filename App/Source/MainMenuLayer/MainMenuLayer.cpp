@@ -3,7 +3,7 @@
 #include "UIComponents/TextStyle.h"
 #include "Core/Application.h"
 #include "Core/InputManager.h"
-#include "GameComponents/GameLayer.h"
+#include "GameLayer/GameLayer.h"
 #include <iostream>
 
 MainMenuLayer::MainMenuLayer()
