@@ -155,7 +155,7 @@ void GameLayer::HandleKeyPresses()
 
     if (inputManager->IsAction("pause", Core::InputState::PRESSED))
     {
-        SuspendUpdateAndRender();
+        SuspendUpdate();
         Core::Application::QueuePush<GameOptionsMenuLayer>();
     }
 }
@@ -179,7 +179,6 @@ void GameLayer::OnUpdate(float ts)
 
 void GameLayer::OnRender()
 {
-    ClearBackground(WHITE);
     m_board.Render();
     m_pacman.Render();
 }
