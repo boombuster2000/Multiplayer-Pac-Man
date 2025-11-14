@@ -30,7 +30,7 @@ namespace Core
 		s_InputManager->AddKeyboardAction("move_right", KEY_D);
 		s_InputManager->AddKeyboardAction("move_right", KEY_RIGHT);
 		s_InputManager->AddKeyboardAction("confirm", KEY_ENTER);
-		s_InputManager->AddKeyboardAction("quit", KEY_Q);
+		s_InputManager->AddKeyboardAction("pause", KEY_ESCAPE);
 
 		// Gamepad
 		s_InputManager->AddGamepadButtonAction("move_up", GAMEPAD_BUTTON_LEFT_FACE_UP, 0);
@@ -38,6 +38,7 @@ namespace Core
 		s_InputManager->AddGamepadButtonAction("move_left", GAMEPAD_BUTTON_LEFT_FACE_LEFT, 0);
 		s_InputManager->AddGamepadButtonAction("move_right", GAMEPAD_BUTTON_LEFT_FACE_RIGHT, 0);
 		s_InputManager->AddGamepadButtonAction("confirm", GAMEPAD_BUTTON_RIGHT_FACE_DOWN, 0);
+		s_InputManager->AddGamepadButtonAction("pause", GAMEPAD_BUTTON_MIDDLE_LEFT, 0);
 
 		s_InputManager->AddGamepadAxisAction("move_up", GAMEPAD_AXIS_LEFT_Y, 0, false);
 		s_InputManager->AddGamepadAxisAction("move_down", GAMEPAD_AXIS_LEFT_Y, 0, true);

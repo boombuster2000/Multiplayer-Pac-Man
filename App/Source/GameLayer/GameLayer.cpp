@@ -153,10 +153,7 @@ void GameLayer::HandleKeyPresses()
     if (IsKeyPressed(KEY_F1))
         m_board.SaveToFile("./Boards/default.json");
 
-    if (inputManager->IsAction("quit", Core::InputState::PRESSED))
-        Core::Application::QueueTransition<GameLayer, MainMenuLayer>();
-
-    if (IsKeyPressed(KEY_ESCAPE))
+    if (inputManager->IsAction("pause", Core::InputState::PRESSED))
     {
         SuspendUpdateAndRender();
         Core::Application::QueuePush<GameOptionsMenuLayer>();
