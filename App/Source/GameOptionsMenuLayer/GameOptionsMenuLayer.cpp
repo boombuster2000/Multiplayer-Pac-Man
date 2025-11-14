@@ -67,6 +67,14 @@ void GameOptionsMenuLayer::OnUpdate(float ts)
 
 void GameOptionsMenuLayer::OnRender()
 {
-    ClearBackground(WHITE);
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.45f));
+
+    const float borderWidth = 20;
+    Vector2Ex<float> dimensions = m_menu.GetDimensions() + Vector2Ex<float>(2 * borderWidth, 2 * borderWidth);
+    Vector2Ex<float> position = m_menu.GetPositionAtAnchor() - Vector2Ex<float>(borderWidth, borderWidth);
+
+    DrawRectangleV(position - Vector2Ex<float>(borderWidth, borderWidth), dimensions + Vector2Ex<float>(2 * borderWidth, 2 * borderWidth), MAROON);
+    DrawRectangleV(position, dimensions, WHITE);
+
     m_menu.Render();
 }
