@@ -90,6 +90,21 @@ namespace Core
 		}
 
 		static Application &Get();
+
+		template <typename TLayer>
+		TLayer *GetLayer()
+		{
+			static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
+			for (const auto &layer : m_LayerStack)
+			{
+				if (typeid(*layer) == typeid(TLayer))
+				{
+					return static_cast<TLayer *>(layer.get());
+				}
+			}
+			return nullptr;
+		}
+
 	};
 
 }
