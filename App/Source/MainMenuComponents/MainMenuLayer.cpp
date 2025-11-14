@@ -23,9 +23,7 @@ MainMenuLayer::MainMenuLayer()
 								{ Core::Application::Get().Stop(); }));
 }
 
-MainMenuLayer::~MainMenuLayer()
-{
-}
+MainMenuLayer::~MainMenuLayer() = default;
 
 void MainMenuLayer::OnUpdate(float ts)
 {
