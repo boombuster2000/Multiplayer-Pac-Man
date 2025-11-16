@@ -14,21 +14,22 @@ BoardSelectionMenuLayer::BoardSelectionMenuLayer()
     TextStyle unselectedStyle = {50, BLACK};
     TextStyle selectedStyle = {60, RED};
 
+    m_menu.AddOption(MenuOption("built-in", selectedStyle, unselectedStyle, true, true,
+                                [this]() { TransitionTo(std::make_unique<GameLayer>()); }));
+
     const std::string path = "./Boards/";
-    bool first = true;
     for (const auto &entry : std::filesystem::directory_iterator(path))
     {
         if (entry.is_regular_file() && entry.path().extension() == ".json")
         {
             std::string filename = entry.path().stem().string();
             std::string fullPath = entry.path().string();
-            m_menu.AddOption(MenuOption(filename, selectedStyle, unselectedStyle, true, first,
+            m_menu.AddOption(MenuOption(filename, selectedStyle, unselectedStyle, true, false,
                                         [this, fullPath]() { TransitionTo(std::make_unique<GameLayer>(fullPath)); }));
-            first = false;
         }
     }
 
-    m_menu.AddOption(MenuOption("Back", selectedStyle, unselectedStyle, true, first,
+    m_menu.AddOption(MenuOption("Back", selectedStyle, unselectedStyle, true, false,
                                 [this]() { TransitionTo(std::make_unique<MainMenuLayer>()); }));
 }
 
