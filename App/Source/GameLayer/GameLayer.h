@@ -18,6 +18,8 @@ class GameLayer : public Core::Layer
     Vector2Ex<float> GetNextValidPacmanPosition(Vector2Ex<float> start, Vector2Ex<float> end,
                                                 UIComponents::Direction direction);
 
+    bool IsPacmanTouchingPellet(const Vector2Ex<float> &pacmanDimensions, const Vector2Ex<float> &pacmanPosition) const;
+
   public:
     GameLayer();
     GameLayer(const std::string &boardPath);
