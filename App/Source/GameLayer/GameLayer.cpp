@@ -10,6 +10,32 @@
 #include "MainMenuLayer/MainMenuLayer.h"
 #include "raylib.h"
 
+bool GameLayer::IsPacmanTouchingPellet(const Vector2Ex<float> &pacmanDimensions,
+                                       const Vector2Ex<float> &pacmanPosition) const
+{
+    const Tile &tile = m_board.GetTileFromPosition(pacmanPosition);
+    const Pellet &pellet = tile.GetPellet();
+    const Vector2Ex<float> pelletPosition = pellet.GetPositionAtAnchor();
+    const Vector2Ex<float> pelletDimensions = pellet.GetDimensions();
+    const Rectangle pacmanRec = {pacmanPosition.x, pacmanPosition.y, pacmanDimensions.x, pacmanDimensions.y};
+    const Rectangle pelletRec = {pelletPosition.x, pelletPosition.y, pelletDimensions.x, pelletDimensions.y};
+
+    return CheckCollisionRecs(pacmanRec, pelletRec);
+}
+
+void GameLayer::CollectPelletAtPosition(const Vector2Ex<float> &position)
+{
+    if (IsPacmanTouchingPellet(m_pacman.GetDimensions(), position))
+    {
+        Tile &tile = m_board.GetTileFromPosition(position);
+        Pellet &pellet = tile.GetPellet();
+
+        int pointsGained = pellet.GetValue();
+
+        pellet.SetType(Pellet::Type::NONE);
+    }
+}
+
 bool GameLayer::CanMoveInDirection(const Vector2Ex<float> &position, const UIComponents::Direction &direction) const
 {
     using namespace UIComponents;
@@ -46,19 +72,6 @@ bool GameLayer::CanMoveInDirection(const Vector2Ex<float> &position, const UICom
     return true;
 }
 
-void GameLayer::CollectPelletAtPosition(const Vector2Ex<float> &position)
-{
-    if (IsPacmanTouchingPellet(m_pacman.GetDimensions(), position))
-    {
-        Tile &tile = m_board.GetTileFromPosition(position);
-        Pellet &pellet = tile.GetPellet();
-
-        int pointsGained = pellet.GetValue();
-
-        pellet.SetType(Pellet::Type::NONE);
-    }
-}
-
 bool GameLayer::TryApplyQueuedDirection(Vector2Ex<float> &currentPosition, UIComponents::Direction &currentDirection)
 {
     UIComponents::Direction queuedDir = m_pacman.GetQueuedDirection();
@@ -77,19 +90,6 @@ bool GameLayer::TryApplyQueuedDirection(Vector2Ex<float> &currentPosition, UICom
     }
 
     return false;
-}
-
-bool GameLayer::IsPacmanTouchingPellet(const Vector2Ex<float> &pacmanDimensions,
-                                       const Vector2Ex<float> &pacmanPosition) const
-{
-    const Tile &tile = m_board.GetTileFromPosition(pacmanPosition);
-    const Pellet &pellet = tile.GetPellet();
-    const Vector2Ex<float> pelletPosition = pellet.GetPositionAtAnchor();
-    const Vector2Ex<float> pelletDimensions = pellet.GetDimensions();
-    const Rectangle pacmanRec = {pacmanPosition.x, pacmanPosition.y, pacmanDimensions.x, pacmanDimensions.y};
-    const Rectangle pelletRec = {pelletPosition.x, pelletPosition.y, pelletDimensions.x, pelletDimensions.y};
-
-    return CheckCollisionRecs(pacmanRec, pelletRec);
 }
 
 GameLayer::GameLayer()
