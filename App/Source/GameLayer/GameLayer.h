@@ -15,10 +15,9 @@ class GameLayer : public Core::Layer
 
   private:
     bool CanMoveInDirection(const Vector2Ex<float> &position, const UIComponents::Direction &direction) const;
-    Vector2Ex<float> GetNextValidPacmanPosition(Vector2Ex<float> start, Vector2Ex<float> end,
-                                                UIComponents::Direction direction);
-
     bool IsPacmanTouchingPellet(const Vector2Ex<float> &pacmanDimensions, const Vector2Ex<float> &pacmanPosition) const;
+    void CollectPelletAtPosition(const Vector2Ex<float> &position);
+    bool TryApplyQueuedDirection(Vector2Ex<float> &currentPosition, UIComponents::Direction &currentDirection);
 
   public:
     GameLayer();

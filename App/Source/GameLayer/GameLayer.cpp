@@ -46,102 +46,37 @@ bool GameLayer::CanMoveInDirection(const Vector2Ex<float> &position, const UICom
     return true;
 }
 
-Vector2Ex<float> GameLayer::GetNextValidPacmanPosition(Vector2Ex<float> start, Vector2Ex<float> end,
-                                                       UIComponents::Direction direction)
+void GameLayer::CollectPelletAtPosition(const Vector2Ex<float> &position)
 {
-    using namespace UIComponents;
-    const Vector2Ex<float> movementDelta = end - start;
-
-    // Number of intermediate steps to check
-    float steps = (direction == Direction::UP || direction == Direction::DOWN) ? std::abs(movementDelta.y)
-                                                                               : std::abs(movementDelta.x);
-
-    Vector2Ex<float> nextValidPosition = start;
-
-    // Allow direction change when stationary (no movement yet)
-    UIComponents::Direction queuedDir = m_pacman.GetQueuedDirection();
-
-    if (IsPacmanTouchingPellet(m_pacman.GetDimensions(), nextValidPosition))
+    if (IsPacmanTouchingPellet(m_pacman.GetDimensions(), position))
     {
-        Tile &tile = m_board.GetTileFromPosition(nextValidPosition);
+        Tile &tile = m_board.GetTileFromPosition(position);
         Pellet &pellet = tile.GetPellet();
 
         int pointsGained = pellet.GetValue();
 
         pellet.SetType(Pellet::Type::NONE);
     }
+}
 
-    if (queuedDir != direction)
+bool GameLayer::TryApplyQueuedDirection(Vector2Ex<float> &currentPosition, UIComponents::Direction &currentDirection)
+{
+    UIComponents::Direction queuedDir = m_pacman.GetQueuedDirection();
+
+    if (queuedDir == currentDirection)
+        return false;
+
+    const Vector2Ex<float> queuedVec = Vector2Ex<float>::GetDirectionVector(queuedDir);
+    const Vector2Ex<float> peekPosition = currentPosition + queuedVec;
+
+    if (CanMoveInDirection(peekPosition, queuedDir))
     {
-        const Vector2Ex<float> queuedVec = Vector2Ex<float>::GetDirectionVector(queuedDir);
-        const Vector2Ex<float> peekPosition = start + queuedVec;
-
-        if (CanMoveInDirection(peekPosition, queuedDir))
-        {
-            m_pacman.ApplyQueuedDirection();
-            direction = queuedDir;
-
-            float moveDistance = steps;
-            end = start + (queuedVec * moveDistance);
-
-            return GetNextValidPacmanPosition(start, end, direction);
-        }
+        m_pacman.ApplyQueuedDirection();
+        currentDirection = queuedDir;
+        return true;
     }
 
-    if (steps <= 0)
-        return start;
-
-    float remaining_steps = steps;
-
-    while (remaining_steps > 0)
-    {
-        // The incremental step size (1 or less for the last step)
-        float step_size = std::min(remaining_steps, 1.0f);
-
-        // Current total step taken
-        float current_total_step = steps - remaining_steps + step_size;
-
-        // Calculate the intermediate position
-        Vector2Ex<float> intermediatePosition = start + (movementDelta / steps) * current_total_step;
-
-        if (IsPacmanTouchingPellet(m_pacman.GetDimensions(), intermediatePosition))
-        {
-            Tile &tile = m_board.GetTileFromPosition(intermediatePosition);
-            Pellet &pellet = tile.GetPellet();
-
-            int pointsGained = pellet.GetValue();
-
-            pellet.SetType(Pellet::Type::NONE);
-        }
-
-        // Check if queued direction is possible here
-        UIComponents::Direction queuedDir = m_pacman.GetQueuedDirection();
-        if (queuedDir != direction)
-        {
-            Vector2Ex<float> peekPosition = intermediatePosition + Vector2Ex<float>::GetDirectionVector(queuedDir);
-            if (CanMoveInDirection(peekPosition, queuedDir))
-            {
-                m_pacman.ApplyQueuedDirection();
-                direction = queuedDir;
-
-                start = intermediatePosition;
-
-                // Redirect remaining movement distance in new direction
-                end = start + (Vector2Ex<float>::GetDirectionVector(direction) * remaining_steps);
-
-                return GetNextValidPacmanPosition(start, end, direction);
-            }
-        }
-
-        // Regular collision check
-        if (!CanMoveInDirection(intermediatePosition, direction))
-            return nextValidPosition;
-
-        nextValidPosition = intermediatePosition;
-        remaining_steps -= step_size;
-    }
-
-    return nextValidPosition;
+    return false;
 }
 
 bool GameLayer::IsPacmanTouchingPellet(const Vector2Ex<float> &pacmanDimensions,
@@ -197,12 +132,76 @@ void GameLayer::HandleKeyPresses()
 
 void GameLayer::HandleCollisions(const float &deltaTime)
 {
-    const Vector2Ex<float> positionBeforeMove = m_pacman.GetPositionAtAnchor();
-    const Vector2Ex<float> nextPosition = m_pacman.GetNextPosition(m_pacman.GetCurrentDirection(), deltaTime);
+    using namespace UIComponents;
 
-    const Vector2Ex<float> newPosition =
-        GetNextValidPacmanPosition(positionBeforeMove, nextPosition, m_pacman.GetCurrentDirection());
-    m_pacman.SetPosition(newPosition);
+    Vector2Ex<float> currentPosition = m_pacman.GetPositionAtAnchor();
+    Direction currentDirection = m_pacman.GetCurrentDirection();
+
+    // Collect pellet at starting position
+    CollectPelletAtPosition(currentPosition);
+
+    // Calculate desired movement
+    const Vector2Ex<float> targetPosition = m_pacman.GetNextPosition(currentDirection, deltaTime);
+    const Vector2Ex<float> movementDelta = targetPosition - currentPosition;
+
+    // Number of intermediate steps to check
+    float totalDistance = (currentDirection == Direction::UP || currentDirection == Direction::DOWN)
+                              ? std::abs(movementDelta.y)
+                              : std::abs(movementDelta.x);
+
+    // Try to apply queued direction at start if stationary or at current position
+    float remainingDistance = totalDistance;
+    if (TryApplyQueuedDirection(currentPosition, currentDirection))
+    {
+        // Direction changed, update current direction for the pacman
+        currentDirection = m_pacman.GetCurrentDirection();
+    }
+
+    if (totalDistance <= 0)
+    {
+        m_pacman.SetPosition(currentPosition);
+        return;
+    }
+
+    Vector2Ex<float> lastValidPosition = currentPosition;
+
+    // Loop through intermediate positions
+    while (remainingDistance > 0)
+    {
+        // The incremental step size (1 or less for the last step)
+        float stepSize = std::min(remainingDistance, 1.0f);
+
+        // Calculate the intermediate position using current direction
+        Vector2Ex<float> directionVector = Vector2Ex<float>::GetDirectionVector(currentDirection);
+        Vector2Ex<float> intermediatePosition = currentPosition + (directionVector * stepSize);
+
+        // Try to apply queued direction at this position
+        if (TryApplyQueuedDirection(intermediatePosition, currentDirection))
+        {
+            CollectPelletAtPosition(intermediatePosition);
+
+            // Direction changed, update position and direction, then continue in new direction
+            lastValidPosition = intermediatePosition;
+            currentPosition = intermediatePosition;
+            currentDirection = m_pacman.GetCurrentDirection();
+            continue;
+        }
+
+        // Check collision
+        if (!CanMoveInDirection(intermediatePosition, currentDirection))
+        {
+            // Hit a wall, stop at last valid position
+            break;
+        }
+
+        // Position is valid, collect pellets and continue
+        CollectPelletAtPosition(intermediatePosition);
+        lastValidPosition = intermediatePosition;
+        currentPosition = intermediatePosition;
+        remainingDistance -= stepSize;
+    }
+
+    m_pacman.SetPosition(lastValidPosition);
 }
 
 void GameLayer::OnUpdate(float ts)
