@@ -125,8 +125,7 @@ Vector2Ex<float> GameLayer::GetNextValidPacmanPosition(Vector2Ex<float> start, V
 }
 
 GameLayer::GameLayer()
-    : m_board(Board::LoadFromFile("./Boards/default.json")),
-      m_pacman(m_board.GetPositionFromIndex(Vector2Ex<int>(1, 1)), Vector2Ex<float>(50, 50), 400)
+    : m_board(Board()), m_pacman(m_board.GetPositionFromIndex(Vector2Ex<int>(1, 1)), Vector2Ex<float>(50, 50), 400)
 {
 }
 
