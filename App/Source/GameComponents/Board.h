@@ -12,6 +12,7 @@ class Board : public UIComponents::Grid<Tile>
 
   public:
     Board();
+    Board(const std::string &filename);
 
     void SetTileType(const Vector2Ex<int> &index, const Tile::Type &type);
 

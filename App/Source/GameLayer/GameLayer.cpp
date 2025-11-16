@@ -130,7 +130,7 @@ GameLayer::GameLayer()
 }
 
 GameLayer::GameLayer(const std::string &boardPath)
-    : m_board(Board::LoadFromFile(boardPath)),
+    : m_board(Board(boardPath)),
       m_pacman(m_board.GetPositionFromIndex(Vector2Ex<int>(1, 1)), Vector2Ex<float>(50, 50), 400)
 {
 }
