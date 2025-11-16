@@ -28,6 +28,9 @@ class Tile : public UIComponents::GridTile
     Type GetType() const;
     void SetType(Type type);
 
+    Pellet &GetPellet();
+    const Pellet &GetPellet() const;
+
     void SetPosition(const Vector2Ex<float> &position);
 
     virtual void Render(Vector2Ex<float> offset = {0, 0}) const override;

@@ -29,6 +29,16 @@ void Tile::SetType(Type type)
     m_type = type;
 }
 
+Pellet &Tile::GetPellet()
+{
+    return m_pellet;
+}
+
+const Pellet &Tile::GetPellet() const
+{
+    return m_pellet;
+}
+
 void Tile::SetPosition(const Vector2Ex<float> &position)
 {
     RenderableObject::SetPosition(position);
