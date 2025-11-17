@@ -1,12 +1,12 @@
 #include "Pellet.h"
 #include "Core/Application.h"
 
-Pellet::Pellet() : RenderableObject(), m_type(Type::NONE), radius(3.0f)
+Pellet::Pellet() : RenderableObject(), m_type(Type::NONE), radius(2.0f)
 {
 }
 
 Pellet::Pellet(Vector2Ex<float> position, const Type type)
-    : RenderableObject(position, UIComponents::AnchorPoint::MIDDLE), m_type(type), radius(3.0f)
+    : RenderableObject(position, UIComponents::AnchorPoint::MIDDLE), m_type(type), radius(2.0f)
 {
 }
 
