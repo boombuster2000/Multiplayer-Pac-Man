@@ -62,6 +62,7 @@ template <class T = GridTile> class Grid : public RenderableObject
 
             m_grid.emplace_back(std::move(row));
         }
+        SetOrigin(anchorPoint);
     }
 
     ~Grid() = default;
