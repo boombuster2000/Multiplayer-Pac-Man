@@ -56,8 +56,8 @@ template <class T = GridTile> class Grid : public RenderableObject
             {
                 row.emplace_back(std::forward<Args>(tileArgs)...);
                 row[x].SetPosition(Vector2Ex<float>(
-                    anchorPointPosition.x + anchorOffset.x + (x * tileDimensions.x) + (x * spacing.x),
-                    anchorPointPosition.y + anchorOffset.y + (y * tileDimensions.y) + (y * spacing.y)));
+                    anchorPointPosition.x + -anchorOffset.x + (x * tileDimensions.x) + (x * spacing.x),
+                    anchorPointPosition.y + -anchorOffset.y + (y * tileDimensions.y) + (y * spacing.y)));
             }
 
             m_grid.emplace_back(std::move(row));
