@@ -12,9 +12,11 @@
 using json = nlohmann::json;
 
 Board::Board()
-    : Grid(UIComponents::Grid<Tile>(Vector2Ex<size_t>(14, 14), Vector2Ex<float>(50, 50), Vector2Ex<float>(10, 10),
-                                    UIComponents::AnchorPoint::TOP_LEFT, Vector2Ex<float>(0, 0), Tile::Type::Path,
-                                    Pellet::Type::NORMAL, Vector2Ex<float>(0, 0), Vector2Ex<float>(50, 50)))
+    : Grid(UIComponents::Grid<Tile>(
+          Vector2Ex<size_t>(14, 14), Vector2Ex<float>(50, 50),
+          Vector2Ex<float>(static_cast<float>(GetScreenWidth()) / 2, static_cast<float>(GetScreenHeight()) / 2),
+          UIComponents::AnchorPoint::MIDDLE, Vector2Ex<float>(0, 0), Tile::Type::Path, Pellet::Type::NORMAL,
+          Vector2Ex<float>(0, 0), Vector2Ex<float>(50, 50)))
 {
     AddBoundaries();
 
