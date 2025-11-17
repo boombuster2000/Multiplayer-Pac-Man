@@ -39,26 +39,27 @@ void GameLayer::CollectPelletAtPosition(const Vector2Ex<float> &position)
 bool GameLayer::CanMoveInDirection(const Vector2Ex<float> &position, const UIComponents::Direction &direction) const
 {
     using namespace UIComponents;
-    const Vector2Ex<float> pacmanSize = m_pacman.GetDimensions() - Vector2Ex<float>(1, 1);
+    using enum AnchorPoint;
+    const Vector2Ex<float> pacmanDimensions = m_pacman.GetDimensions();
 
     Vector2Ex<float> cornersToCheck[2];
     switch (direction)
     {
     case Direction::UP:
         cornersToCheck[0] = position;
-        cornersToCheck[1] = position + Vector2Ex<float>(pacmanSize.x, 0);
+        cornersToCheck[1] = position + RenderableObject::CalculateAnchorOffset(TOP_RIGHT, pacmanDimensions);
         break;
     case Direction::DOWN:
-        cornersToCheck[0] = position + Vector2Ex<float>(0, pacmanSize.y);
-        cornersToCheck[1] = position + Vector2Ex<float>(pacmanSize.x, pacmanSize.y);
+        cornersToCheck[0] = position + RenderableObject::CalculateAnchorOffset(BOTTOM_LEFT, pacmanDimensions);
+        cornersToCheck[1] = position + RenderableObject::CalculateAnchorOffset(BOTTOM_RIGHT, pacmanDimensions);
         break;
     case Direction::LEFT:
         cornersToCheck[0] = position;
-        cornersToCheck[1] = position + Vector2Ex<float>(0, pacmanSize.y);
+        cornersToCheck[1] = position + RenderableObject::CalculateAnchorOffset(BOTTOM_LEFT, pacmanDimensions);
         break;
     case Direction::RIGHT:
-        cornersToCheck[0] = position + Vector2Ex<float>(pacmanSize.x, 0);
-        cornersToCheck[1] = position + Vector2Ex<float>(pacmanSize.x, pacmanSize.y);
+        cornersToCheck[0] = position + RenderableObject::CalculateAnchorOffset(TOP_RIGHT, pacmanDimensions);
+        cornersToCheck[1] = position + RenderableObject::CalculateAnchorOffset(BOTTOM_RIGHT, pacmanDimensions);
         break;
     }
 
