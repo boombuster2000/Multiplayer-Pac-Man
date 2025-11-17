@@ -12,26 +12,51 @@
 using json = nlohmann::json;
 
 Board::Board()
-    : Grid(UIComponents::Grid<Tile>(Vector2Ex<size_t>(8, 8), Vector2Ex<float>(50, 50), Vector2Ex<float>(10, 10),
+    : Grid(UIComponents::Grid<Tile>(Vector2Ex<size_t>(14, 14), Vector2Ex<float>(50, 50), Vector2Ex<float>(10, 10),
                                     UIComponents::AnchorPoint::TOP_LEFT, Vector2Ex<float>(0, 0), Tile::Type::Path,
                                     Pellet::Type::NORMAL, Vector2Ex<float>(0, 0), Vector2Ex<float>(50, 50)))
 {
     AddBoundaries();
 
-    SetTileType({5, 2}, Tile::Type::Wall);
-    SetTileType({5, 3}, Tile::Type::Wall);
-    SetTileType({4, 2}, Tile::Type::Wall);
+    // Row 2 - top horizontal walls
+    for (int x : {2, 4, 5, 6, 7, 8, 9, 10, 11})
+        SetTileType({x, 2}, Tile::Type::Wall);
 
-    SetTileType({2, 5}, Tile::Type::Wall);
-    SetTileType({2, 4}, Tile::Type::Wall);
-    SetTileType({2, 3}, Tile::Type::Wall);
-    SetTileType({2, 2}, Tile::Type::Wall);
+    // Row 3 - vertical pillars
+    for (int x : {2, 11})
+        SetTileType({x, 3}, Tile::Type::Wall);
 
-    SetTileType({3, 5}, Tile::Type::Wall);
-    SetTileType({4, 5}, Tile::Type::Wall);
-    SetTileType({5, 5}, Tile::Type::Wall);
+    // Row 4 - inner walls with gaps
+    for (int x : {2, 4, 5, 6, 7, 8, 9, 11})
+        SetTileType({x, 4}, Tile::Type::Wall);
 
-    SetTileType({3, 4}, Tile::Type::Wall);
+    // Row 5 - ghost house top
+    for (int x : {0, 2, 4, 11})
+        SetTileType({x, 5}, Tile::Type::Wall);
+
+    // Row 6 - ghost house sides
+    for (int x : {0, 2, 4, 5, 6, 7, 9, 11})
+        SetTileType({x, 6}, Tile::Type::Wall);
+
+    // Row 7 - ghost house sides
+    for (int x : {0, 2, 4, 5, 6, 7, 9, 11})
+        SetTileType({x, 7}, Tile::Type::Wall);
+
+    // Row 8 - ghost house bottom
+    for (int x : {0, 2, 4, 9, 11})
+        SetTileType({x, 8}, Tile::Type::Wall);
+
+    // Row 9 - inner walls with gaps
+    for (int x : {2, 4, 5, 6, 7, 8, 9, 11})
+        SetTileType({x, 9}, Tile::Type::Wall);
+
+    // Row 10 - vertical pillars
+    for (int x : {2, 11})
+        SetTileType({x, 10}, Tile::Type::Wall);
+
+    // Row 11 - bottom horizontal walls
+    for (int x : {2, 3, 4, 5, 6, 7, 8, 9, 11})
+        SetTileType({x, 11}, Tile::Type::Wall);
 }
 
 Board::Board(const std::string &filename)
