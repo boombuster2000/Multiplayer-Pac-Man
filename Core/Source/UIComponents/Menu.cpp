@@ -115,6 +115,8 @@ void Menu::UpdateOptionsAnchorPointPositions()
         alignmentAnchor = AnchorPoint::TOP_RIGHT;
         break;
     case Alignment::LEFT:
+        alignmentAnchor = AnchorPoint::TOP_LEFT;
+        break;
     default:
         alignmentAnchor = AnchorPoint::TOP_LEFT;
         break;
