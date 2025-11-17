@@ -54,11 +54,15 @@ void Tile::Render(Vector2Ex<float> offset) const
 
     if (m_type == Type::Wall)
     {
-        DrawTextureEx(*wallTexture, position, 0, size.y / (float)wallTexture->height, WHITE);
+        Rectangle srcRect = {0, 0, (float)wallTexture->width, (float)wallTexture->height};
+        Rectangle destRect = {position.x, position.y, size.x, size.y};
+        DrawTexturePro(*wallTexture, srcRect, destRect, {0, 0}, 0, WHITE);
     }
     else if (m_type == Type::Path)
     {
-        DrawTextureEx(*pathTexture, position, 0, size.y / (float)pathTexture->height, WHITE);
+        Rectangle srcRect = {0, 0, (float)pathTexture->width, (float)pathTexture->height};
+        Rectangle destRect = {position.x, position.y, size.x, size.y};
+        DrawTexturePro(*pathTexture, srcRect, destRect, {0, 0}, 0, WHITE);
         m_pellet.Render();
     }
 }
