@@ -40,6 +40,14 @@ class RenderableObject
     /// @param origin A position representing the origin position in the object.
     virtual void SetOrigin(Vector2Ex<float> origin);
 
+    /// @brief Calculates the local origin for the given anchorpoint.
+    /// @param anchorPoint Where in the object you want the local origin of.
+    /// @param width The width of the object.
+    /// @param height The height of the object.
+    /// @return Returns the local origin for the given anchorpoint.
+    static Vector2Ex<float> CalculateAnchorOffset(const AnchorPoint anchorPoint, const float width, const float height);
+    static Vector2Ex<float> CalculateAnchorOffset(const AnchorPoint anchorPoint, const Vector2Ex<float> &dimensions);
+
     /// @return Returns the position anchorpoints of the object in the 2d space.
     virtual Vector2Ex<float> GetPositionAtAnchor(AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT) const;
 

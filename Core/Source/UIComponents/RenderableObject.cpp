@@ -72,51 +72,61 @@ void RenderableObject::SetOrigin(Vector2Ex<float> origin)
     m_objectOrigin = origin;
 }
 
+Vector2Ex<float> RenderableObject::CalculateAnchorOffset(const AnchorPoint anchorPoint, const float width,
+                                                         const float height)
+{
+    Vector2Ex<float> offset(0, 0);
+
+    using enum AnchorPoint;
+    switch (anchorPoint)
+    {
+    case TOP_LEFT:
+        break;
+    case TOP_MIDDLE:
+        offset.x = -width / 2;
+        break;
+    case TOP_RIGHT:
+        offset.x = -width;
+        break;
+    case MIDDLE_LEFT:
+        offset.y = -height / 2;
+        break;
+    case MIDDLE:
+        offset.x = -width / 2;
+        offset.y = -height / 2;
+        break;
+    case MIDDLE_RIGHT:
+        offset.x = -width;
+        offset.y = -height / 2;
+        break;
+    case BOTTOM_LEFT:
+        offset.y = -height;
+        break;
+    case BOTTOM_MIDDLE:
+        offset.x = -width / 2;
+        offset.y = -height;
+        break;
+    case BOTTOM_RIGHT:
+        offset.x = -width;
+        offset.y = -height;
+        break;
+    }
+
+    return offset - Vector2Ex<float>(1, 1);
+}
+
+Vector2Ex<float> RenderableObject::CalculateAnchorOffset(const AnchorPoint anchorPoint,
+                                                         const Vector2Ex<float> &dimensions)
+{
+    return CalculateAnchorOffset(anchorPoint, dimensions.x, dimensions.y);
+}
+
 // Gives top left position by default as a common reference points between objects for calculations
 Vector2Ex<float> RenderableObject::GetPositionAtAnchor(AnchorPoint anchorpoint) const
 {
-    using enum AnchorPoint;
-    // Done manually because a dot appears when moving up and left.
-    const Vector2Ex<float> &dimensions =
-        GetDimensions(); // - Vector2Ex<float>(1, 1); // This is the pixel before the next tile.;
-    Vector2Ex<float> position = m_worldOrigin - m_objectOrigin;
-
-    switch (anchorpoint)
-    {
-    case TOP_LEFT:
-        // No adjustment needed
-        break;
-    case TOP_MIDDLE:
-        position.x += dimensions.x / 2;
-        break;
-    case TOP_RIGHT:
-        position.x += dimensions.x - 1;
-        break;
-    case MIDDLE_LEFT:
-        position.y += dimensions.y / 2;
-        break;
-    case MIDDLE:
-        position.x += dimensions.x / 2;
-        position.y += dimensions.y / 2;
-        break;
-    case MIDDLE_RIGHT:
-        position.x += dimensions.x - 1;
-        position.y += dimensions.y / 2;
-        break;
-    case BOTTOM_LEFT:
-        position.y += dimensions.y - 1;
-        break;
-    case BOTTOM_MIDDLE:
-        position.x += dimensions.x / 2;
-        position.y += dimensions.y - 1;
-        break;
-    case BOTTOM_RIGHT:
-        position.x += dimensions.x - 1;
-        position.y += dimensions.y - 1;
-        break;
-    default:
-        break;
-    }
+    const Vector2Ex<float> &dimensions = GetDimensions();
+    Vector2Ex<float> position = m_worldOrigin - m_objectOrigin; // Gets top left position.
+    position += CalculateAnchorOffset(anchorpoint, dimensions);
 
     return position;
 }
