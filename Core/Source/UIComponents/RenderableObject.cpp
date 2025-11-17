@@ -27,44 +27,7 @@ void RenderableObject::SetOrigin(AnchorPoint anchorPoint)
     using enum AnchorPoint;
     const Vector2Ex<float> &dimensions = GetDimensions();
 
-    const float width = dimensions.x;
-    const float height = dimensions.y;
-
-    const float halfWidth = width / 2;
-    const float halfHeight = height / 2;
-
-    switch (anchorPoint)
-    {
-    case TOP_LEFT:
-        m_objectOrigin = Vector2Ex<float>(0, 0);
-        break;
-    case TOP_MIDDLE:
-        m_objectOrigin = Vector2Ex<float>(halfWidth, 0);
-        break;
-    case TOP_RIGHT:
-        m_objectOrigin = Vector2Ex<float>(width, 0);
-        break;
-    case MIDDLE_LEFT:
-        m_objectOrigin = Vector2Ex<float>(0, halfHeight);
-        break;
-    case MIDDLE:
-        m_objectOrigin = Vector2Ex<float>(halfWidth, halfHeight);
-        break;
-    case MIDDLE_RIGHT:
-        m_objectOrigin = Vector2Ex<float>(width, halfHeight);
-        break;
-    case BOTTOM_LEFT:
-        m_objectOrigin = Vector2Ex<float>(0, height);
-        break;
-    case BOTTOM_MIDDLE:
-        m_objectOrigin = Vector2Ex<float>(halfWidth, height);
-        break;
-    case BOTTOM_RIGHT:
-        m_objectOrigin = Vector2Ex<float>(width, height);
-        break;
-    default:
-        break;
-    }
+    m_objectOrigin = CalculateAnchorOffset(anchorPoint, dimensions);
 }
 
 void RenderableObject::SetOrigin(Vector2Ex<float> origin)
@@ -83,32 +46,32 @@ Vector2Ex<float> RenderableObject::CalculateAnchorOffset(const AnchorPoint ancho
     case TOP_LEFT:
         break;
     case TOP_MIDDLE:
-        offset.x = -width / 2;
+        offset.x = width / 2;
         break;
     case TOP_RIGHT:
-        offset.x = -width;
+        offset.x = width;
         break;
     case MIDDLE_LEFT:
-        offset.y = -height / 2;
+        offset.y = height / 2;
         break;
     case MIDDLE:
-        offset.x = -width / 2;
-        offset.y = -height / 2;
+        offset.x = width / 2;
+        offset.y = height / 2;
         break;
     case MIDDLE_RIGHT:
-        offset.x = -width;
-        offset.y = -height / 2;
+        offset.x = width;
+        offset.y = height / 2;
         break;
     case BOTTOM_LEFT:
-        offset.y = -height;
+        offset.y = height;
         break;
     case BOTTOM_MIDDLE:
-        offset.x = -width / 2;
-        offset.y = -height;
+        offset.x = width / 2;
+        offset.y = height;
         break;
     case BOTTOM_RIGHT:
-        offset.x = -width;
-        offset.y = -height;
+        offset.x = width;
+        offset.y = height;
         break;
     }
 
