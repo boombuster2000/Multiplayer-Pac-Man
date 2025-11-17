@@ -35,10 +35,11 @@ void RenderableObject::SetOrigin(Vector2Ex<float> origin)
     m_objectOrigin = origin;
 }
 
-Vector2Ex<float> RenderableObject::CalculateAnchorOffset(const AnchorPoint anchorPoint, const float width,
-                                                         const float height)
+Vector2Ex<float> RenderableObject::CalculateAnchorOffset(const AnchorPoint anchorPoint, float width, float height)
 {
     Vector2Ex<float> offset(0, 0);
+    width -= 1;
+    height -= 1;
 
     using enum AnchorPoint;
     switch (anchorPoint)
@@ -75,7 +76,7 @@ Vector2Ex<float> RenderableObject::CalculateAnchorOffset(const AnchorPoint ancho
         break;
     }
 
-    return offset - Vector2Ex<float>(1, 1);
+    return offset;
 }
 
 Vector2Ex<float> RenderableObject::CalculateAnchorOffset(const AnchorPoint anchorPoint,
