@@ -38,6 +38,12 @@ template <class T = GridTile> class Grid : public RenderableObject
         : RenderableObject(anchorPointPosition, anchorPoint), m_tileDimensions(tileDimensions), m_spacing(spacing),
           m_gridSize(arraySize)
     {
+        // Calculate grid dimensions
+        float width = arraySize.x * tileDimensions.x + (arraySize.x > 0 ? (arraySize.x - 1) * spacing.x : 0);
+        float height = arraySize.y * tileDimensions.y + (arraySize.y > 0 ? (arraySize.y - 1) * spacing.y : 0);
+
+        // Calculate anchor point offset
+        Vector2Ex<float> anchorOffset = RenderableObject::CalculateAnchorOffset(anchorPoint, width, height);
 
         m_grid.reserve(arraySize.y);
 
@@ -49,8 +55,9 @@ template <class T = GridTile> class Grid : public RenderableObject
             for (int x = 0; x < arraySize.x; x++)
             {
                 row.emplace_back(std::forward<Args>(tileArgs)...);
-                row[x].SetPosition(Vector2Ex<float>(anchorPointPosition.x + (x * tileDimensions.x) + (x * spacing.x),
-                                                    anchorPointPosition.y + (y * tileDimensions.y) + (y * spacing.y)));
+                row[x].SetPosition(Vector2Ex<float>(
+                    anchorPointPosition.x + anchorOffset.x + (x * tileDimensions.x) + (x * spacing.x),
+                    anchorPointPosition.y + anchorOffset.y + (y * tileDimensions.y) + (y * spacing.y)));
             }
 
             m_grid.emplace_back(std::move(row));
