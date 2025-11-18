@@ -1,19 +1,13 @@
 #pragma once
 
-#include "Core/Layer.h"
-#include "UIComponents/Menu.h"
+#include "BaseMenuLayer/BaseMenuLayer.h"
 
-class MainMenuLayer : public Core::Layer
+class MainMenuLayer : public BaseMenuLayer
 {
-
   private:
-    UIComponents::Menu m_menu;
-    bool m_joystickAxisUsed = false;
+    virtual void SetupMenuOptions() override;
 
   public:
     MainMenuLayer();
-    virtual ~MainMenuLayer();
-
-    virtual void OnUpdate(float ts) override;
-    virtual void OnRender() override;
+    virtual ~MainMenuLayer() = default;
 };

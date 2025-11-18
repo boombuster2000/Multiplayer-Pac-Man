@@ -1,18 +1,13 @@
 #pragma once
 
-#include "Core/Layer.h"
-#include "UIComponents/Menu.h"
+#include "BaseMenuLayer/BaseMenuLayer.h"
 
-class BoardSelectionMenuLayer : public Core::Layer
+class BoardSelectionMenuLayer : public BaseMenuLayer
 {
   private:
-    UIComponents::Menu m_menu;
-    bool m_joystickAxisUsed = false;
+    virtual void SetupMenuOptions() override;
 
   public:
     BoardSelectionMenuLayer();
-    virtual ~BoardSelectionMenuLayer();
-
-    virtual void OnUpdate(float ts) override;
-    virtual void OnRender() override;
+    virtual ~BoardSelectionMenuLayer() = default;
 };

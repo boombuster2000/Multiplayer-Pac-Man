@@ -4,9 +4,12 @@
 #include "GameLayer/GameLayer.h"
 #include "MainMenuLayer/MainMenuLayer.h"
 
-GameOptionsMenuLayer::GameOptionsMenuLayer()
-    : m_menu({(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2}, UIComponents::AnchorPoint::MIDDLE,
-             UIComponents::Alignment::CENTER, true, 10)
+GameOptionsMenuLayer::GameOptionsMenuLayer() : BaseMenuLayer(UIComponents::Alignment::CENTER, true, 10.0f)
+{
+    SetupMenuOptions();
+}
+
+void GameOptionsMenuLayer::SetupMenuOptions()
 {
     using namespace UIComponents;
     TextStyle unselectedStyle = {50, BLACK};
@@ -33,25 +36,13 @@ GameOptionsMenuLayer::GameOptionsMenuLayer()
     }));
 }
 
-GameOptionsMenuLayer::~GameOptionsMenuLayer() = default;
-
 void GameOptionsMenuLayer::OnUpdate(float ts)
 {
+    BaseMenuLayer::OnUpdate(ts);
+
     auto inputManager = Core::Application::GetInputManager();
 
-    if (inputManager->IsAction("move_down", Core::InputState::PRESSED))
-    {
-        m_menu.SelectNext();
-    }
-    else if (inputManager->IsAction("move_up", Core::InputState::PRESSED))
-    {
-        m_menu.SelectPrevious();
-    }
-    else if (inputManager->IsAction("confirm", Core::InputState::PRESSED))
-    {
-        m_menu.ConfirmSelection();
-    }
-    else if (inputManager->IsAction("pause", Core::InputState::PRESSED))
+    if (inputManager->IsAction("pause", Core::InputState::PRESSED))
     {
         GameLayer *gameLayer = Core::Application::Get().GetLayer<GameLayer>();
         if (gameLayer)
@@ -59,11 +50,6 @@ void GameOptionsMenuLayer::OnUpdate(float ts)
             gameLayer->Resume();
             Pop();
         }
-    }
-
-    if (m_menu.IsUIUpdateNeeded())
-    {
-        m_menu.UpdateOptionsAnchorPointPositions();
     }
 }
 
@@ -79,5 +65,5 @@ void GameOptionsMenuLayer::OnRender()
                    dimensions + Vector2Ex<float>(2 * borderWidth, 2 * borderWidth), MAROON);
     DrawRectangleV(position, dimensions, WHITE);
 
-    m_menu.Render();
+    BaseMenuLayer::OnRender();
 }

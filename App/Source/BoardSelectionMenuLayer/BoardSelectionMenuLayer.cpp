@@ -6,9 +6,12 @@
 #include <iostream>
 #include <string>
 
-BoardSelectionMenuLayer::BoardSelectionMenuLayer()
-    : m_menu({(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2}, UIComponents::AnchorPoint::MIDDLE,
-             UIComponents::Alignment::CENTER, true, 10)
+BoardSelectionMenuLayer::BoardSelectionMenuLayer() : BaseMenuLayer(UIComponents::Alignment::CENTER, true, 10.0f)
+{
+    SetupMenuOptions();
+}
+
+void BoardSelectionMenuLayer::SetupMenuOptions()
 {
     using namespace UIComponents;
     TextStyle unselectedStyle = {50, BLACK};
@@ -31,34 +34,4 @@ BoardSelectionMenuLayer::BoardSelectionMenuLayer()
 
     m_menu.AddOption(MenuOption("Back", selectedStyle, unselectedStyle, true, false,
                                 [this]() { TransitionTo(std::make_unique<MainMenuLayer>()); }));
-}
-
-BoardSelectionMenuLayer::~BoardSelectionMenuLayer() = default;
-
-void BoardSelectionMenuLayer::OnUpdate(float ts)
-{
-    auto inputManager = Core::Application::GetInputManager();
-
-    if (inputManager->IsAction("move_down", Core::InputState::PRESSED))
-    {
-        m_menu.SelectNext();
-    }
-    else if (inputManager->IsAction("move_up", Core::InputState::PRESSED))
-    {
-        m_menu.SelectPrevious();
-    }
-    else if (inputManager->IsAction("confirm", Core::InputState::PRESSED))
-    {
-        m_menu.ConfirmSelection();
-    }
-
-    if (m_menu.IsUIUpdateNeeded())
-    {
-        m_menu.UpdateOptionsAnchorPointPositions();
-    }
-}
-
-void BoardSelectionMenuLayer::OnRender()
-{
-    m_menu.Render();
 }

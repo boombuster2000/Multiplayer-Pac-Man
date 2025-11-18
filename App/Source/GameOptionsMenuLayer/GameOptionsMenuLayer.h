@@ -1,16 +1,15 @@
 #pragma once
 
-#include "Core/Layer.h"
-#include "UIComponents/Menu.h"
+#include "BaseMenuLayer/BaseMenuLayer.h"
 
-class GameOptionsMenuLayer : public Core::Layer
+class GameOptionsMenuLayer : public BaseMenuLayer
 {
   private:
-    UIComponents::Menu m_menu;
+    virtual void SetupMenuOptions() override;
 
   public:
     GameOptionsMenuLayer();
-    virtual ~GameOptionsMenuLayer();
+    virtual ~GameOptionsMenuLayer() = default;
 
     virtual void OnUpdate(float ts) override;
     virtual void OnRender() override;
