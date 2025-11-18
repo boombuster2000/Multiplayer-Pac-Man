@@ -1,6 +1,6 @@
 #include "Core/Application.h"
-#include "MainMenuLayer/MainMenuLayer.h"
 #include "OverlayLayer/OverlayLayer.h"
+#include "ProfileSelectionMenuLayer/ProfileSelectionLayer.h"
 
 void LoadAllTextures()
 {
@@ -22,6 +22,6 @@ int main()
     LoadAllTextures();
 
     Core::Application::QueuePush(std::make_unique<OverlayLayer>());
-    Core::Application::QueuePush(std::make_unique<MainMenuLayer>());
+    Core::Application::QueuePush(std::make_unique<ProfileSelectionMenuLayer>());
     application.Run();
 }
