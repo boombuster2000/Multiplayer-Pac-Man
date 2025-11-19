@@ -11,14 +11,14 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(FETCHCONTENT_BASE_DIR "${CMAKE_SOURCE_DIR}/.cmake_cache")
 
 # Add subprojects
-add_subdirectory(Core)
-add_subdirectory(App)
+add_subdirectory(engine)
+add_subdirectory(game)
 
 # Define the source and destination resource directories
-set(RESOURCE_SRC_DIR ${CMAKE_SOURCE_DIR}/Resources)
-set(RESOURCE_DST_DIR $<TARGET_FILE_DIR:Pac-Man>/Resources)
-set(BOARDS_SRC_DIR ${CMAKE_SOURCE_DIR}/Boards)
-set(BOARDS_DST_DIR $<TARGET_FILE_DIR:Pac-Man>/Boards)
+set(RESOURCE_SRC_DIR ${CMAKE_SOURCE_DIR}/resources)
+set(RESOURCE_DST_DIR $<TARGET_FILE_DIR:Pac-Man>/resources)
+set(BOARDS_SRC_DIR ${CMAKE_SOURCE_DIR}/resources/boards)
+set(BOARDS_DST_DIR $<TARGET_FILE_DIR:Pac-Man>/resources/boards)
 
 # Recursively collect all resource files
 file(GLOB_RECURSE RESOURCE_FILES "${RESOURCE_SRC_DIR}/*")
