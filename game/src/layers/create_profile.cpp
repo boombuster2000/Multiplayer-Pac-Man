@@ -1,10 +1,12 @@
 #include "game/layers/create_profile.h"
 #include "engine/ui/enums.h"
+#include "engine/ui/text_menu_option.h"
 #include "game/components/player.h"
 #include "game/game_application.h"
 #include "game/layers/board_selection_menu.h"
 #include "game/layers/main_menu.h"
 #include "game/layers/profile_selection_menu_layer.h"
+
 
 void CreateProfileLayer::SetupMenuOptions()
 {
@@ -12,10 +14,10 @@ void CreateProfileLayer::SetupMenuOptions()
     TextStyle unselectedStyle = {20, BLACK};
     TextStyle selectedStyle = {25, RED};
 
-    m_menu.AddOption(
-        MenuOption("Continue", selectedStyle, unselectedStyle, true, true, [this]() { this->OnContinueClicked(); }));
-    m_menu.AddOption(
-        MenuOption("Back", selectedStyle, unselectedStyle, true, false, [this]() { this->OnBackClicked(); }));
+    m_menu.AddOption(std::make_unique<TextMenuOption>("Continue", selectedStyle, unselectedStyle, true,
+                                                      [this]() { this->OnContinueClicked(); }));
+    m_menu.AddOption(std::make_unique<TextMenuOption>("Back", selectedStyle, unselectedStyle, false,
+                                                      [this]() { this->OnBackClicked(); }));
 }
 
 CreateProfileLayer::CreateProfileLayer() : BaseMenuLayer(ui::Alignment::CENTER, true, 10.0f)

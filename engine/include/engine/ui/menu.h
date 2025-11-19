@@ -2,6 +2,7 @@
 #include "engine/core/vector2ex.h"
 #include "engine/ui/menu_option.h"
 #include "engine/ui/renderable_object.h"
+#include <memory>
 #include <vector>
 
 namespace ui
@@ -11,7 +12,7 @@ class Menu : public RenderableObject
 {
 
   private:
-    std::vector<MenuOption> m_options;
+    std::vector<std::unique_ptr<MenuOption>> m_options;
 
     int m_selectedIndex;
     float m_spacing;
@@ -24,7 +25,7 @@ class Menu : public RenderableObject
          float spacing);
     ~Menu() = default;
 
-    void AddOption(MenuOption option);
+    void AddOption(std::unique_ptr<MenuOption> option);
     void DeleteOption(int index);
     void ClearOptions();
 

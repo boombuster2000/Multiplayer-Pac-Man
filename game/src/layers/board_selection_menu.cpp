@@ -1,5 +1,6 @@
 #include "game/layers/board_selection_menu.h"
 #include "engine/core/application.h"
+#include "engine/ui/text_menu_option.h"
 #include "game/layers/game.h"
 #include "game/layers/main_menu.h"
 #include <filesystem>
@@ -17,8 +18,8 @@ void BoardSelectionMenuLayer::SetupMenuOptions()
     TextStyle unselectedStyle = {50, BLACK};
     TextStyle selectedStyle = {60, RED};
 
-    m_menu.AddOption(MenuOption("built-in", selectedStyle, unselectedStyle, true, true,
-                                [this]() { TransistionTo(std::make_unique<GameLayer>()); }));
+    m_menu.AddOption(std::make_unique<TextMenuOption>("built-in", selectedStyle, unselectedStyle, true,
+                                                      [this]() { TransistionTo(std::make_unique<GameLayer>()); }));
 
     const std::string path = "./resources/boards/";
     for (const auto& entry : std::filesystem::directory_iterator(path))
@@ -27,11 +28,13 @@ void BoardSelectionMenuLayer::SetupMenuOptions()
         {
             std::string filename = entry.path().stem().string();
             std::string fullPath = entry.path().string();
-            m_menu.AddOption(MenuOption(filename, selectedStyle, unselectedStyle, true, false,
-                                        [this, fullPath]() { TransistionTo(std::make_unique<GameLayer>(fullPath)); }));
+            m_menu.AddOption(
+                std::make_unique<TextMenuOption>(filename, selectedStyle, unselectedStyle, false, [this, fullPath]() {
+                    TransistionTo(std::make_unique<GameLayer>(fullPath));
+                }));
         }
     }
 
-    m_menu.AddOption(MenuOption("Back", selectedStyle, unselectedStyle, true, false,
-                                [this]() { TransistionTo(std::make_unique<MainMenuLayer>()); }));
+    m_menu.AddOption(std::make_unique<TextMenuOption>("Back", selectedStyle, unselectedStyle, false,
+                                                      [this]() { TransistionTo(std::make_unique<MainMenuLayer>()); }));
 }

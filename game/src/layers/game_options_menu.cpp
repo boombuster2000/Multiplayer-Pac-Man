@@ -1,8 +1,10 @@
 #include "game/layers/game_options_menu.h"
 #include "engine/core/application.h"
 #include "engine/core/input_manager.h"
+#include "engine/ui/text_menu_option.h"
 #include "game/layers/game.h"
 #include "game/layers/main_menu.h"
+#include <memory>
 
 GameOptionsMenuLayer::GameOptionsMenuLayer() : BaseMenuLayer(ui::Alignment::CENTER, true, 10.0f)
 {
@@ -15,7 +17,7 @@ void GameOptionsMenuLayer::SetupMenuOptions()
     TextStyle unselectedStyle = {50, BLACK};
     TextStyle selectedStyle = {60, RED};
 
-    m_menu.AddOption(MenuOption("Resume", selectedStyle, unselectedStyle, true, true, [this]() {
+    m_menu.AddOption(std::make_unique<TextMenuOption>("Resume", selectedStyle, unselectedStyle, true, [this]() {
         GameLayer* gameLayer = engine::Application::Get().GetLayer<GameLayer>();
         if (gameLayer)
         {
@@ -24,9 +26,9 @@ void GameOptionsMenuLayer::SetupMenuOptions()
         }
     }));
 
-    m_menu.AddOption(MenuOption("Options", selectedStyle, unselectedStyle, true, false));
+    m_menu.AddOption(std::make_unique<TextMenuOption>("Options", selectedStyle, unselectedStyle, false));
 
-    m_menu.AddOption(MenuOption("Return To Menu", selectedStyle, unselectedStyle, true, false, []() {
+    m_menu.AddOption(std::make_unique<TextMenuOption>("Return To Menu", selectedStyle, unselectedStyle, false, []() {
         GameLayer* gameLayer = engine::Application::Get().GetLayer<GameLayer>();
         if (gameLayer)
         {
