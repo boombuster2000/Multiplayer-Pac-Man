@@ -1,33 +1,33 @@
 #pragma once
-
-#include "engine/ui/enums.h"
 #include "engine/ui/renderable_object.h"
-#include "engine/ui/text.h"
-#include "engine/ui/text_style.h"
 #include <functional>
-#include <string>
 
 namespace ui
 {
+class RenderableObject;
 
-class MenuOption : public Text
+class MenuOption
 {
-
   private:
     bool m_isSelected;
-    TextStyle m_selectedStyle;
-    TextStyle m_unselectedStyle;
     std::function<void()> m_callback;
 
+  protected:
+    virtual void UpdateStyle() = 0;
+
   public:
-    MenuOption(std::string text, TextStyle selectedStyle, TextStyle unselectedStyle, bool visible, bool IsSelected,
-               std::function<void()> callback = nullptr);
+    MenuOption(bool isSelected, std::function<void()> callback = nullptr);
 
     ~MenuOption() = default;
 
-    void SetSelected(bool selected);
+    void SetSelected(const bool selected);
+
     bool IsSelected() const;
+
     void Select();
+
+    virtual RenderableObject& GetRenderableObject() = 0;
+    virtual const RenderableObject& GetRenderableObject() const = 0;
 };
 
 } // namespace ui
