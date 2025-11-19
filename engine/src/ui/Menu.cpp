@@ -1,5 +1,4 @@
 #include "engine/ui/menu.h"
-#include <iostream>
 #include <stdexcept>
 
 namespace ui
@@ -11,15 +10,15 @@ Menu::Menu(Vector2Ex<float> anchorPointPosition, AnchorPoint anchorPoint, Alignm
 {
 }
 
-void Menu::AddOption(MenuOption option)
+void Menu::AddOption(std::unique_ptr<MenuOption> option)
 {
     // If this is the first option, mark it as selected.
     if (m_options.empty())
     {
-        option.SetSelected(true);
+        option->SetSelected(true);
     }
 
-    m_options.push_back(option);
+    m_options.push_back(std::move(option));
     m_isUIupdateNeeded = true; // Let the update function handle all positioning.
 }
 
@@ -34,7 +33,7 @@ void Menu::DeleteOption(int index)
         m_selectedIndex = static_cast<int>(m_options.size()) - 1;
 
     if (!m_options.empty())
-        m_options[m_selectedIndex].SetSelected(true);
+        m_options[m_selectedIndex]->SetSelected(true);
 
     m_isUIupdateNeeded = true;
 }
@@ -52,9 +51,9 @@ void Menu::SelectNext()
     if (m_options.empty())
         return;
 
-    m_options[m_selectedIndex].SetSelected(false);
+    m_options[m_selectedIndex]->SetSelected(false);
     m_selectedIndex = (m_selectedIndex + 1) % m_options.size();
-    m_options[m_selectedIndex].SetSelected(true);
+    m_options[m_selectedIndex]->SetSelected(true);
 
     m_isUIupdateNeeded = true;
 }
@@ -64,9 +63,9 @@ void Menu::SelectPrevious()
     if (m_options.empty())
         return;
 
-    m_options[m_selectedIndex].SetSelected(false);
+    m_options[m_selectedIndex]->SetSelected(false);
     m_selectedIndex = (m_selectedIndex - 1 + m_options.size()) % m_options.size();
-    m_options[m_selectedIndex].SetSelected(true);
+    m_options[m_selectedIndex]->SetSelected(true);
 
     m_isUIupdateNeeded = true;
 }
@@ -76,7 +75,7 @@ void Menu::ConfirmSelection()
     if (m_options.empty())
         return;
 
-    m_options[m_selectedIndex].Select();
+    m_options[m_selectedIndex]->Select();
 }
 
 const MenuOption& Menu::GetSelectedOption() const
@@ -84,7 +83,7 @@ const MenuOption& Menu::GetSelectedOption() const
     if (m_options.empty())
         throw std::out_of_range("No options in the menu.");
 
-    return m_options[m_selectedIndex];
+    return *m_options[m_selectedIndex];
 }
 
 int Menu::GetSelectedIndex() const
@@ -128,19 +127,14 @@ void Menu::UpdateOptionsAnchorPointPositions()
     // 3. Loop through all options to set their origin and calculate their final position
     for (size_t i = 0; i < m_options.size(); ++i)
     {
-        // Set the option's internal object origin to match the menu's alignment
-        m_options[i].SetOrigin(alignmentAnchor);
-
-        // For options after the first one, calculate the new vertical position
-        if (i > 0)
-        {
-            const auto& lastOption = m_options[i - 1];
-            // The new Y is the previous option's top-left Y + its height + spacing
-            currentPosition.y = lastOption.GetPositionAtAnchor().y + lastOption.GetDimensions().y + m_spacing;
-        }
+        RenderableObject& object = m_options[i]->GetRenderableObject();
+        object.SetOrigin(alignmentAnchor);
 
         // Set the world position of the option's origin
-        m_options[i].SetPosition(currentPosition);
+        object.SetPosition(currentPosition);
+
+        // Update currentPosition for the next option
+        currentPosition.y += object.GetDimensions().y + m_spacing;
     }
 
     m_isUIupdateNeeded = false;
@@ -153,7 +147,7 @@ Vector2Ex<float> Menu::GetDimensions() const
 
     for (const auto& option : m_options)
     {
-        Vector2Ex<float> optionSize = option.GetDimensions();
+        Vector2Ex<float> optionSize = option->GetRenderableObject().GetDimensions();
         if (optionSize.x > width)
             width = optionSize.x;
         height += optionSize.y + m_spacing;
@@ -172,7 +166,7 @@ void Menu::Render(Vector2Ex<float> offset) const
 
     for (const auto& option : m_options)
     {
-        option.Render(offset);
+        option->GetRenderableObject().Render(offset);
     }
 }
 } // namespace ui
