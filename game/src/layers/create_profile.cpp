@@ -7,7 +7,6 @@
 #include "game/layers/main_menu.h"
 #include "game/layers/profile_selection_menu_layer.h"
 
-
 void CreateProfileLayer::SetupMenuOptions()
 {
     using namespace ui;
@@ -25,12 +24,10 @@ CreateProfileLayer::CreateProfileLayer() : BaseMenuLayer(ui::Alignment::CENTER, 
     using namespace ui;
     const Vector2Ex<float> centreOfScreen = {(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2};
 
-    const TextStyle backgroundTextStyle = {20.0f, GRAY};
-    const TextStyle typedTextStyle = {20.0f, BLACK};
+    TextBoxStyle style = {2.0f, BLACK, WHITE, {20.0f, GRAY}, {20.0f, BLACK}, Alignment::CENTER, 2.0f};
 
-    m_profileNameInput =
-        std::make_unique<TextBox>(centreOfScreen, Vector2Ex<float>{200, 50}, typedTextStyle, Alignment::CENTER,
-                                  AnchorPoint::MIDDLE, 2.0f, backgroundTextStyle, "Enter Profile Name", true);
+    m_profileNameInput = std::make_unique<TextBox>(centreOfScreen, Vector2Ex<float>{200, 50}, style,
+                                                   "Enter Profile Name", AnchorPoint::MIDDLE, true);
 
     SetupMenuOptions();
     m_menu.SetPosition({centreOfScreen.x, centreOfScreen.y + 100});
@@ -45,7 +42,7 @@ void CreateProfileLayer::OnUpdate(float ts)
 void CreateProfileLayer::OnRender()
 {
     BaseMenuLayer::OnRender();
-    m_profileNameInput->Render();
+    m_profileNameInput->Render({0, 0});
 }
 
 void CreateProfileLayer::OnContinueClicked()
