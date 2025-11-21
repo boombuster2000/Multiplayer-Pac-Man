@@ -1,5 +1,5 @@
-#include "engine/ui/enums.h"
 #include "engine/ui/text_box.h"
+#include "engine/ui/enums.h"
 #include "raylib.h"
 #include <unordered_map>
 
@@ -57,13 +57,13 @@ Vector2Ex<float> TextBox::CalculateTextPositionOffset(const Vector2Ex<float>& bo
                                                       const Vector2Ex<float>& textDimensions) const
 {
     float x = 0.0f;
-    switch (m_textAlignment)
+    switch (m_style.alignment)
     {
     case Alignment::LEFT:
-        x = m_padding;
+        x = m_style.padding;
         break;
     case Alignment::RIGHT:
-        x = boxDimensions.x - textDimensions.x - m_padding;
+        x = boxDimensions.x - textDimensions.x - m_style.padding;
         break;
     case Alignment::CENTER:
         x = (boxDimensions.x - textDimensions.x) / 2;
@@ -84,13 +84,11 @@ void TextBox::UpdateTextPosition()
     m_text.SetPosition(newTextPos);
 }
 
-TextBox::TextBox(Vector2Ex<float> position, Vector2Ex<float> dimensions, TextStyle typedTextStyle,
-                 Alignment textAlignment, AnchorPoint anchorPoint, float padding, TextStyle backgroundTextStyle,
-                 std::string backgroundText, bool visible)
-    : RenderableObject(position, anchorPoint, visible), m_dimensions(dimensions), m_typedTextStyle(typedTextStyle),
-      m_text("", typedTextStyle, position, AnchorPoint::TOP_LEFT, visible), m_textAlignment(textAlignment),
-      m_padding(padding), m_backgroundTextStyle(backgroundTextStyle),
-      m_backgroundText(backgroundText, backgroundTextStyle, position, AnchorPoint::TOP_LEFT, visible),
+TextBox::TextBox(Vector2Ex<float> position, Vector2Ex<float> dimensions, const TextBoxStyle& style,
+                 const std::string& backgroundText, AnchorPoint anchorPoint, bool visible)
+    : RenderableObject(position, anchorPoint, visible), m_dimensions(dimensions),
+      m_text("", style.typingTextStyle, position, AnchorPoint::TOP_LEFT, visible), m_style(style),
+      m_backgroundText(backgroundText, style.backgroundTextStyle, position, AnchorPoint::TOP_LEFT, visible),
       m_cursorVisible(true), m_cursorTimer(0.0f)
 {
     SetOrigin(anchorPoint);
@@ -117,8 +115,9 @@ Vector2Ex<float> TextBox::GetDimensions() const
 void TextBox::Render(Vector2Ex<float> offset) const
 {
     const Vector2Ex<float>& renderPos = GetPositionAtAnchor(AnchorPoint::TOP_LEFT) + offset;
-    DrawRectangleV(renderPos, m_dimensions, LIGHTGRAY);
-    DrawRectangleLinesEx({renderPos.x, renderPos.y, m_dimensions.x, m_dimensions.y}, 1, BLACK);
+    DrawRectangleV(renderPos, m_dimensions, m_style.backgroundColor);
+    DrawRectangleLinesEx({renderPos.x, renderPos.y, m_dimensions.x, m_dimensions.y}, m_style.boarderThickness,
+                         m_style.borderColor);
 
     if (m_text.GetText().empty())
     {
@@ -134,6 +133,18 @@ void TextBox::Render(Vector2Ex<float> offset) const
             DrawCursor(cursorPosition + offset, m_text.GetFontSize(), BLACK);
         }
     }
+}
+
+void TextBox::SetStyle(const TextBoxStyle& style)
+{
+    m_style = style;
+    m_text.SetStyle(m_style.typingTextStyle);
+    m_backgroundText.SetStyle(m_style.backgroundTextStyle);
+}
+
+std::string TextBox::GetText() const
+{
+    return m_text.GetText();
 }
 
 void TextBox::DrawCursor(Vector2Ex<float> position, float fontSize, Color color) const
