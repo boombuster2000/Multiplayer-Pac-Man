@@ -17,6 +17,8 @@ class TextBox : public RenderableObject
     bool m_cursorVisible;
     float m_cursorTimer;
     TextBoxStyle m_style;
+    TextBoxStyle m_activeStyle;
+    TextBoxStyle m_renderStyle;
     bool m_isActive;
 
   private:
@@ -29,8 +31,8 @@ class TextBox : public RenderableObject
 
   public:
     TextBox(Vector2Ex<float> position, Vector2Ex<float> dimensions, const TextBoxStyle& style,
-            const std::string& backgroundText = "", AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT,
-            bool isActive = false, bool visible = true);
+            const TextBoxStyle& activeStyle, const std::string& backgroundText = "",
+            AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT, bool isActive = false, bool visible = true);
 
     void SetStyle(const TextBoxStyle& style);
     std::string GetText() const;

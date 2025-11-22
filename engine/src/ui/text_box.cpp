@@ -91,9 +91,11 @@ void TextBox::UpdateAllTextPositions()
 }
 
 TextBox::TextBox(Vector2Ex<float> position, Vector2Ex<float> dimensions, const TextBoxStyle& style,
-                 const std::string& backgroundText, AnchorPoint anchorPoint, bool isActive, bool visible)
+                 const TextBoxStyle& activeStyle, const std::string& backgroundText, AnchorPoint anchorPoint,
+                 bool isActive, bool visible)
     : RenderableObject(position, anchorPoint, visible), m_dimensions(dimensions),
       m_text("", style.typingTextStyle, position, AnchorPoint::TOP_LEFT, visible), m_style(style),
+      m_activeStyle(activeStyle), m_renderStyle(isActive ? activeStyle : style),
       m_backgroundText(backgroundText, style.backgroundTextStyle, position, AnchorPoint::TOP_LEFT, visible),
       m_isActive(isActive), m_cursorVisible(isActive), m_cursorTimer(0.0f)
 {
@@ -120,6 +122,9 @@ void TextBox::SetActive(bool isActive)
 {
     m_isActive = isActive;
     m_cursorVisible = isActive ? m_cursorVisible : false;
+    m_renderStyle = isActive ? m_activeStyle : m_style;
+    m_text.SetStyle(m_renderStyle.typingTextStyle);
+    m_backgroundText.SetStyle(m_renderStyle.backgroundTextStyle);
 }
 
 Vector2Ex<float> TextBox::GetDimensions() const
@@ -136,9 +141,9 @@ void TextBox::SetPosition(Vector2Ex<float> position)
 void TextBox::Render(Vector2Ex<float> offset) const
 {
     const Vector2Ex<float>& renderPos = GetPositionAtAnchor(AnchorPoint::TOP_LEFT) + offset;
-    DrawRectangleV(renderPos, m_dimensions, m_style.backgroundColor);
-    DrawRectangleLinesEx({renderPos.x, renderPos.y, m_dimensions.x, m_dimensions.y}, m_style.boarderThickness,
-                         m_style.borderColor);
+    DrawRectangleV(renderPos, m_dimensions, m_renderStyle.backgroundColor);
+    DrawRectangleLinesEx({renderPos.x, renderPos.y, m_dimensions.x, m_dimensions.y}, m_renderStyle.boarderThickness,
+                         m_renderStyle.borderColor);
 
     if (m_text.GetText().empty())
     {
@@ -159,8 +164,13 @@ void TextBox::Render(Vector2Ex<float> offset) const
 void TextBox::SetStyle(const TextBoxStyle& style)
 {
     m_style = style;
-    m_text.SetStyle(m_style.typingTextStyle);
-    m_backgroundText.SetStyle(m_style.backgroundTextStyle);
+
+    if (!m_isActive)
+    {
+        m_renderStyle = style;
+        m_text.SetStyle(m_renderStyle.typingTextStyle);
+        m_backgroundText.SetStyle(m_renderStyle.backgroundTextStyle);
+    }
 }
 
 std::string TextBox::GetText() const

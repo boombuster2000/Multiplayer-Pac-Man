@@ -29,11 +29,13 @@ CreateProfileLayer::CreateProfileLayer() : BaseMenuLayer(ui::Alignment::CENTER, 
 
     TextBoxStyle selectedBoxStyle = {2.0f, RED, WHITE, {20.0f, GRAY}, {20.0f, BLACK}, Alignment::CENTER, 2.0f};
     TextBoxStyle unselectedBoxStyle = {2.0f, BLACK, WHITE, {20.0f, GRAY}, {20.0f, BLACK}, Alignment::CENTER, 2.0f};
+    TextBoxStyle activeBoxStyle = {2.0f, DARKBLUE, WHITE, {20.0f, GRAY}, {20.0f, BLACK}, Alignment::CENTER, 2.0f};
 
     // Create unique_ptr locally, capture raw pointer, then hand ownership to menu
     auto localTextBox = std::make_unique<ui::TextBoxOption>(
-        Vector2Ex<float>{200, 50}, selectedBoxStyle, unselectedBoxStyle, "Enter Profile Name", ui::AnchorPoint::MIDDLE,
-        false, true, false, [this]() { this->m_profileNameInput->SetActive(!(this->m_profileNameInput->IsActive())); });
+        Vector2Ex<float>{200, 50}, selectedBoxStyle, unselectedBoxStyle, activeBoxStyle, "Enter Profile Name",
+        ui::AnchorPoint::MIDDLE, false, true, false,
+        [this]() { this->m_profileNameInput->SetActive(!(this->m_profileNameInput->IsActive())); });
 
     m_profileNameInput = localTextBox.get();
     m_menu.AddOption(std::move(localTextBox));
