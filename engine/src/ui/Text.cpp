@@ -5,7 +5,7 @@ namespace ui
 
 Text::Text(std::string text, TextStyle textStyle, Vector2Ex<float> anchorPointPosition, AnchorPoint anchorPoint,
            bool visible)
-    : RenderableObject(anchorPointPosition, anchorPoint, visible)
+    : RenderableObject(anchorPointPosition, anchorPoint, visible), m_style(textStyle)
 {
     SetText(text);
     SetFontSize(textStyle.fontSize);
