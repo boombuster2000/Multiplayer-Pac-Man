@@ -1,16 +1,18 @@
 #pragma once
 
 #include "base_menu.h"
-#include "engine/ui/text_box.h"
+#include "engine/ui/text_box_option.h"
 #include <memory>
 
 class CreateProfileLayer : public BaseMenuLayer
 {
   private:
-    std::unique_ptr<ui::TextBox> m_profileNameInput;
+    ui::TextBoxOption* m_profileNameInput;
 
+  private:
     virtual void SetupMenuOptions() override;
 
+    void OnTextBoxClicked();
     void OnContinueClicked();
     void OnBackClicked();
 

@@ -17,11 +17,12 @@ class TextBox : public RenderableObject
     bool m_cursorVisible;
     float m_cursorTimer;
     TextBoxStyle m_style;
+    bool m_isActive;
 
   private:
     void HandleKeyPresses();
     void UpdateCursor();
-    void UpdateTextPosition();
+    void UpdateAllTextPositions();
     void DrawCursor(Vector2Ex<float> position, float fontSize, Color color) const;
     Vector2Ex<float> CalculateTextPositionOffset(const Vector2Ex<float>& boxDimensions,
                                                  const Vector2Ex<float>& textDimensions) const;
@@ -29,12 +30,17 @@ class TextBox : public RenderableObject
   public:
     TextBox(Vector2Ex<float> position, Vector2Ex<float> dimensions, const TextBoxStyle& style,
             const std::string& backgroundText = "", AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT,
-            bool visible = true);
+            bool isActive = false, bool visible = true);
 
-    void Update();
-    void Render(Vector2Ex<float> offset) const override;
-    Vector2Ex<float> GetDimensions() const override;
     void SetStyle(const TextBoxStyle& style);
     std::string GetText() const;
+    void Update();
+
+    bool IsActive() const;
+    void SetActive(bool isActive);
+
+    void SetPosition(Vector2Ex<float> position) override;
+    Vector2Ex<float> GetDimensions() const override;
+    void Render(Vector2Ex<float> offset) const override;
 };
 } // namespace ui

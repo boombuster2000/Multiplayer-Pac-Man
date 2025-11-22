@@ -17,11 +17,17 @@ class TextBoxOption : public MenuOption
     void UpdateStyle() override;
 
   public:
-    TextBoxOption(Vector2Ex<float> position, Vector2Ex<float> dimensions, const TextBoxStyle& selectedStyle,
-                  const TextBoxStyle& unselectedStyle, const std::string& backgroundText = "",
-                  AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT, bool visible = true, bool isSelected = false,
+    TextBoxOption(Vector2Ex<float> dimensions, const TextBoxStyle& selectedStyle, const TextBoxStyle& unselectedStyle,
+                  const std::string& backgroundText = "", AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT,
+                  bool isActive = false, bool visible = true, bool isSelected = false,
                   std::function<void()> callback = nullptr);
 
+    void Update();
+
+    bool IsActive() const;
+    void SetActive(bool isActive);
+
+    std::string GetText() const;
     RenderableObject& GetRenderableObject() override;
     const RenderableObject& GetRenderableObject() const override;
 };

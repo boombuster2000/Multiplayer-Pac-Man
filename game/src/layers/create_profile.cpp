@@ -1,4 +1,6 @@
 #include "game/layers/create_profile.h"
+#include "engine/core/application.h"
+#include "engine/core/input_manager.h"
 #include "engine/ui/enums.h"
 #include "engine/ui/text_menu_option.h"
 #include "game/components/player.h"
@@ -13,8 +15,9 @@ void CreateProfileLayer::SetupMenuOptions()
     TextStyle unselectedStyle = {20, BLACK};
     TextStyle selectedStyle = {25, RED};
 
-    m_menu.AddOption(std::make_unique<TextMenuOption>("Continue", selectedStyle, unselectedStyle, true,
+    m_menu.AddOption(std::make_unique<TextMenuOption>("Continue", selectedStyle, unselectedStyle, false,
                                                       [this]() { this->OnContinueClicked(); }));
+
     m_menu.AddOption(std::make_unique<TextMenuOption>("Back", selectedStyle, unselectedStyle, false,
                                                       [this]() { this->OnBackClicked(); }));
 }
@@ -24,25 +27,45 @@ CreateProfileLayer::CreateProfileLayer() : BaseMenuLayer(ui::Alignment::CENTER, 
     using namespace ui;
     const Vector2Ex<float> centreOfScreen = {(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2};
 
-    TextBoxStyle style = {2.0f, BLACK, WHITE, {20.0f, GRAY}, {20.0f, BLACK}, Alignment::CENTER, 2.0f};
+    TextBoxStyle selectedBoxStyle = {2.0f, RED, WHITE, {20.0f, GRAY}, {20.0f, BLACK}, Alignment::CENTER, 2.0f};
+    TextBoxStyle unselectedBoxStyle = {2.0f, BLACK, WHITE, {20.0f, GRAY}, {20.0f, BLACK}, Alignment::CENTER, 2.0f};
 
-    m_profileNameInput = std::make_unique<TextBox>(centreOfScreen, Vector2Ex<float>{200, 50}, style,
-                                                   "Enter Profile Name", AnchorPoint::MIDDLE, true);
+    // Create unique_ptr locally, capture raw pointer, then hand ownership to menu
+    auto localTextBox = std::make_unique<ui::TextBoxOption>(
+        Vector2Ex<float>{200, 50}, selectedBoxStyle, unselectedBoxStyle, "Enter Profile Name", ui::AnchorPoint::MIDDLE,
+        false, true, false, [this]() { this->m_profileNameInput->SetActive(!(this->m_profileNameInput->IsActive())); });
 
+    m_profileNameInput = localTextBox.get();
+    m_menu.AddOption(std::move(localTextBox));
     SetupMenuOptions();
     m_menu.SetPosition({centreOfScreen.x, centreOfScreen.y + 100});
 }
 
 void CreateProfileLayer::OnUpdate(float ts)
 {
-    BaseMenuLayer::OnUpdate(ts);
-    m_profileNameInput->Update();
+    auto inputManager = engine::Application::GetInputManager();
+
+    if (!m_profileNameInput->IsActive())
+        BaseMenuLayer::OnUpdate(ts);
+    else
+    {
+
+        m_profileNameInput->Update();
+
+        if (inputManager->IsAction("confirm", engine::InputState::PRESSED))
+        {
+            m_profileNameInput->SetActive(false);
+        }
+    }
 }
 
 void CreateProfileLayer::OnRender()
 {
     BaseMenuLayer::OnRender();
-    m_profileNameInput->Render({0, 0});
+}
+
+void CreateProfileLayer::OnTextBoxClicked()
+{
 }
 
 void CreateProfileLayer::OnContinueClicked()

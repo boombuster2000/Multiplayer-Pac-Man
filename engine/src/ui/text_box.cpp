@@ -76,40 +76,61 @@ Vector2Ex<float> TextBox::CalculateTextPositionOffset(const Vector2Ex<float>& bo
     return {x, y};
 };
 
-void TextBox::UpdateTextPosition()
+void TextBox::UpdateAllTextPositions()
 {
     const Vector2Ex<float>& textBoxTopLeft = GetPositionAtAnchor(AnchorPoint::TOP_LEFT);
+
     const Vector2Ex<float>& textDimensions = m_text.GetDimensions();
     const Vector2Ex<float>& newTextPos = textBoxTopLeft + CalculateTextPositionOffset(m_dimensions, textDimensions);
     m_text.SetPosition(newTextPos);
-}
 
-TextBox::TextBox(Vector2Ex<float> position, Vector2Ex<float> dimensions, const TextBoxStyle& style,
-                 const std::string& backgroundText, AnchorPoint anchorPoint, bool visible)
-    : RenderableObject(position, anchorPoint, visible), m_dimensions(dimensions),
-      m_text("", style.typingTextStyle, position, AnchorPoint::TOP_LEFT, visible), m_style(style),
-      m_backgroundText(backgroundText, style.backgroundTextStyle, position, AnchorPoint::TOP_LEFT, visible),
-      m_cursorVisible(true), m_cursorTimer(0.0f)
-{
-    SetOrigin(anchorPoint);
-
-    const Vector2Ex<float>& textBoxTopLeft = GetPositionAtAnchor(AnchorPoint::TOP_LEFT);
     const Vector2Ex<float>& backgroundTextSize = m_backgroundText.GetDimensions();
     const Vector2Ex<float>& backgroundTextPos =
         textBoxTopLeft + CalculateTextPositionOffset(m_dimensions, backgroundTextSize);
     m_backgroundText.SetPosition(backgroundTextPos);
 }
 
+TextBox::TextBox(Vector2Ex<float> position, Vector2Ex<float> dimensions, const TextBoxStyle& style,
+                 const std::string& backgroundText, AnchorPoint anchorPoint, bool isActive, bool visible)
+    : RenderableObject(position, anchorPoint, visible), m_dimensions(dimensions),
+      m_text("", style.typingTextStyle, position, AnchorPoint::TOP_LEFT, visible), m_style(style),
+      m_backgroundText(backgroundText, style.backgroundTextStyle, position, AnchorPoint::TOP_LEFT, visible),
+      m_isActive(isActive), m_cursorVisible(isActive), m_cursorTimer(0.0f)
+{
+    SetOrigin(anchorPoint);
+    UpdateAllTextPositions();
+}
+
 void TextBox::Update()
 {
+    if (!IsActive())
+        return;
+
     HandleKeyPresses();
     UpdateCursor();
-    UpdateTextPosition();
+    UpdateAllTextPositions();
+}
+
+bool TextBox::IsActive() const
+{
+    return m_isActive;
+}
+
+void TextBox::SetActive(bool isActive)
+{
+    m_isActive = isActive;
+    m_cursorVisible = isActive ? m_cursorVisible : false;
 }
 
 Vector2Ex<float> TextBox::GetDimensions() const
 {
     return m_dimensions;
+}
+
+void TextBox::SetPosition(Vector2Ex<float> position)
+{
+    RenderableObject::SetPosition(position);
+    UpdateAllTextPositions();
 }
 
 void TextBox::Render(Vector2Ex<float> offset) const
