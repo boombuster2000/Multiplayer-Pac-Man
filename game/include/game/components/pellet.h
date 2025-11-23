@@ -50,5 +50,6 @@ class Pellet : public ui::RenderableObject
     virtual Vector2Ex<float> GetDimensions() const override;
     virtual void Render(Vector2Ex<float> offset = {0, 0}) const override;
 
+    friend void to_json(json&, const Pellet&);
     friend void from_json(const json&, Pellet&);
 };

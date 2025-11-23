@@ -5,14 +5,15 @@
 #include <utility>
 #include <vector>
 
-#include "engine/serialization/renderable_object_json.hpp"
-#include "engine/serialization/vector2ex_json.hpp"
 #include "engine/ui/enums.h"
 #include "engine/ui/grid_tile.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 namespace ui
 {
-template <class T = GridTile> class Grid : public RenderableObject
+template <class T = GridTile>
+class Grid : public RenderableObject
 {
     static_assert(std::is_base_of<GridTile, T>::value, "T must derive from ui::GridTile");
 
@@ -239,5 +240,10 @@ template <class T = GridTile> class Grid : public RenderableObject
             for (const auto& tile : row)
                 tile.Render(offset);
     }
+
+    template <typename U>
+    friend void to_json(json&, const Grid<U>&);
+    template <typename U>
+    friend void from_json(const json&, Grid<U>&);
 };
 } // namespace ui

@@ -3,6 +3,8 @@
 #include "engine/core/vector2ex.h"
 #include "engine/ui/enums.h"
 #include "raylib.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 namespace ui
 {
@@ -69,6 +71,9 @@ class RenderableObject
 
     virtual Vector2Ex<float> GetDimensions() const = 0;
     virtual void Render(Vector2Ex<float> offset) const = 0;
+
+    friend void to_json(json&, const RenderableObject&);
+    friend void from_json(const json&, RenderableObject&);
 };
 
 } // namespace ui
