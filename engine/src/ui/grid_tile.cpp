@@ -1,6 +1,7 @@
+#include "engine/ui/grid_tile.h"
 #include "engine/core/vector2ex.h"
 #include "engine/ui/enums.h"
-#include "engine/ui/grid_tile.h"
+
 
 ui::GridTile::GridTile() : RenderableObject(), m_dimensions(Vector2Ex<float>(0, 0))
 {
@@ -14,11 +15,6 @@ ui::GridTile::GridTile(Vector2Ex<float> dimensions, Vector2Ex<float> position)
 Vector2Ex<float> ui::GridTile::GetDimensions() const
 {
     return m_dimensions;
-}
-
-void ui::GridTile::SetDimensions(const Vector2Ex<float>& dimensions)
-{
-    m_dimensions = dimensions;
 }
 
 void ui::GridTile::Render(Vector2Ex<float> offset) const
