@@ -15,7 +15,8 @@ Board::Board()
     : Grid(Vector2Ex<size_t>(14, 14), Vector2Ex<float>(50, 50),
            Vector2Ex<float>(static_cast<float>(GetScreenWidth()) / 2, static_cast<float>(GetScreenHeight()) / 2),
            ui::AnchorPoint::MIDDLE, Vector2Ex<float>(0, 0), Tile::Type::PATH, Pellet::Type::NORMAL,
-           Vector2Ex<float>(0, 0), Vector2Ex<float>(50, 50))
+           Vector2Ex<float>(0, 0), Vector2Ex<float>(50, 50)),
+      m_name("built-in")
 {
     addBoundaries();
 
@@ -65,16 +66,24 @@ Board::Board(const std::string& filename)
     *this = Board::LoadFromFile(filename);
 }
 
+std::string Board::GetName() const
+{
+    return m_name;
+}
+
 void Board::SetTileType(const Vector2Ex<int>& index, const Tile::Type& type)
 {
     Grid::GetTile(index).SetType(type);
 }
 
-void Board::SaveToFile(const std::string& filename) const
+void Board::SaveToFile() const
 {
     json j = *this;
 
-    std::ofstream file(filename);
+    const std::string boardFolder = "./resources/boards/";
+    const std::string filename = m_name + std::string(".json");
+
+    std::ofstream file(boardFolder + filename);
     if (file.is_open())
     {
         file << j.dump(4);
