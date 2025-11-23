@@ -13,7 +13,6 @@ class Profile
     Profile() = default;
     Profile(std::string username);
 
-    void SetUsername(const std::string& username);
     std::string GetUsername() const;
 
     friend void to_json(json&, const Profile&);

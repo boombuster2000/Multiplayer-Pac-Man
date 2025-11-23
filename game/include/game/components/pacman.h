@@ -19,7 +19,7 @@ class Pacman : public ui::RenderableObject
     ui::Direction m_queuedDirection;
 
   private:
-    void setRotation(const ui::Direction& direction);
+    void SetRotation(const ui::Direction& direction);
 
   public:
     Pacman();

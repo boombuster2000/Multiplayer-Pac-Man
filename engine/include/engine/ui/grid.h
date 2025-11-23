@@ -118,35 +118,14 @@ class Grid : public RenderableObject
         return m_tileDimensions;
     }
 
-    void SetTileDimensions(const Vector2Ex<float>& dimensions)
-    {
-        m_tileDimensions = dimensions;
-    }
-
     Vector2Ex<float> GetSpacing() const
     {
         return m_spacing;
     }
 
-    void SetSpacing(const Vector2Ex<float>& spacing)
-    {
-        m_spacing = spacing;
-    }
-
     Vector2Ex<size_t> GetGridSize() const
     {
         return m_gridSize;
-    }
-
-    void SetGridSize(const Vector2Ex<size_t>& gridSize)
-    {
-        m_gridSize = gridSize;
-
-        m_grid.resize(gridSize.y);
-        for (auto& row : m_grid)
-        {
-            row.resize(gridSize.x);
-        }
     }
 
     Vector2Ex<int> GetRelativeIndexFromPosition(const Vector2Ex<float>& position) const
