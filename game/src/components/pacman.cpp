@@ -3,7 +3,7 @@
 
 Pacman::Pacman() = default;
 
-void Pacman::setRotation(const ui::Direction& direction)
+void Pacman::SetRotation(const ui::Direction& direction)
 {
     switch (direction)
     {
@@ -46,13 +46,13 @@ void Pacman::QueueDirection(ui::Direction direction)
     m_queuedDirection = direction;
 
     if (IsStationary())
-        setRotation(m_queuedDirection);
+        SetRotation(m_queuedDirection);
 }
 
 void Pacman::ApplyQueuedDirection()
 {
     m_currentDirection = m_queuedDirection;
-    setRotation(m_currentDirection);
+    SetRotation(m_currentDirection);
 }
 
 void Pacman::SetPosition(const Vector2Ex<float> position)
