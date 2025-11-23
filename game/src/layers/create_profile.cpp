@@ -16,13 +16,16 @@
 void CreateProfileLayer::SetupMenuOptions()
 {
     using namespace ui;
-    TextStyle unselectedStyle = {20, BLACK};
-    TextStyle selectedStyle = {25, RED};
+    TextStyle unselectedStyle = {30, DARKGRAY};
+    TextStyle selectedStyle = {40, ORANGE};
 
     m_menu.AddOption(std::make_unique<TextMenuOption>("Continue", selectedStyle, unselectedStyle, false,
                                                       [this]() { this->OnContinueClicked(); }));
 
-    m_menu.AddOption(std::make_unique<TextMenuOption>("Back", selectedStyle, unselectedStyle, false,
+    TextStyle backButtonUnselectedStyle = {25, GRAY};
+    TextStyle backButtonSelectedStyle = {30, LIGHTGRAY};
+
+    m_menu.AddOption(std::make_unique<TextMenuOption>("Back", backButtonSelectedStyle, backButtonUnselectedStyle, false,
                                                       [this]() { this->OnBackClicked(); }));
 }
 
@@ -31,7 +34,7 @@ CreateProfileLayer::CreateProfileLayer() : BaseMenuLayer(ui::Alignment::CENTER, 
     using namespace ui;
     const Vector2Ex<float> centreOfScreen = {(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2};
 
-    TextBoxStyle selectedBoxStyle = {2.0f, RED, WHITE, {20.0f, GRAY}, {20.0f, BLACK}, Alignment::CENTER, 2.0f};
+    TextBoxStyle selectedBoxStyle = {2.0f, ORANGE, WHITE, {20.0f, GRAY}, {20.0f, BLACK}, Alignment::CENTER, 2.0f};
     TextBoxStyle unselectedBoxStyle = {2.0f, BLACK, WHITE, {20.0f, GRAY}, {20.0f, BLACK}, Alignment::CENTER, 2.0f};
     TextBoxStyle activeBoxStyle = {2.0f, DARKBLUE, WHITE, {20.0f, GRAY}, {20.0f, BLACK}, Alignment::CENTER, 2.0f};
 

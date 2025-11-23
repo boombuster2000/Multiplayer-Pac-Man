@@ -14,8 +14,8 @@ MainMenuLayer::MainMenuLayer() : BaseMenuLayer(ui::Alignment::CENTER, true, 10.0
 void MainMenuLayer::SetupMenuOptions()
 {
     using namespace ui;
-    TextStyle unselectedStyle = {50, BLACK};
-    TextStyle selectedStyle = {60, RED};
+    TextStyle unselectedStyle = {30, DARKGRAY};
+    TextStyle selectedStyle = {40, ORANGE};
 
     m_menu.AddOption(std::make_unique<TextMenuOption>("Start Game", selectedStyle, unselectedStyle, true, [this]() {
         TransistionTo(std::make_unique<BoardSelectionMenuLayer>());

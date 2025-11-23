@@ -18,13 +18,15 @@ ProfileSelectionMenuLayer::ProfileSelectionMenuLayer() : BaseMenuLayer(ui::Align
 void ProfileSelectionMenuLayer::SetupMenuOptions()
 {
     using namespace ui;
-    TextStyle profile_unselectedStyle = {30, BLACK};
-    TextStyle profile_selectedStyle = {35, RED};
-    TextStyle create_unselectedStyle = {40, BLACK};
-    TextStyle create_selectedStyle = {45, RED};
+    TextStyle profileUnselectedStyle = {30, DARKGRAY};
+    TextStyle profileSelectedStyle = {40, ORANGE};
+
+    TextStyle buttonUnselectedStyle = {25, GRAY};    // Use for "Create Profile" and "Back"
+    TextStyle buttonSelectedStyle = {30, LIGHTGRAY}; // Use for "Create Profile" and "Back"
 
     const std::string path = "profiles";
 
+    bool isFirstOption = true;
     for (const auto& entry : std::filesystem::directory_iterator(path))
     {
         if (entry.is_regular_file() && entry.path().extension() == ".json")
@@ -33,15 +35,22 @@ void ProfileSelectionMenuLayer::SetupMenuOptions()
             nlohmann::json data = nlohmann::json::parse(f);
             auto profile = std::make_shared<Profile>(data.get<Profile>());
 
-            m_menu.AddOption(std::make_unique<TextMenuOption>(profile->GetUsername(), profile_selectedStyle,
-                                                              profile_unselectedStyle, true, [this, profile]() {
+            m_menu.AddOption(std::make_unique<TextMenuOption>(profile->GetUsername(), profileSelectedStyle,
+                                                              profileUnselectedStyle, isFirstOption, [this, profile]() {
                                                                   game::GameApplication::Get().SetProfile(profile);
                                                                   TransistionTo(std::make_unique<MainMenuLayer>());
                                                               }));
+            isFirstOption = false;
         }
     }
 
     m_menu.AddOption(
-        std::make_unique<TextMenuOption>("Create Profile", create_selectedStyle, create_unselectedStyle, false,
+        std::make_unique<TextMenuOption>("Create Profile", buttonSelectedStyle, buttonUnselectedStyle, isFirstOption,
                                          [this]() { TransistionTo(std::make_unique<CreateProfileLayer>()); }));
+
+    if (isFirstOption)
+        isFirstOption = false; // "Create Profile" took the first slot if no profiles existed.
+
+    m_menu.AddOption(std::make_unique<TextMenuOption>("Exit", buttonSelectedStyle, buttonUnselectedStyle, false,
+                                                      [this]() { game::GameApplication::Get().Stop(); }));
 }

@@ -15,10 +15,10 @@ BoardSelectionMenuLayer::BoardSelectionMenuLayer() : BaseMenuLayer(ui::Alignment
 void BoardSelectionMenuLayer::SetupMenuOptions()
 {
     using namespace ui;
-    TextStyle unselectedStyle = {50, BLACK};
-    TextStyle selectedStyle = {60, RED};
+    TextStyle boardUnselectedStyle = {30, DARKGRAY};
+    TextStyle boardSelectedStyle = {40, ORANGE};
 
-    m_menu.AddOption(std::make_unique<TextMenuOption>("built-in", selectedStyle, unselectedStyle, true,
+    m_menu.AddOption(std::make_unique<TextMenuOption>("built-in", boardSelectedStyle, boardUnselectedStyle, true,
                                                       [this]() { TransistionTo(std::make_unique<GameLayer>()); }));
 
     const std::string path = "./resources/boards/";
@@ -28,13 +28,15 @@ void BoardSelectionMenuLayer::SetupMenuOptions()
         {
             std::string filename = entry.path().stem().string();
             std::string fullPath = entry.path().string();
-            m_menu.AddOption(
-                std::make_unique<TextMenuOption>(filename, selectedStyle, unselectedStyle, false, [this, fullPath]() {
-                    TransistionTo(std::make_unique<GameLayer>(fullPath));
-                }));
+            m_menu.AddOption(std::make_unique<TextMenuOption>(
+                filename, boardSelectedStyle, boardUnselectedStyle, false,
+                [this, fullPath]() { TransistionTo(std::make_unique<GameLayer>(fullPath)); }));
         }
     }
 
-    m_menu.AddOption(std::make_unique<TextMenuOption>("Back", selectedStyle, unselectedStyle, false,
+    TextStyle backButtonUnselectedStyle = {25, GRAY};
+    TextStyle backButtonSelectedStyle = {30, LIGHTGRAY};
+
+    m_menu.AddOption(std::make_unique<TextMenuOption>("Back", backButtonSelectedStyle, backButtonUnselectedStyle, false,
                                                       [this]() { TransistionTo(std::make_unique<MainMenuLayer>()); }));
 }

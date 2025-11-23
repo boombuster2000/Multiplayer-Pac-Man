@@ -14,8 +14,8 @@ GameOptionsMenuLayer::GameOptionsMenuLayer() : BaseMenuLayer(ui::Alignment::CENT
 void GameOptionsMenuLayer::SetupMenuOptions()
 {
     using namespace ui;
-    TextStyle unselectedStyle = {50, BLACK};
-    TextStyle selectedStyle = {60, RED};
+    TextStyle unselectedStyle = {30, DARKGRAY};
+    TextStyle selectedStyle = {40, ORANGE};
 
     m_menu.AddOption(std::make_unique<TextMenuOption>("Resume", selectedStyle, unselectedStyle, true, [this]() {
         GameLayer* gameLayer = engine::Application::Get().GetLayer<GameLayer>();
