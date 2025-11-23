@@ -4,10 +4,14 @@
 #include "engine/ui/enums.h"
 #include "engine/ui/text_menu_option.h"
 #include "game/components/player.h"
+#include "game/components/profile.h"
 #include "game/game_application.h"
 #include "game/layers/board_selection_menu.h"
 #include "game/layers/main_menu.h"
 #include "game/layers/profile_selection_menu_layer.h"
+#include "game/serialization/json_converters.hpp"
+#include <fstream>
+#include <nlohmann/json.hpp>
 
 void CreateProfileLayer::SetupMenuOptions()
 {
@@ -76,6 +80,12 @@ void CreateProfileLayer::OnContinueClicked()
     if (!profileName.empty())
     {
         auto profile = std::make_shared<Profile>(profileName);
+
+        using nlohmann::json;
+        json profile_json = *profile;
+        std::ofstream o("profiles/" + profileName + ".json");
+        o << std::setw(4) << profile_json << std::endl;
+
         game::GameApplication::Get().SetProfile(profile);
         TransistionTo(std::make_unique<MainMenuLayer>());
     }
