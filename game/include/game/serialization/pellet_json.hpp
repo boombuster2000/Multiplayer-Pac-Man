@@ -3,6 +3,7 @@
 #include "engine/serialization/vector2ex_json.hpp"
 #include "game/components/pellet.h"
 #include <nlohmann/json.hpp>
+#include <stdexcept>
 
 using nlohmann::json;
 
@@ -15,27 +16,36 @@ NLOHMANN_JSON_SERIALIZE_ENUM(Pellet::Type, {
 inline void to_json(json& j, const Pellet& pellet)
 {
     // Serialize base part first
-    json base;
-    to_json(base, static_cast<const ui::RenderableObject&>(pellet));
+    to_json(j, static_cast<const ui::RenderableObject&>(pellet));
 
-    j = base;
-    j["dimensions"] = pellet.GetDimensions();
-    j["type"] = pellet.GetType();
+    j["dimensions"] = Vector2Ex<float>(pellet.radius, pellet.radius);
+    j["type"] = pellet.m_type;
 }
 
 inline void from_json(const json& j, Pellet& pellet)
 {
+    if (!j.is_object())
+        throw std::runtime_error("Failed to deserialize Pellet: JSON is not an object.");
+
     // Deserialize base fields
     from_json(j, static_cast<ui::RenderableObject&>(pellet));
 
-    if (j.contains("dimensions"))
+    try
     {
         Vector2Ex<float> dims = j.at("dimensions").get<Vector2Ex<float>>();
         pellet.radius = dims.x;
     }
-
-    if (j.contains("type"))
+    catch (const std::exception& e)
     {
-        pellet.m_type = j.at("type").get<Pellet::Type>();
+        throw std::runtime_error("Failed to deserialize Pellet.dimensions: " + std::string(e.what()));
+    }
+
+    try
+    {
+        j.at("type").get_to(pellet.m_type);
+    }
+    catch (const std::exception& e)
+    {
+        throw std::runtime_error("Failed to deserialize Pellet.type: " + std::string(e.what()));
     }
 }
