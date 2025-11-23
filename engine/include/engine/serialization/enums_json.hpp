@@ -2,153 +2,29 @@
 #include "engine/ui/enums.h"
 #include <nlohmann/json.hpp>
 
+// Using NLOHMANN_JSON_SERIALIZE_ENUM is more concise and less error-prone.
+// It throws nlohmann::json::out_of_range for invalid values during deserialization,
+// which is consistent with the library's behavior for other types.
 namespace ui
 {
 
-using namespace ui;
-using json = nlohmann::json;
+NLOHMANN_JSON_SERIALIZE_ENUM(AnchorPoint,
+                             {{AnchorPoint::TOP_LEFT, "TOP_LEFT"},
+                              {AnchorPoint::TOP_MIDDLE, "TOP_MIDDLE"},
+                              {AnchorPoint::TOP_RIGHT, "TOP_RIGHT"},
+                              {AnchorPoint::MIDDLE_LEFT, "MIDDLE_LEFT"},
+                              {AnchorPoint::MIDDLE, "MIDDLE"},
+                              {AnchorPoint::MIDDLE_RIGHT, "MIDDLE_RIGHT"},
+                              {AnchorPoint::BOTTOM_LEFT, "BOTTOM_LEFT"},
+                              {AnchorPoint::BOTTOM_MIDDLE, "BOTTOM_MIDDLE"},
+                              {AnchorPoint::BOTTOM_RIGHT, "BOTTOM_RIGHT"}})
 
-// ----------------- AnchorPoint -----------------
-inline void to_json(json& j, const AnchorPoint& a)
-{
-    switch (a)
-    {
-    case AnchorPoint::TOP_LEFT:
-        j = "TOP_LEFT";
-        break;
-    case AnchorPoint::TOP_MIDDLE:
-        j = "TOP_MIDDLE";
-        break;
-    case AnchorPoint::TOP_RIGHT:
-        j = "TOP_RIGHT";
-        break;
-    case AnchorPoint::MIDDLE_LEFT:
-        j = "MIDDLE_LEFT";
-        break;
-    case AnchorPoint::MIDDLE:
-        j = "MIDDLE";
-        break;
-    case AnchorPoint::MIDDLE_RIGHT:
-        j = "MIDDLE_RIGHT";
-        break;
-    case AnchorPoint::BOTTOM_LEFT:
-        j = "BOTTOM_LEFT";
-        break;
-    case AnchorPoint::BOTTOM_MIDDLE:
-        j = "BOTTOM_MIDDLE";
-        break;
-    case AnchorPoint::BOTTOM_RIGHT:
-        j = "BOTTOM_RIGHT";
-        break;
-    }
-}
+NLOHMANN_JSON_SERIALIZE_ENUM(Alignment, {{Alignment::LEFT, "LEFT"}, {Alignment::CENTER, "CENTER"}, {Alignment::RIGHT, "RIGHT"}})
 
-inline void from_json(const json& j, AnchorPoint& a)
-{
-    const auto& s = j.get<std::string>();
-    if (s == "TOP_LEFT")
-        a = AnchorPoint::TOP_LEFT;
-
-    else if (s == "TOP_MIDDLE")
-        a = AnchorPoint::TOP_MIDDLE;
-
-    else if (s == "TOP_RIGHT")
-        a = AnchorPoint::TOP_RIGHT;
-
-    else if (s == "MIDDLE_LEFT")
-        a = AnchorPoint::MIDDLE_LEFT;
-
-    else if (s == "MIDDLE")
-        a = AnchorPoint::MIDDLE;
-
-    else if (s == "MIDDLE_RIGHT")
-        a = AnchorPoint::MIDDLE_RIGHT;
-
-    else if (s == "BOTTOM_LEFT")
-        a = AnchorPoint::BOTTOM_LEFT;
-
-    else if (s == "BOTTOM_MIDDLE")
-        a = AnchorPoint::BOTTOM_MIDDLE;
-
-    else if (s == "BOTTOM_RIGHT")
-        a = AnchorPoint::BOTTOM_RIGHT;
-
-    else
-        throw std::invalid_argument("Invalid AnchorPoint: " + s);
-}
-
-// ----------------- Alignment -----------------
-inline void to_json(json& j, const Alignment& a)
-{
-    switch (a)
-    {
-    case Alignment::LEFT:
-        j = "LEFT";
-        break;
-    case Alignment::CENTER:
-        j = "CENTER";
-        break;
-    case Alignment::RIGHT:
-        j = "RIGHT";
-        break;
-    }
-}
-
-inline void from_json(const json& j, Alignment& a)
-{
-    const auto& s = j.get<std::string>();
-
-    if (s == "LEFT")
-        a = Alignment::LEFT;
-
-    else if (s == "CENTER")
-        a = Alignment::CENTER;
-
-    else if (s == "RIGHT")
-        a = Alignment::RIGHT;
-
-    else
-        throw std::invalid_argument("Invalid Alignment: " + s);
-}
-
-// ----------------- Direction -----------------
-inline void to_json(json& j, const Direction& d)
-{
-    switch (d)
-    {
-    case Direction::UP:
-        j = "UP";
-        break;
-    case Direction::DOWN:
-        j = "DOWN";
-        break;
-    case Direction::LEFT:
-        j = "LEFT";
-        break;
-    case Direction::RIGHT:
-        j = "RIGHT";
-        break;
-    }
-}
-
-inline void from_json(const json& j, Direction& d)
-{
-    const auto& s = j.get<std::string>();
-
-    if (s == "UP")
-        d = Direction::UP;
-
-    else if (s == "DOWN")
-        d = Direction::DOWN;
-
-    else if (s == "LEFT")
-        d = Direction::LEFT;
-
-    else if (s == "RIGHT")
-        d = Direction::RIGHT;
-
-    else
-        throw std::invalid_argument("Invalid Direction: " + s);
-}
+NLOHMANN_JSON_SERIALIZE_ENUM(Direction,
+                             {{Direction::UP, "UP"},
+                              {Direction::DOWN, "DOWN"},
+                              {Direction::LEFT, "LEFT"},
+                              {Direction::RIGHT, "RIGHT"}})
 
 } // namespace ui
