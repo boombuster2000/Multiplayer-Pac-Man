@@ -21,8 +21,8 @@ void ProfileSelectionMenuLayer::SetupMenuOptions()
     TextStyle profileUnselectedStyle = {30, DARKGRAY};
     TextStyle profileSelectedStyle = {40, ORANGE};
 
-    TextStyle buttonUnselectedStyle = {25, GRAY};    // Use for "Create Profile" and "Back"
-    TextStyle buttonSelectedStyle = {30, LIGHTGRAY}; // Use for "Create Profile" and "Back"
+    TextStyle buttonUnselectedStyle = {25, GRAY}; // Use for "Create Profile" and "Back"
+    TextStyle buttonSelectedStyle = {30, ORANGE}; // Use for "Create Profile" and "Back"
 
     const std::string path = "profiles";
 

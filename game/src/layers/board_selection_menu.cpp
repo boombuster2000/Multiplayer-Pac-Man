@@ -35,7 +35,7 @@ void BoardSelectionMenuLayer::SetupMenuOptions()
     }
 
     TextStyle backButtonUnselectedStyle = {25, GRAY};
-    TextStyle backButtonSelectedStyle = {30, LIGHTGRAY};
+    TextStyle backButtonSelectedStyle = {30, ORANGE};
 
     m_menu.AddOption(std::make_unique<TextMenuOption>("Back", backButtonSelectedStyle, backButtonUnselectedStyle, false,
                                                       [this]() { TransistionTo(std::make_unique<MainMenuLayer>()); }));
