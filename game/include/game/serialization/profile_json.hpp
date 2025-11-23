@@ -7,7 +7,7 @@ using nlohmann::json;
 
 inline void to_json(json& j, const Profile& profile)
 {
-    j = json{{"username", profile.m_username}};
+    j = json{{"username", profile.m_username}, {"personal_highscores", profile.m_personalHighscores}};
 }
 
 inline void from_json(const json& j, Profile& profile)
@@ -22,5 +22,17 @@ inline void from_json(const json& j, Profile& profile)
     catch (const std::exception& e)
     {
         throw std::runtime_error("Failed to deserialize Profile.username: " + std::string(e.what()));
+    }
+
+    if (!j["personal_highscores"].is_object())
+        throw std::runtime_error("Failed to deserialize Profile: JSON.personal_highscores is not an object");
+
+    try
+    {
+        j.at("personal_highscores").get_to(profile.m_personalHighscores);
+    }
+    catch (const std::exception& e)
+    {
+        throw std::runtime_error("Failed to deserialize Profile.personalHighscores: " + std::string(e.what()));
     }
 }
