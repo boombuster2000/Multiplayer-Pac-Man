@@ -17,7 +17,7 @@ concept NumberLike = requires(T a, T b) {
     // Binary operators
     { a + b } -> std::convertible_to<T>;
     { a - b } -> std::convertible_to<T>;
-    { a * b } -> std::convertible_to<T>;
+    { a* b } -> std::convertible_to<T>;
     { a / b } -> std::convertible_to<T>;
     { a == b } -> std::convertible_to<bool>;
 
@@ -25,7 +25,8 @@ concept NumberLike = requires(T a, T b) {
     { std::sqrt(a) } -> std::convertible_to<T>;
 };
 
-template <NumberLike T> class Vector2Ex
+template <NumberLike T>
+class Vector2Ex
 {
   public:
     T x;
@@ -117,12 +118,14 @@ template <NumberLike T> class Vector2Ex
     }
 
     // Scalar operators
-    template <NumberLike U> constexpr Vector2Ex operator*(const U& scalar) const
+    template <NumberLike U>
+    constexpr Vector2Ex operator*(const U& scalar) const
     {
         return {static_cast<T>(x * scalar), static_cast<T>(y * scalar)};
     }
 
-    template <NumberLike U> constexpr Vector2Ex operator/(const U& scalar) const
+    template <NumberLike U>
+    constexpr Vector2Ex operator/(const U& scalar) const
     {
         return {static_cast<T>(x / scalar), static_cast<T>(y / scalar)};
     }
