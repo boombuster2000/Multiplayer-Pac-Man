@@ -9,6 +9,7 @@
 #include "game/layers/game_options_menu.h"
 #include "game/layers/main_menu.h"
 #include "raylib.h"
+#include <string>
 
 bool GameLayer::IsPacmanTouchingPellet(const Vector2Ex<float>& pacmanDimensions,
                                        const Vector2Ex<float>& pacmanPosition) const
@@ -31,6 +32,8 @@ void GameLayer::CollectPelletAtPosition(const Vector2Ex<float>& position)
         Pellet& pellet = tile.GetPellet();
 
         int pointsGained = pellet.GetValue();
+        m_player.AddPoints(pointsGained);
+        UpdateHighscores();
 
         pellet.SetType(Pellet::Type::NONE);
     }
@@ -123,7 +126,7 @@ void GameLayer::HandleKeyPresses()
         m_player.GetPacman().QueueDirection(RIGHT);
 
     if (IsKeyPressed(KEY_F1))
-        m_board.SaveToFile("./resources/boards/default.json");
+        m_board.SaveToFile();
 
     if (inputManager->IsAction("pause", engine::InputState::PRESSED))
     {
@@ -206,6 +209,13 @@ void GameLayer::HandleCollisions(const float& deltaTime)
     m_player.GetPacman().SetPosition(lastValidPosition);
 }
 
+void GameLayer::UpdateHighscores()
+{
+    const std::string& boardName = m_board.GetName();
+
+    game::GameApplication::Get().GetProfile()->UpdateHighScore(boardName, m_player.GetPoints());
+}
+
 void GameLayer::OnUpdate(float ts)
 {
     HandleKeyPresses();
@@ -216,4 +226,24 @@ void GameLayer::OnRender()
 {
     m_board.Render();
     m_player.GetPacman().Render();
+    RenderScores();
+}
+
+void GameLayer::RenderScores()
+{
+    const int currentPoints = m_player.GetPoints();
+    const std::string& boardName = m_board.GetName();
+    const auto& highscores = game::GameApplication::Get().GetProfile()->GetPersonalHighscores();
+
+    int highscore = 0;
+    if (highscores.contains(boardName))
+    {
+        highscore = highscores.at(boardName);
+    }
+
+    const std::string currentPointsStr = "Score: " + std::to_string(currentPoints);
+    const std::string highscoreStr = "Highscore: " + std::to_string(highscore);
+
+    DrawText(highscoreStr.c_str(), 10, 10, 20, BLACK);
+    DrawText(currentPointsStr.c_str(), 10, 40, 20, BLACK);
 }

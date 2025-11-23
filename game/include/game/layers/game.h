@@ -20,6 +20,7 @@ class GameLayer : public engine::Layer
     void CollectPelletAtPosition(const Vector2Ex<float>& position);
     bool CanMoveInDirection(const Vector2Ex<float>& position, const ui::Direction& direction) const;
     bool TryApplyQueuedDirection(Vector2Ex<float>& currentPosition, ui::Direction& currentDirection);
+    void RenderScores();
 
   public:
     GameLayer();
@@ -28,6 +29,7 @@ class GameLayer : public engine::Layer
 
     void HandleKeyPresses();
     void HandleCollisions(const float& deltaTime);
+    void UpdateHighscores();
 
     virtual void OnUpdate(float ts) override;
     virtual void OnRender() override;
