@@ -80,11 +80,7 @@ void CreateProfileLayer::OnContinueClicked()
     if (!profileName.empty())
     {
         auto profile = std::make_shared<Profile>(profileName);
-
-        using nlohmann::json;
-        json profile_json = *profile;
-        std::ofstream o("profiles/" + profileName + ".json");
-        o << std::setw(4) << profile_json << std::endl;
+        profile->Save();
 
         game::GameApplication::Get().SetProfile(profile);
         TransistionTo(std::make_unique<MainMenuLayer>());
