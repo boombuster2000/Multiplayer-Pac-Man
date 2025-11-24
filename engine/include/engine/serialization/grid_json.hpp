@@ -42,38 +42,42 @@ inline void to_json(json& j, const Grid<T>& grid)
 template <typename T>
 inline void from_json(const json& j, Grid<T>& grid)
 {
-    if (!j.is_object())
-        throw std::runtime_error("Failed to deserialize Grid: JSON is not an object.");
+    static_assert(std::is_base_of_v<GridTile, T>, "T must derive from GridTile");
 
-    static_assert(std::is_base_of<GridTile, T>::value, "T must derive from ui::GridTile");
+    if (!j.is_object())
+        throw json::type_error::create(302, "Grid must be a JSON object.", &j);
+
+    // Deserialize base class
     from_json(j, static_cast<RenderableObject&>(grid));
 
+    // ---- Required fields ----
     try
     {
         j.at("tile_dimensions").get_to(grid.m_tileDimensions);
     }
-    catch (const std::exception& e)
+    catch (const json::exception& e)
     {
-        throw std::runtime_error("Failed to deserialize Grid.tile_dimensions: " + std::string(e.what()));
+        throw json::other_error::create(500, std::string("Failed to read Grid.tile_dimensions: ") + e.what(), &j);
     }
 
     try
     {
         j.at("spacing").get_to(grid.m_spacing);
     }
-    catch (const std::exception& e)
+    catch (const json::exception& e)
     {
-        throw std::runtime_error("Failed to deserialize Grid.spacing: " + std::string(e.what()));
+        throw json::other_error::create(501, std::string("Failed to read Grid.spacing: ") + e.what(), &j);
     }
 
+    // ---- Grid ----
     try
     {
         const auto& grid_j = j.at("grid");
         if (!grid_j.is_array())
-            throw json::type_error::create(302, "grid must be an array of arrays", &j);
+            throw json::type_error::create(302, "Grid.grid must be an array of rows.", &grid_j);
 
         size_t y_size = grid_j.size();
-        size_t x_size = (y_size > 0) ? grid_j.at(0).size() : 0;
+        size_t x_size = y_size > 0 ? grid_j.at(0).size() : 0;
 
         grid.m_gridSize = {x_size, y_size};
         grid.m_grid.assign(y_size, std::vector<T>(x_size));
@@ -82,28 +86,28 @@ inline void from_json(const json& j, Grid<T>& grid)
         {
             const auto& row_j = grid_j.at(y);
             if (!row_j.is_array())
-                throw json::type_error::create(302, "grid must be an array of arrays", &j);
+                throw json::type_error::create(302, "Grid grid rows must be arrays.", &row_j);
 
             for (size_t x = 0; x < x_size; ++x)
             {
-                if (x < row_j.size())
+                try
                 {
-                    try
-                    {
+                    if (x < row_j.size())
                         row_j.at(x).get_to(grid.m_grid[y][x]);
-                    }
-                    catch (const std::exception& e)
-                    {
-                        throw std::runtime_error("Failed to deserialize element at Grid.grid[" + std::to_string(y) +
-                                                 "][" + std::to_string(x) + "]: " + e.what());
-                    }
+                }
+                catch (const json::exception& e)
+                {
+                    throw json::other_error::create(502,
+                                                    "Failed to deserialize Grid.grid[" + std::to_string(y) + "][" +
+                                                        std::to_string(x) + "]: " + e.what(),
+                                                    &row_j);
                 }
             }
         }
     }
-    catch (const std::exception& e)
+    catch (const json::exception& e)
     {
-        throw std::runtime_error("Failed to deserialize Grid.grid: " + std::string(e.what()));
+        throw json::other_error::create(503, std::string("Failed to deserialize Grid.grid: ") + e.what(), &j);
     }
 }
 } // namespace ui
