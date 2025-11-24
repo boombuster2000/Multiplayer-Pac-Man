@@ -65,7 +65,8 @@ class Application
 
     static void QueuePop(std::type_index layerType);
 
-    template <typename TLayer> static void QueuePop()
+    template <typename TLayer>
+    static void QueuePop()
     {
         static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
         QueuePop(std::type_index(typeid(TLayer)));
@@ -75,12 +76,13 @@ class Application
 
     static Application& Get();
 
-    template <typename TLayer> TLayer* GetLayer()
+    template <typename TLayer>
+    TLayer* GetLayer()
     {
         static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
         for (const auto& layer : m_layerStack)
         {
-            if (typeid(*layer) == typeid(TLayer))
+            if (typeid(*layer.get()) == typeid(TLayer))
             {
                 return static_cast<TLayer*>(layer.get());
             }
@@ -90,13 +92,15 @@ class Application
 };
 
 // Template implementations for Layer transition methods
-template <typename TLayer> void Layer::TransistionTo(std::unique_ptr<TLayer> layer)
+template <typename TLayer>
+void Layer::TransistionTo(std::unique_ptr<TLayer> layer)
 {
     static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
     Application::QueueTransition(GetTypeIndex(), std::move(layer));
 }
 
-template <typename TLayer> void Layer::Push(std::unique_ptr<TLayer> layer)
+template <typename TLayer>
+void Layer::Push(std::unique_ptr<TLayer> layer)
 {
     static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
     Application::QueuePush(std::move(layer));
