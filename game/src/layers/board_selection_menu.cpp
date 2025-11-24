@@ -107,6 +107,7 @@ void BoardSelectionMenuLayer::UpdateLeaderboard()
             m_leaderboardWidth = m_leaderboardScores.back().GetDimensions().x;
         }
     }
+
     PositionUIElements();
 }
 
@@ -127,16 +128,14 @@ void BoardSelectionMenuLayer::PositionUIElements()
         }
     }
 
-    float totalWidth = menuWidth + spacing + m_leaderboardWidth;
-    float startX = ((float)GetScreenWidth() - totalWidth) / 2;
+    Vector2Ex<float> menuPos = {400, ((float)GetScreenHeight() - menuHeight) / 2};
 
     // Position Menu
-    m_menu.SetPosition({startX, ((float)GetScreenHeight() - menuHeight) / 2});
+    m_menu.SetPosition(menuPos);
     m_menu.SetOrigin(ui::AnchorPoint::TOP_LEFT);
 
     // Position Leaderboard
-    float leaderboardStartY = ((float)GetScreenHeight() - leaderboardHeight) / 2;
-    Vector2Ex leaderboardTitlePos = {startX + menuWidth + spacing, leaderboardStartY};
+    Vector2Ex leaderboardTitlePos = {GetScreenWidth() - m_leaderboardWidth - 300, 100.f};
     m_leaderboardTitle.SetPosition(leaderboardTitlePos);
     m_leaderboardTitle.SetOrigin(ui::AnchorPoint::TOP_LEFT);
 
