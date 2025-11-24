@@ -110,6 +110,11 @@ GameLayer::GameLayer(const std::string& boardPath)
 {
 }
 
+GameLayer::~GameLayer()
+{
+    m_board.SaveHighscoresToFile();
+}
+
 void GameLayer::HandleKeyPresses()
 {
     using enum ui::Direction;
@@ -225,7 +230,7 @@ void GameLayer::OnUpdate(float ts)
 
     if (m_timePassedSinceLastSave >= 10.0f)
     {
-        m_board.SaveToFile();
+        m_board.SaveHighscoresToFile();
         m_timePassedSinceLastSave = 0.0f;
     }
 

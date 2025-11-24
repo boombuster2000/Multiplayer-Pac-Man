@@ -27,7 +27,7 @@ class GameLayer : public engine::Layer
   public:
     GameLayer();
     GameLayer(const std::string& boardPath);
-    virtual ~GameLayer() = default;
+    ~GameLayer();
 
     void HandleKeyPresses();
     void HandleCollisions(const float& deltaTime);
