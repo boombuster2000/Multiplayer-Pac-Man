@@ -66,8 +66,6 @@ class Grid : public RenderableObject
         SetOrigin(anchorPoint);
     }
 
-    ~Grid() = default;
-
     std::vector<T>& operator[](size_t y)
     {
         return m_grid[y];
