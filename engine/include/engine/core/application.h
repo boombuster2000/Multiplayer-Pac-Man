@@ -93,14 +93,14 @@ class Application
 
 // Template implementations for Layer transition methods
 template <typename TLayer>
-void Layer::TransistionTo(std::unique_ptr<TLayer> layer)
+void Layer::TransistionTo(std::unique_ptr<TLayer> layer) const
 {
     static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
     Application::QueueTransition(GetTypeIndex(), std::move(layer));
 }
 
 template <typename TLayer>
-void Layer::Push(std::unique_ptr<TLayer> layer)
+void Layer::Push(std::unique_ptr<TLayer> layer) const
 {
     static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
     Application::QueuePush(std::move(layer));
