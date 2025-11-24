@@ -11,6 +11,7 @@ inline void to_json(json& j, const Board& board)
     to_json(j, grid);
 
     j["name"] = board.m_name;
+    j["highScores"] = board.m_highScores;
 }
 
 inline void from_json(const json& j, Board& board)
@@ -22,4 +23,9 @@ inline void from_json(const json& j, Board& board)
         throw std::runtime_error("Failed to deserialize Board: missing field 'name'");
 
     j.at("name").get_to(board.m_name);
+
+    if (!j.contains("highScores"))
+        throw std::runtime_error("Failed to deserialize Board: missing field 'highScores'");
+
+    j.at("highScores").get_to(board.m_highScores);
 }

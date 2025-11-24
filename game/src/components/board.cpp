@@ -16,7 +16,7 @@ Board::Board()
            Vector2Ex<float>(static_cast<float>(GetScreenWidth()) / 2, static_cast<float>(GetScreenHeight()) / 2),
            ui::AnchorPoint::MIDDLE, Vector2Ex<float>(0, 0), Tile::Type::PATH, Pellet::Type::NORMAL,
            Vector2Ex<float>(0, 0), Vector2Ex<float>(50, 50)),
-      m_name("built-in")
+      m_name("test-file")
 {
     addBoundaries();
 
@@ -91,6 +91,50 @@ void Board::SaveToFile() const
     }
 }
 
+void Board::SaveHighscoresToFile() const
+{
+    const std::string boardFolder = "./resources/boards/";
+    const std::string filename = m_name + std::string(".json");
+
+    Board originalBoard = Board::LoadFromFile(boardFolder + filename);
+
+    for (const auto& [profileName, score] : m_highScores)
+    {
+        originalBoard.SetHighscore(profileName, score);
+    }
+
+    json j = originalBoard;
+
+    std::ofstream file(boardFolder + filename);
+
+    if (file.is_open())
+    {
+        file << j.dump(4);
+        file.close();
+    }
+}
+
+std::unordered_map<std::string, int> Board::GetHighscores() const
+{
+    return m_highScores;
+}
+
+void Board::SetHighscore(const std::string& profileName, int score)
+{
+    if (m_highScores.contains(profileName))
+    {
+        if (score > m_highScores.at(profileName))
+        {
+            m_highScores[profileName] = score;
+        }
+    }
+    else
+    {
+        m_highScores[profileName] = score;
+    }
+    SortHighscores();
+}
+
 Board Board::LoadFromFile(const std::string& filename)
 {
     std::ifstream file(filename);
@@ -103,6 +147,7 @@ Board Board::LoadFromFile(const std::string& filename)
     file >> j;
     file.close();
     Board board = j.get<Board>();
+    board.SortHighscores();
     return board;
 }
 
@@ -120,6 +165,22 @@ void Board::addBoundaries()
     {
         GetTile(y, 0).SetType(Tile::Type::WALL);
         GetTile(y, boardSize.x - 1).SetType(Tile::Type::WALL);
+    }
+}
+
+void Board::SortHighscores()
+{
+    // Convert unordered_map to vector of pairs
+    std::vector<std::pair<std::string, int>> scoreVector(m_highScores.begin(), m_highScores.end());
+
+    // Sort the vector based on scores in descending order
+    std::sort(scoreVector.begin(), scoreVector.end(), [](const auto& a, const auto& b) { return a.second > b.second; });
+
+    // Clear the original map and reinsert sorted entries
+    m_highScores.clear();
+    for (const auto& pair : scoreVector)
+    {
+        m_highScores[pair.first] = pair.second;
     }
 }
 

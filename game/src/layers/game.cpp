@@ -98,14 +98,21 @@ bool GameLayer::TryApplyQueuedDirection(Vector2Ex<float>& currentPosition, ui::D
 
 GameLayer::GameLayer()
     : m_board(), m_player(game::GameApplication::Get().GetProfile(),
-                          Pacman(m_board.GetPlayerSpawnPoint(), Vector2Ex<float>(50, 50), 400))
+                          Pacman(m_board.GetPlayerSpawnPoint(), Vector2Ex<float>(50, 50), 400)),
+      m_timePassedSinceLastSave(0)
 {
 }
 
 GameLayer::GameLayer(const std::string& boardPath)
     : m_board(boardPath), m_player(game::GameApplication::Get().GetProfile(),
-                                   Pacman(m_board.GetPlayerSpawnPoint(), Vector2Ex<float>(50, 50), 400))
+                                   Pacman(m_board.GetPlayerSpawnPoint(), Vector2Ex<float>(50, 50), 400)),
+      m_timePassedSinceLastSave(0)
 {
+}
+
+GameLayer::~GameLayer()
+{
+    m_board.SaveHighscoresToFile();
 }
 
 void GameLayer::HandleKeyPresses()
@@ -214,10 +221,19 @@ void GameLayer::UpdateHighscores()
     const std::string& boardName = m_board.GetName();
 
     game::GameApplication::Get().GetProfile()->UpdateHighScore(boardName, m_player.GetPoints());
+    m_board.SetHighscore(game::GameApplication::Get().GetProfile()->GetUsername(), m_player.GetPoints());
 }
 
 void GameLayer::OnUpdate(float ts)
 {
+    m_timePassedSinceLastSave += ts;
+
+    if (m_timePassedSinceLastSave >= 10.0f)
+    {
+        m_board.SaveHighscoresToFile();
+        m_timePassedSinceLastSave = 0.0f;
+    }
+
     HandleKeyPresses();
     HandleCollisions(ts);
 }

@@ -15,6 +15,8 @@ class GameLayer : public engine::Layer
     Player m_player;
     ui::Direction m_queuedDirection;
 
+    float m_timePassedSinceLastSave;
+
   private:
     bool IsPacmanTouchingPellet(const Vector2Ex<float>& pacmanDimensions, const Vector2Ex<float>& pacmanPosition) const;
     void CollectPelletAtPosition(const Vector2Ex<float>& position);
@@ -25,7 +27,7 @@ class GameLayer : public engine::Layer
   public:
     GameLayer();
     GameLayer(const std::string& boardPath);
-    virtual ~GameLayer() = default;
+    ~GameLayer();
 
     void HandleKeyPresses();
     void HandleCollisions(const float& deltaTime);

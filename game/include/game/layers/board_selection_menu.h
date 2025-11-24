@@ -1,14 +1,31 @@
 #pragma once
 
-#include "base_menu.h"
-#include "game/components/player.h"
+#include "engine/core/layer.h"
+#include "engine/ui/menu.h"
+#include "engine/ui/text.h"
+#include "game/components/board.h"
+#include <string>
+#include <vector>
 
-class BoardSelectionMenuLayer : public BaseMenuLayer
+class BoardSelectionMenuLayer : public engine::Layer
 {
   private:
-    virtual void SetupMenuOptions() override;
+    ui::Menu m_menu;
+    std::vector<std::string> m_boardPaths;
+    int m_lastSelectedIndex = -1;
+
+    ui::Text m_leaderboardTitle;
+    std::vector<ui::Text> m_leaderboardScores;
+    float m_leaderboardWidth = 0.f;
+
+    void SetupMenuOptions();
+    void UpdateLeaderboard();
+    void PositionUIElements();
 
   public:
     BoardSelectionMenuLayer();
-    virtual ~BoardSelectionMenuLayer() = default;
+    ~BoardSelectionMenuLayer() = default;
+
+    void OnUpdate(float ts) override;
+    void OnRender() override;
 };
