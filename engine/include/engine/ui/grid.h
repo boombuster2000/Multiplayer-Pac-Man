@@ -15,7 +15,7 @@ namespace ui
 template <class T = GridTile>
 class Grid : public RenderableObject
 {
-    static_assert(std::is_base_of<GridTile, T>::value, "T must derive from ui::GridTile");
+    static_assert(std::is_base_of_v<GridTile, T>, "T must derive from ui::GridTile");
 
   private:
     using GridType = std::vector<std::vector<T>>;
