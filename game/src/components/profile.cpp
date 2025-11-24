@@ -47,7 +47,7 @@ void Profile::UpdateHighScore(const std::string& boardName, const int points)
     }
 }
 
-void Profile::Save()
+void Profile::Save() const
 {
     using nlohmann::json;
     json profile_json = *this;

@@ -19,7 +19,7 @@ class Profile
 
     std::unordered_map<std::string, int> GetPersonalHighscores() const;
     void UpdateHighScore(const std::string& boardName, const int points);
-    void Save();
+    void Save() const;
 
     friend void to_json(json&, const Profile&);
     friend void from_json(const json&, Profile&);
