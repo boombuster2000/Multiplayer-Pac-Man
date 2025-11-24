@@ -114,7 +114,7 @@ void BoardSelectionMenuLayer::PositionUIElements()
 {
     float menuWidth = m_menu.GetDimensions().x;
     float menuHeight = m_menu.GetDimensions().y;
-    float spacing = 50.f;
+    float spacing = 50.0f;
 
     // Leaderboard dimensions
     float leaderboardHeight = m_leaderboardTitle.GetDimensions().y;
@@ -155,9 +155,9 @@ void BoardSelectionMenuLayer::OnRender()
 {
     m_menu.Render();
 
+    m_leaderboardTitle.Render();
     if (!m_leaderboardScores.empty())
     {
-        m_leaderboardTitle.Render();
         for (const auto& score : m_leaderboardScores)
         {
             score.Render();
