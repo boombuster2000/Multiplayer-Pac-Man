@@ -16,7 +16,7 @@ Board::Board()
            Vector2Ex<float>(static_cast<float>(GetScreenWidth()) / 2, static_cast<float>(GetScreenHeight()) / 2),
            ui::AnchorPoint::MIDDLE, Vector2Ex<float>(0, 0), Tile::Type::PATH, Pellet::Type::NORMAL,
            Vector2Ex<float>(0, 0), Vector2Ex<float>(50, 50)),
-      m_name("built-in")
+      m_name("test-file")
 {
     addBoundaries();
 
@@ -109,7 +109,6 @@ void Board::SetHighscore(const std::string& profileName, int score)
     {
         m_highScores[profileName] = score;
     }
-
     SortHighscores();
 }
 
