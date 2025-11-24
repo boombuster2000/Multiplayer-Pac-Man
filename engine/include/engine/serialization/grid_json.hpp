@@ -15,7 +15,7 @@ namespace ui
 template <typename T>
 inline void to_json(json& j, const Grid<T>& grid)
 {
-    static_assert(std::is_base_of<GridTile, T>::value, "T must derive from ui::GridTile");
+    static_assert(std::is_base_of_v<GridTile, T>, "T must derive from ui::GridTile");
 
     // Serialize base RenderableObject
     to_json(j, static_cast<const RenderableObject&>(grid));
