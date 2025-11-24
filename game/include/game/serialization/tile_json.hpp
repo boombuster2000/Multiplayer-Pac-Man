@@ -1,5 +1,6 @@
 #pragma once
 #include "engine/serialization/json_converters.hpp"
+#include "engine/serialization/json_helpers.hpp"
 #include "game/components/tile.h"
 #include "game/serialization/pellet_json.hpp"
 #include "tile_type_json.hpp"
@@ -19,26 +20,10 @@ inline void to_json(json& j, const Tile& v)
 
 inline void from_json(const json& j, Tile& v)
 {
-    if (!j.is_object())
-        throw std::runtime_error("Failed to deserialize Tile: JSON is not an object.");
+    serialization::require_object(j, "Tile");
 
     from_json(j, static_cast<GridTile&>(v));
 
-    try
-    {
-        j.at("type").get_to(v.m_type);
-    }
-    catch (const std::exception& e)
-    {
-        throw std::runtime_error("Failed to deserialize Tile.type: " + std::string(e.what()));
-    }
-
-    try
-    {
-        j.at("pellet").get_to(v.m_pellet);
-    }
-    catch (const std::exception& e)
-    {
-        throw std::runtime_error("Failed to deserialize Tile.pellet: " + std::string(e.what()));
-    }
+    serialization::get_required_field(j, "type", v.m_type, "Tile", 500);
+    serialization::get_required_field(j, "pellet", v.m_pellet, "Tile", 501);
 }

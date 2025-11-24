@@ -1,5 +1,6 @@
 #pragma once
 #include "engine/serialization/json_converters.hpp"
+#include "engine/serialization/json_helpers.hpp"
 #include "engine/ui/grid.h"
 #include "raylib.h"
 #include <nlohmann/json.hpp>
@@ -44,30 +45,14 @@ inline void from_json(const json& j, Grid<T>& grid)
 {
     static_assert(std::is_base_of_v<GridTile, T>, "T must derive from GridTile");
 
-    if (!j.is_object())
-        throw json::type_error::create(302, "Grid must be a JSON object.", &j);
+    serialization::require_object(j, "Grid");
 
     // Deserialize base class
     from_json(j, static_cast<RenderableObject&>(grid));
 
     // ---- Required fields ----
-    try
-    {
-        j.at("tile_dimensions").get_to(grid.m_tileDimensions);
-    }
-    catch (const json::exception& e)
-    {
-        throw json::other_error::create(500, std::string("Failed to read Grid.tile_dimensions: ") + e.what(), &j);
-    }
-
-    try
-    {
-        j.at("spacing").get_to(grid.m_spacing);
-    }
-    catch (const json::exception& e)
-    {
-        throw json::other_error::create(501, std::string("Failed to read Grid.spacing: ") + e.what(), &j);
-    }
+    serialization::get_required_field(j, "tile_dimensions", grid.m_tileDimensions, "Grid", 500);
+    serialization::get_required_field(j, "spacing", grid.m_spacing, "Grid", 501);
 
     // ---- Grid ----
     try
