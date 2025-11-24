@@ -5,6 +5,7 @@
 #include "raylib.h"
 #include <nlohmann/json.hpp>
 #include <string>
+#include <unordered_map>
 
 using json = nlohmann::json;
 
@@ -15,9 +16,11 @@ class Board : public ui::Grid<Tile>
 
   private:
     std::string m_name;
+    std::unordered_map<std::string, int> m_highScores;
 
   private:
     void addBoundaries();
+    void SortHighscores();
 
   public:
     Board();
@@ -30,6 +33,9 @@ class Board : public ui::Grid<Tile>
     void SetTileType(const Vector2Ex<int>& index, const Tile::Type& type);
 
     void SaveToFile() const;
+
+    std::unordered_map<std::string, int> GetHighscores() const;
+    void SetHighscore(const std::string& profileName, int score);
 
     static Board LoadFromFile(const std::string& filename);
 };

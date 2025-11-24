@@ -91,6 +91,28 @@ void Board::SaveToFile() const
     }
 }
 
+std::unordered_map<std::string, int> Board::GetHighscores() const
+{
+    return m_highScores;
+}
+
+void Board::SetHighscore(const std::string& profileName, int score)
+{
+    if (m_highScores.contains(profileName))
+    {
+        if (score > m_highScores.at(profileName))
+        {
+            m_highScores[profileName] = score;
+        }
+    }
+    else
+    {
+        m_highScores[profileName] = score;
+    }
+
+    SortHighscores();
+}
+
 Board Board::LoadFromFile(const std::string& filename)
 {
     std::ifstream file(filename);
@@ -103,6 +125,7 @@ Board Board::LoadFromFile(const std::string& filename)
     file >> j;
     file.close();
     Board board = j.get<Board>();
+    board.SortHighscores();
     return board;
 }
 
@@ -120,6 +143,22 @@ void Board::addBoundaries()
     {
         GetTile(y, 0).SetType(Tile::Type::WALL);
         GetTile(y, boardSize.x - 1).SetType(Tile::Type::WALL);
+    }
+}
+
+void Board::SortHighscores()
+{
+    // Convert unordered_map to vector of pairs
+    std::vector<std::pair<std::string, int>> scoreVector(m_highScores.begin(), m_highScores.end());
+
+    // Sort the vector based on scores in descending order
+    std::sort(scoreVector.begin(), scoreVector.end(), [](const auto& a, const auto& b) { return a.second > b.second; });
+
+    // Clear the original map and reinsert sorted entries
+    m_highScores.clear();
+    for (const auto& pair : scoreVector)
+    {
+        m_highScores[pair.first] = pair.second;
     }
 }
 

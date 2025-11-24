@@ -214,6 +214,7 @@ void GameLayer::UpdateHighscores()
     const std::string& boardName = m_board.GetName();
 
     game::GameApplication::Get().GetProfile()->UpdateHighScore(boardName, m_player.GetPoints());
+    m_board.SetHighscore(game::GameApplication::Get().GetProfile()->GetUsername(), m_player.GetPoints());
 }
 
 void GameLayer::OnUpdate(float ts)
