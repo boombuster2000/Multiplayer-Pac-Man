@@ -16,7 +16,7 @@ class Layer
         SUSPENDED_UPDATE_AND_RENDER,
     };
 
-  protected:
+  private:
     State m_state = State::ACTIVE;
 
   public:
