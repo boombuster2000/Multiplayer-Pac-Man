@@ -1,5 +1,6 @@
 #pragma once
 
+#include "transparentStringHasher.h"
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -28,9 +29,9 @@ class InputManager
         bool positive = true;
     };
 
-    std::unordered_map<std::string, std::vector<Action>> m_actions;
-    std::unordered_map<std::string, InputState> m_actionStates;
-    std::unordered_map<std::string, float> m_actionValues;
+    std::unordered_map<std::string, std::vector<Action>, TransparentStringHash, std::equal_to<>> m_actions;
+    std::unordered_map<std::string, InputState, TransparentStringHash, std::equal_to<>> m_actionStates;
+    std::unordered_map<std::string, float, TransparentStringHash, std::equal_to<>> m_actionValues;
 
   public:
     InputManager();
