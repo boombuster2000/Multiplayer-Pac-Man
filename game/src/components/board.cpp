@@ -91,6 +91,29 @@ void Board::SaveToFile() const
     }
 }
 
+void Board::SaveHighscoresToFile() const
+{
+    const std::string boardFolder = "./resources/boards/";
+    const std::string filename = m_name + std::string(".json");
+
+    Board originalBoard = Board::LoadFromFile(boardFolder + filename);
+
+    for (const auto& [profileName, score] : m_highScores)
+    {
+        originalBoard.SetHighscore(profileName, score);
+    }
+
+    json j = originalBoard;
+
+    std::ofstream file(boardFolder + filename);
+
+    if (file.is_open())
+    {
+        file << j.dump(4);
+        file.close();
+    }
+}
+
 std::unordered_map<std::string, int> Board::GetHighscores() const
 {
     return m_highScores;

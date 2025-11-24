@@ -36,6 +36,7 @@ class Board : public ui::Grid<Tile>
 
     std::unordered_map<std::string, int> GetHighscores() const;
     void SetHighscore(const std::string& profileName, int score);
+    void SaveHighscoresToFile() const;
 
     static Board LoadFromFile(const std::string& filename);
 };
