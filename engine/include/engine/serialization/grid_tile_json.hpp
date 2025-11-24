@@ -7,7 +7,6 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
-using namespace ui;
 using json = nlohmann::json;
 
 namespace ui
