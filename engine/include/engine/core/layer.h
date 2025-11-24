@@ -22,6 +22,7 @@ class Layer
   public:
     virtual ~Layer() = default;
 
+    // TODO: Need to build event system.
     virtual void OnEvent(Event& event)
     {
     }
