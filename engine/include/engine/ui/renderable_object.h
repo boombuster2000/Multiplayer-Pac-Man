@@ -24,8 +24,8 @@ class RenderableObject
 
   public:
     RenderableObject();
-    RenderableObject(Vector2Ex<float> anchorPointPosition, AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT,
-                     bool visible = true);
+    explicit RenderableObject(Vector2Ex<float> anchorPointPosition, AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT,
+                              bool visible = true);
     virtual ~RenderableObject() = default;
 
     /// @return Returns the position of the orgin in the object (not in the 2d space).

@@ -16,7 +16,7 @@ class MenuOption
     virtual void UpdateStyle() = 0;
 
   public:
-    MenuOption(bool isSelected, std::function<void()> callback = nullptr);
+    explicit MenuOption(bool isSelected, std::function<void()> callback = nullptr);
 
     ~MenuOption() = default;
 
