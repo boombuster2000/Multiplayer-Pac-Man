@@ -211,7 +211,7 @@ class Grid : public RenderableObject
         return true;
     }
 
-    virtual void Render(Vector2Ex<float> offset = {0, 0}) const override
+    void Render(Vector2Ex<float> offset = {0, 0}) const override
     {
         for (const auto& row : m_grid)
             for (const auto& tile : row)
