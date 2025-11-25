@@ -15,7 +15,6 @@ class GridTile : public RenderableObject
   public:
     GridTile();
     GridTile(Vector2Ex<float> dimensions, Vector2Ex<float> position);
-    ~GridTile() = default;
 
     virtual Vector2Ex<float> GetDimensions() const override;
 
