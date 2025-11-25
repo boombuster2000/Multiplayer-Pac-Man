@@ -16,9 +16,9 @@ class GridTile : public RenderableObject
     GridTile();
     GridTile(Vector2Ex<float> dimensions, Vector2Ex<float> position);
 
-    virtual Vector2Ex<float> GetDimensions() const override;
+    Vector2Ex<float> GetDimensions() const override;
 
-    virtual void Render(Vector2Ex<float> offset = {0, 0}) const override;
+    void Render(Vector2Ex<float> offset = {0, 0}) const override;
 
     friend void to_json(json&, const GridTile&);
     friend void from_json(const json&, GridTile&);
