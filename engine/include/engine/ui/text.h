@@ -20,7 +20,6 @@ class Text : public RenderableObject
   public:
     Text(std::string text, TextStyle style, Vector2Ex<float> anchorPointPosition, AnchorPoint AnchorPoint,
          bool visible);
-    ~Text() = default;
 
     void SetText(std::string text);
     std::string GetText() const;
@@ -34,8 +33,8 @@ class Text : public RenderableObject
     void SetStyle(TextStyle style);
     TextStyle GetStyle() const;
 
-    virtual Vector2Ex<float> GetDimensions() const override;
-    virtual void Render(Vector2Ex<float> offset = {0, 0}) const override;
+    Vector2Ex<float> GetDimensions() const override;
+    void Render(Vector2Ex<float> offset = {0, 0}) const override;
 };
 
 } // namespace ui

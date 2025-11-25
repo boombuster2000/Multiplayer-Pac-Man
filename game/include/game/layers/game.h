@@ -33,6 +33,6 @@ class GameLayer : public engine::Layer
     void HandleCollisions(const float& deltaTime);
     void UpdateHighscores();
 
-    virtual void OnUpdate(float ts) override;
-    virtual void OnRender() override;
+    void OnUpdate(float ts) override;
+    void OnRender() override;
 };

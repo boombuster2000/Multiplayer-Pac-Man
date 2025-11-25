@@ -47,8 +47,8 @@ class Pellet : public ui::RenderableObject
     static int GetTypePoints(const Type& t);
     static void SetTypePoints(const TypePointValues& newValues);
 
-    virtual Vector2Ex<float> GetDimensions() const override;
-    virtual void Render(Vector2Ex<float> offset = {0, 0}) const override;
+    Vector2Ex<float> GetDimensions() const override;
+    void Render(Vector2Ex<float> offset = {0, 0}) const override;
 
     friend void to_json(json&, const Pellet&);
     friend void from_json(const json&, Pellet&);

@@ -19,9 +19,9 @@ class TextMenuOption : public MenuOption
                    std::function<void()> callback = nullptr, Vector2Ex<float> position = {0, 0},
                    AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT, bool isVisible = true);
 
-    virtual void UpdateStyle() override;
+    void UpdateStyle() override;
 
-    virtual RenderableObject& GetRenderableObject() override;
-    virtual const RenderableObject& GetRenderableObject() const override;
+    RenderableObject& GetRenderableObject() override;
+    const RenderableObject& GetRenderableObject() const override;
 };
 } // namespace ui

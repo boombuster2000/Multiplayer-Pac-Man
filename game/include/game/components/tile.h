@@ -37,7 +37,7 @@ class Tile : public ui::GridTile
 
     void SetPosition(const Vector2Ex<float>& position);
 
-    virtual void Render(Vector2Ex<float> offset = {0, 0}) const override;
+    void Render(Vector2Ex<float> offset = {0, 0}) const override;
 
     friend void to_json(json&, const Tile&);
     friend void from_json(const json&, Tile&);

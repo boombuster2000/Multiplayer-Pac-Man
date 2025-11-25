@@ -6,5 +6,5 @@ class OverlayLayer : public engine::Layer
 {
   public:
     OverlayLayer();
-    virtual void OnRender() override;
+    void OnRender() override;
 };
