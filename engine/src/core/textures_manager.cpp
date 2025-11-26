@@ -24,9 +24,7 @@ std::shared_ptr<Texture2D> TexturesManager::GetTexture(const std::string& key) c
 {
     auto it = m_loadedTextures.find(key);
     if (it == m_loadedTextures.end())
-    {
-        throw std::runtime_error("Texture not found: " + key);
-    }
+        throw std::out_of_range("Texture not found: " + key);
 
     return it->second;
 }
