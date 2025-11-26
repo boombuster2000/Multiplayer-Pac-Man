@@ -72,10 +72,6 @@ void CreateProfileLayer::OnRender()
     BaseMenuLayer::OnRender();
 }
 
-void CreateProfileLayer::OnTextBoxClicked()
-{
-}
-
 void CreateProfileLayer::OnContinueClicked()
 {
     std::string profileName = m_profileNameInput->GetText();

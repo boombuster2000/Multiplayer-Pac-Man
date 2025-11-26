@@ -12,7 +12,6 @@ class CreateProfileLayer : public BaseMenuLayer
   private:
     void SetupMenuOptions() final;
 
-    void OnTextBoxClicked();
     void OnContinueClicked();
     void OnBackClicked();
 
