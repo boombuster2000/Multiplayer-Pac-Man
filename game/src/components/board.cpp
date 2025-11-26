@@ -180,9 +180,9 @@ void Board::SortHighscores()
 
     // Clear the original map and reinsert sorted entries
     m_highScores.clear();
-    for (const auto& pair : scoreVector)
+    for (const auto& [key, value] : scoreVector)
     {
-        m_highScores[pair.first] = pair.second;
+        m_highScores[key] = value;
     }
 }
 
