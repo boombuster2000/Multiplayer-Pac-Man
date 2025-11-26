@@ -10,6 +10,7 @@
 #include "game/layers/main_menu.h"
 #include "raylib.h"
 #include <array>
+#include <format>
 #include <string>
 
 bool GameLayer::IsPacmanTouchingPellet(const Vector2Ex<float>& pacmanDimensions,
@@ -259,8 +260,8 @@ void GameLayer::RenderScores()
         highscore = it->second;
     }
 
-    const std::string currentPointsStr = "Score: " + std::to_string(currentPoints);
-    const std::string highscoreStr = "Highscore: " + std::to_string(highscore);
+    const std::string currentPointsStr = std::format("Score: {}", currentPoints);
+    const std::string highscoreStr = std::format("Highscore: {}", highscore);
 
     DrawText(highscoreStr.c_str(), 10, 10, 20, BLACK);
     DrawText(currentPointsStr.c_str(), 10, 40, 20, BLACK);
