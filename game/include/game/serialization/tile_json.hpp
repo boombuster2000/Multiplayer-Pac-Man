@@ -8,7 +8,6 @@
 #include <stdexcept>
 
 using json = nlohmann::json;
-using namespace ui;
 
 inline void to_json(json& j, const Tile& v)
 {
