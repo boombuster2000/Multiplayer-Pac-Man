@@ -6,6 +6,7 @@
 #include "game/layers/main_menu.h"
 #include <algorithm>
 #include <filesystem>
+#include <format>
 #include <iostream>
 #include <string>
 
@@ -92,15 +93,14 @@ void BoardSelectionMenuLayer::UpdateLeaderboard()
 
     auto highscores = board.GetHighscores();
     std::vector<std::pair<std::string, int>> sortedScores(highscores.begin(), highscores.end());
-    std::sort(sortedScores.begin(), sortedScores.end(),
-              [](const auto& a, const auto& b) { return a.second > b.second; });
+    std::ranges::sort(sortedScores, [](const auto& a, const auto& b) { return a.second > b.second; });
 
     m_leaderboardScores.clear();
     m_leaderboardWidth = m_leaderboardTitle.GetDimensions().x;
 
-    for (const auto& score : sortedScores)
+    for (const auto& [name, score] : sortedScores)
     {
-        m_leaderboardScores.emplace_back(score.first + " " + std::to_string(score.second), ui::TextStyle{30, LIGHTGRAY},
+        m_leaderboardScores.emplace_back(std::format("{} {}", name, score), ui::TextStyle{30, LIGHTGRAY},
                                          Vector2Ex<float>{0, 0}, ui::AnchorPoint::TOP_LEFT, true);
         if (m_leaderboardScores.back().GetDimensions().x > m_leaderboardWidth)
         {
