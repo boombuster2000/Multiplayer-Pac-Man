@@ -12,7 +12,7 @@ class GameApplication : public engine::Application
     std::shared_ptr<Profile> m_loadedProfile;
 
   public:
-    GameApplication(const engine::ApplicationSpecification& specification);
+    explicit GameApplication(const engine::ApplicationSpecification& specification);
 
     void SetProfile(std::shared_ptr<Profile> profile);
     std::shared_ptr<Profile> GetProfile();
