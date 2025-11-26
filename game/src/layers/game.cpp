@@ -44,25 +44,26 @@ bool GameLayer::CanMoveInDirection(const Vector2Ex<float>& position, const ui::D
 {
     using namespace ui;
     using enum AnchorPoint;
+    using enum Direction;
     const Vector2Ex<float> pacmanDimensions = m_player.GetPacman().GetDimensions();
 
     std::array<Vector2Ex<float>, 2> cornersToCheck;
 
     switch (direction)
     {
-    case Direction::UP:
+    case UP:
         cornersToCheck[0] = position;
         cornersToCheck[1] = position + RenderableObject::CalculateAnchorOffset(TOP_RIGHT, pacmanDimensions);
         break;
-    case Direction::DOWN:
+    case DOWN:
         cornersToCheck[0] = position + RenderableObject::CalculateAnchorOffset(BOTTOM_LEFT, pacmanDimensions);
         cornersToCheck[1] = position + RenderableObject::CalculateAnchorOffset(BOTTOM_RIGHT, pacmanDimensions);
         break;
-    case Direction::LEFT:
+    case LEFT:
         cornersToCheck[0] = position;
         cornersToCheck[1] = position + RenderableObject::CalculateAnchorOffset(BOTTOM_LEFT, pacmanDimensions);
         break;
-    case Direction::RIGHT:
+    case RIGHT:
         cornersToCheck[0] = position + RenderableObject::CalculateAnchorOffset(TOP_RIGHT, pacmanDimensions);
         cornersToCheck[1] = position + RenderableObject::CalculateAnchorOffset(BOTTOM_RIGHT, pacmanDimensions);
         break;
