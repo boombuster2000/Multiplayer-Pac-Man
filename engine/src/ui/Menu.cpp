@@ -5,8 +5,8 @@ namespace ui
 {
 Menu::Menu(Vector2Ex<float> anchorPointPosition, AnchorPoint anchorPoint, Alignment alignment, bool visible,
            float spacing)
-    : RenderableObject(anchorPointPosition, anchorPoint, visible), m_selectedIndex(0), m_spacing(spacing),
-      m_alignment(alignment), m_anchorPoint(anchorPoint), m_isUIupdateNeeded(true)
+    : RenderableObject(anchorPointPosition, anchorPoint, visible) m_spacing(spacing), m_alignment(alignment),
+      m_anchorPoint(anchorPoint)
 {
 }
 
