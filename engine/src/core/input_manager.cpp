@@ -3,9 +3,6 @@
 
 namespace engine
 {
-InputManager::InputManager()
-{
-}
 
 void InputManager::Update()
 {

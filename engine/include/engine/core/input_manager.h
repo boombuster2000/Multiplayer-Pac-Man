@@ -34,7 +34,7 @@ class InputManager
     std::unordered_map<std::string, float, TransparentStringHash, std::equal_to<>> m_actionValues;
 
   public:
-    InputManager();
+    InputManager() = default;
     ~InputManager() = default;
 
     void Update();
