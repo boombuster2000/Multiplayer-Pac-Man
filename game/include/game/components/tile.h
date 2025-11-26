@@ -35,7 +35,7 @@ class Tile : public ui::GridTile
     Pellet& GetPellet();
     const Pellet& GetPellet() const;
 
-    void SetPosition(const Vector2Ex<float>& position);
+    void SetPosition(Vector2Ex<float> position) override;
 
     void Render(Vector2Ex<float> offset = {0, 0}) const override;
 
