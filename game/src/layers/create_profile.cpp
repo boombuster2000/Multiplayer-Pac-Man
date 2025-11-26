@@ -12,7 +12,6 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
-
 void CreateProfileLayer::SetupMenuOptions()
 {
     using namespace ui;
@@ -32,7 +31,7 @@ void CreateProfileLayer::SetupMenuOptions()
 CreateProfileLayer::CreateProfileLayer() : BaseMenuLayer(ui::Alignment::CENTER, true, 10.0f)
 {
     using namespace ui;
-    const Vector2Ex<float> centreOfScreen = {(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2};
+    const Vector2Ex centreOfScreen = {(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2};
 
     TextBoxStyle selectedBoxStyle = {2.0f, ORANGE, WHITE, {20.0f, GRAY}, {20.0f, BLACK}, Alignment::CENTER, 2.0f};
     TextBoxStyle unselectedBoxStyle = {2.0f, BLACK, WHITE, {20.0f, GRAY}, {20.0f, BLACK}, Alignment::CENTER, 2.0f};
