@@ -113,7 +113,7 @@ void Application::ProcessPendingActions()
 
         case LayerActionType::POP: {
             auto it = std::ranges::find_if(m_layerStack, [&](const std::unique_ptr<Layer>& layer) {
-                return std::type_index(typeid(*layer.get())) == action.fromType;
+                return std::type_index(typeid(*layer)) == action.fromType;
             });
 
             if (it != m_layerStack.end())
@@ -124,7 +124,7 @@ void Application::ProcessPendingActions()
 
         case LayerActionType::TRANSITION: {
             auto it = std::ranges::find_if(m_layerStack, [&](const std::unique_ptr<Layer>& layer) {
-                return std::type_index(typeid(*layer.get())) == action.fromType;
+                return std::type_index(typeid(*layer)) == action.fromType;
             });
 
             if (it != m_layerStack.end())

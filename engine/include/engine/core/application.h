@@ -86,7 +86,7 @@ class Application
         static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
         for (const auto& layer : m_layerStack)
         {
-            if (typeid(*layer.get()) == typeid(TLayer))
+            if (typeid(*layer) == typeid(TLayer))
             {
                 return static_cast<TLayer*>(layer.get());
             }
