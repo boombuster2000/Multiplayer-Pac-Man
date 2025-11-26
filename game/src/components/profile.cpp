@@ -27,8 +27,8 @@ void Profile::UpdateHighScore(std::string_view boardName, const int points)
         return;
 
     bool newHighScore = false;
-    auto it = m_personalHighscores.find(boardName);
-    if (it != m_personalHighscores.end())
+
+    if (auto it = m_personalHighscores.find(boardName); it != m_personalHighscores.end())
     {
         if (it->second < points)
         {
