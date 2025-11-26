@@ -108,8 +108,7 @@ void InputManager::UpdateActionState(const std::string& name, bool isDown)
 
 bool InputManager::IsAction(const std::string& action, InputState state) const
 {
-    auto it = m_actionStates.find(action);
-    if (it != m_actionStates.end())
+    if (auto it = m_actionStates.find(action); it != m_actionStates.end())
     {
         return it->second == state;
     }
@@ -118,8 +117,7 @@ bool InputManager::IsAction(const std::string& action, InputState state) const
 
 float InputManager::GetActionValue(const std::string& action) const
 {
-    auto it = m_actionValues.find(action);
-    if (it != m_actionValues.end())
+    if (auto it = m_actionValues.find(action); it != m_actionValues.end())
     {
         return it->second;
     }
