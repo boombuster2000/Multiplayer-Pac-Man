@@ -79,28 +79,29 @@ void InputManager::ProcessGamepadAxis(const Action& action, bool& isDown, float&
 
 void InputManager::UpdateActionState(const std::string& name, bool isDown)
 {
+    using enum InputState;
     InputState& state = m_actionStates[name];
 
     if (isDown)
     {
-        if (state == InputState::UP || state == InputState::RELEASED)
+        if (state == UP || state == RELEASED)
         {
-            state = InputState::PRESSED;
+            state = PRESSED;
         }
         else
         {
-            state = InputState::DOWN;
+            state = DOWN;
         }
     }
     else
     {
-        if (state == InputState::DOWN || state == InputState::PRESSED)
+        if (state == DOWN || state == PRESSED)
         {
-            state = InputState::RELEASED;
+            state = RELEASED;
         }
         else
         {
-            state = InputState::UP;
+            state = UP;
         }
     }
 }
