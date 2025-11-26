@@ -1,15 +1,17 @@
 #pragma once
+#include "engine/core/transparentStringHasher.h"
 #include <nlohmann/json.hpp>
 #include <string>
 #include <unordered_map>
 
+typedef std::unordered_map<std::string, int, TransparentStringHash, std::equal_to<>> HighscoreMap;
 using json = nlohmann::json;
 
 class Profile
 {
   private:
     std::string m_username;
-    std::unordered_map<std::string, int> m_personalHighscores;
+    HighscoreMap m_personalHighscores;
 
   public:
     Profile() = default;
@@ -17,7 +19,7 @@ class Profile
 
     std::string GetUsername() const;
 
-    std::unordered_map<std::string, int> GetPersonalHighscores() const;
+    HighscoreMap GetPersonalHighscores() const;
     void UpdateHighScore(const std::string& boardName, const int points);
     void Save() const;
 

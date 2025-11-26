@@ -13,7 +13,7 @@ std::string Profile::GetUsername() const
 {
     return m_username;
 }
-std::unordered_map<std::string, int> Profile::GetPersonalHighscores() const
+HighscoreMap Profile::GetPersonalHighscores() const
 {
     return m_personalHighscores;
 }
