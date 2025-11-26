@@ -6,7 +6,7 @@
 class ProfileSelectionMenuLayer : public BaseMenuLayer
 {
   private:
-    void SetupMenuOptions() override;
+    void SetupMenuOptions() final;
 
   public:
     ProfileSelectionMenuLayer();

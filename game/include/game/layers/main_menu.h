@@ -6,7 +6,7 @@
 class MainMenuLayer : public BaseMenuLayer
 {
   private:
-    void SetupMenuOptions() override;
+    void SetupMenuOptions() final;
 
   public:
     MainMenuLayer();

@@ -5,11 +5,11 @@
 class GameOptionsMenuLayer : public BaseMenuLayer
 {
   private:
-    void SetupMenuOptions() override;
+    void SetupMenuOptions() final;
 
   public:
     GameOptionsMenuLayer();
 
-    void OnUpdate(float ts) override;
-    void OnRender() override;
+    void OnUpdate(float ts) final;
+    void OnRender() final;
 };
