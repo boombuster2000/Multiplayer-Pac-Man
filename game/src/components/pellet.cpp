@@ -37,6 +37,8 @@ int Pellet::GetTypePoints(const Type& t)
     case NONE:
         return s_typePoints.none;
     }
+
+    throw std::invalid_argument("Invalid pellet type for getting type points.");
 }
 
 void Pellet::SetTypePoints(const TypePointValues& newValues)
