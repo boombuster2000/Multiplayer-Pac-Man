@@ -11,7 +11,7 @@ class Profile
 {
   private:
     std::string m_username;
-    HighscoreMap m_personalHighscores;
+    HighscoreMap m_personalHighscores{};
 
   public:
     Profile() = default;

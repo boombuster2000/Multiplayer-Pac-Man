@@ -5,7 +5,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
-Profile::Profile(std::string username) : m_username(username), m_personalHighscores()
+Profile::Profile(std::string username) : m_username(username)
 {
 }
 
