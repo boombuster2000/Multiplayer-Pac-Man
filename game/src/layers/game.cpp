@@ -9,6 +9,7 @@
 #include "game/layers/game_options_menu.h"
 #include "game/layers/main_menu.h"
 #include "raylib.h"
+#include <array>
 #include <string>
 
 bool GameLayer::IsPacmanTouchingPellet(const Vector2Ex<float>& pacmanDimensions,
@@ -45,7 +46,8 @@ bool GameLayer::CanMoveInDirection(const Vector2Ex<float>& position, const ui::D
     using enum AnchorPoint;
     const Vector2Ex<float> pacmanDimensions = m_player.GetPacman().GetDimensions();
 
-    Vector2Ex<float> cornersToCheck[2];
+    std::array<Vector2Ex<float>, 2> cornersToCheck;
+
     switch (direction)
     {
     case Direction::UP:
