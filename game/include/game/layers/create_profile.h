@@ -10,7 +10,7 @@ class CreateProfileLayer : public BaseMenuLayer
     ui::TextBoxOption* m_profileNameInput;
 
   private:
-    void SetupMenuOptions() override;
+    void SetupMenuOptions() final;
 
     void OnTextBoxClicked();
     void OnContinueClicked();
@@ -19,7 +19,7 @@ class CreateProfileLayer : public BaseMenuLayer
   public:
     CreateProfileLayer();
 
-    void OnUpdate(float ts) override;
+    void OnUpdate(float ts) final;
 
-    void OnRender();
+    void OnRender() final;
 };
