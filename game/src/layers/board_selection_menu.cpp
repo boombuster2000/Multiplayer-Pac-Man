@@ -54,7 +54,7 @@ void BoardSelectionMenuLayer::SetupMenuOptions()
 
 void BoardSelectionMenuLayer::OnUpdate(float ts)
 {
-    auto inputManager = engine::Application::GetInputManager();
+    const auto& inputManager = engine::Application::GetInputManager();
 
     if (inputManager.IsAction("move_down", engine::InputState::PRESSED))
     {
