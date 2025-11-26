@@ -11,11 +11,11 @@ class TextBox : public RenderableObject
 {
 
   private:
+    float m_cursorTimer = 0.0f;
     Vector2Ex<float> m_dimensions;
     Text m_text;
     Text m_backgroundText;
     bool m_cursorVisible;
-    float m_cursorTimer;
     TextBoxStyle m_style;
     TextBoxStyle m_activeStyle;
     TextBoxStyle m_renderStyle;

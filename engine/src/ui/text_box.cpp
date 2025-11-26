@@ -102,7 +102,7 @@ TextBox::TextBox(Vector2Ex<float> position, Vector2Ex<float> dimensions, const T
       m_text("", style.typingTextStyle, position, AnchorPoint::TOP_LEFT, visible), m_style(style),
       m_activeStyle(activeStyle), m_renderStyle(isActive ? activeStyle : style),
       m_backgroundText(backgroundText, style.backgroundTextStyle, position, AnchorPoint::TOP_LEFT, visible),
-      m_isActive(isActive), m_cursorVisible(isActive), m_cursorTimer(0.0f)
+      m_isActive(isActive), m_cursorVisible(isActive)
 {
     SetOrigin(anchorPoint);
     UpdateAllTextPositions();
