@@ -26,13 +26,13 @@ class GameLayer : public engine::Layer
 
   public:
     GameLayer();
-    GameLayer(const std::string& boardPath);
-    ~GameLayer();
+    explicit GameLayer(const std::string& boardPath);
+    ~GameLayer() final;
 
     void HandleKeyPresses();
     void HandleCollisions(const float& deltaTime);
     void UpdateHighscores();
 
-    void OnUpdate(float ts) override;
-    void OnRender() override;
+    void OnUpdate(float ts) final;
+    void OnRender() final;
 };
