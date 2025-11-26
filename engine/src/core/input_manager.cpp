@@ -126,16 +126,16 @@ float InputManager::GetActionValue(const std::string& action) const
 
 void InputManager::AddKeyboardAction(const std::string& action, int keyboardKey)
 {
-    m_actions[action].push_back({action, keyboardKey});
+    m_actions[action].emplace_back(action, keyboardKey);
 }
 
 void InputManager::AddGamepadButtonAction(const std::string& action, int gamepadButton, int gamepadIndex)
 {
-    m_actions[action].push_back({action, -1, gamepadButton, -1, gamepadIndex});
+    m_actions[action].emplace_back(action, -1, gamepadButton, -1, gamepadIndex);
 }
 
 void InputManager::AddGamepadAxisAction(const std::string& action, int gamepadAxis, int gamepadIndex, bool positive)
 {
-    m_actions[action].push_back({action, -1, -1, gamepadAxis, gamepadIndex, positive});
+    m_actions[action].emplace_back(action, -1, -1, gamepadAxis, gamepadIndex, positive);
 }
 } // namespace engine
