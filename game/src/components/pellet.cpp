@@ -27,13 +27,14 @@ int Pellet::GetValue() const
 
 int Pellet::GetTypePoints(const Type& t)
 {
+    using enum Type;
     switch (t)
     {
-    case Type::NORMAL:
+    case NORMAL:
         return s_typePoints.normal;
-    case Type::SUPER:
+    case SUPER:
         return s_typePoints.super;
-    case Type::NONE:
+    case NONE:
         return s_typePoints.none;
     }
 
