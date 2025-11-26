@@ -1,10 +1,11 @@
 #include "game/layers/game_options_menu.h"
-#include "engine/core/application.h"
 #include "engine/core/input_manager.h"
 #include "engine/ui/text_menu_option.h"
+#include "game/game_application.h"
 #include "game/layers/game.h"
 #include "game/layers/main_menu.h"
 #include <memory>
+
 
 GameOptionsMenuLayer::GameOptionsMenuLayer() : BaseMenuLayer(ui::Alignment::CENTER, true, 10.0f)
 {
@@ -44,7 +45,7 @@ void GameOptionsMenuLayer::OnUpdate(float ts)
 
     auto inputManager = engine::Application::GetInputManager();
 
-    if (inputManager->IsAction("pause", engine::InputState::PRESSED))
+    if (inputManager.IsAction("pause", engine::InputState::PRESSED))
     {
         GameLayer* gameLayer = engine::Application::Get().GetLayer<GameLayer>();
         if (gameLayer)

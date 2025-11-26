@@ -120,22 +120,22 @@ void GameLayer::HandleKeyPresses()
     using enum ui::Direction;
     auto inputManager = game::GameApplication::GetInputManager();
 
-    if (inputManager->IsAction("move_up", engine::InputState::PRESSED))
+    if (inputManager.IsAction("move_up", engine::InputState::PRESSED))
         m_player.GetPacman().QueueDirection(UP);
 
-    if (inputManager->IsAction("move_down", engine::InputState::PRESSED))
+    if (inputManager.IsAction("move_down", engine::InputState::PRESSED))
         m_player.GetPacman().QueueDirection(DOWN);
 
-    if (inputManager->IsAction("move_left", engine::InputState::PRESSED))
+    if (inputManager.IsAction("move_left", engine::InputState::PRESSED))
         m_player.GetPacman().QueueDirection(LEFT);
 
-    if (inputManager->IsAction("move_right", engine::InputState::PRESSED))
+    if (inputManager.IsAction("move_right", engine::InputState::PRESSED))
         m_player.GetPacman().QueueDirection(RIGHT);
 
     if (IsKeyPressed(KEY_F1))
         m_board.SaveToFile();
 
-    if (inputManager->IsAction("pause", engine::InputState::PRESSED))
+    if (inputManager.IsAction("pause", engine::InputState::PRESSED))
     {
         SuspendUpdate();
         Push(std::make_unique<GameOptionsMenuLayer>());

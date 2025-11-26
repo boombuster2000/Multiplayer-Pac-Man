@@ -4,9 +4,41 @@
 
 void LoadAllTextures()
 {
-    game::GameApplication::GetTexturesManager()->AddTexture("wall", "./resources/textures/wall.png");
-    game::GameApplication::GetTexturesManager()->AddTexture("path", "./resources/textures/path.png");
-    game::GameApplication::GetTexturesManager()->AddTexture("pac-man", "./resources/textures/pac-man.png");
+    auto& texturesManager = game::GameApplication::GetTexturesManager();
+
+    texturesManager.AddTexture("wall", "./resources/textures/wall.png");
+    texturesManager.AddTexture("path", "./resources/textures/path.png");
+    texturesManager.AddTexture("pac-man", "./resources/textures/pac-man.png");
+}
+
+void LoadKeyBinds()
+{
+    auto& inputManager = game::GameApplication::GetInputManager();
+
+    // Keyboard
+    inputManager.AddKeyboardAction("move_up", KEY_W);
+    inputManager.AddKeyboardAction("move_up", KEY_UP);
+    inputManager.AddKeyboardAction("move_down", KEY_S);
+    inputManager.AddKeyboardAction("move_down", KEY_DOWN);
+    inputManager.AddKeyboardAction("move_left", KEY_A);
+    inputManager.AddKeyboardAction("move_left", KEY_LEFT);
+    inputManager.AddKeyboardAction("move_right", KEY_D);
+    inputManager.AddKeyboardAction("move_right", KEY_RIGHT);
+    inputManager.AddKeyboardAction("confirm", KEY_ENTER);
+    inputManager.AddKeyboardAction("pause", KEY_ESCAPE);
+
+    // Gamepad
+    inputManager.AddGamepadButtonAction("move_up", GAMEPAD_BUTTON_LEFT_FACE_UP, 0);
+    inputManager.AddGamepadButtonAction("move_down", GAMEPAD_BUTTON_LEFT_FACE_DOWN, 0);
+    inputManager.AddGamepadButtonAction("move_left", GAMEPAD_BUTTON_LEFT_FACE_LEFT, 0);
+    inputManager.AddGamepadButtonAction("move_right", GAMEPAD_BUTTON_LEFT_FACE_RIGHT, 0);
+    inputManager.AddGamepadButtonAction("confirm", GAMEPAD_BUTTON_RIGHT_FACE_DOWN, 0);
+    inputManager.AddGamepadButtonAction("pause", GAMEPAD_BUTTON_MIDDLE_LEFT, 0);
+
+    inputManager.AddGamepadAxisAction("move_up", GAMEPAD_AXIS_LEFT_Y, 0, false);
+    inputManager.AddGamepadAxisAction("move_down", GAMEPAD_AXIS_LEFT_Y, 0, true);
+    inputManager.AddGamepadAxisAction("move_left", GAMEPAD_AXIS_LEFT_X, 0, false);
+    inputManager.AddGamepadAxisAction("move_right", GAMEPAD_AXIS_LEFT_X, 0, true);
 }
 
 int main()
@@ -20,6 +52,7 @@ int main()
 
     game::GameApplication application(appSpec);
     LoadAllTextures();
+    LoadKeyBinds();
 
     game::GameApplication::QueuePush(std::make_unique<OverlayLayer>());
     game::GameApplication::QueuePush(std::make_unique<ProfileSelectionMenuLayer>());

@@ -1,4 +1,3 @@
-#include "engine/core/application.h"
 #include "engine/ui/text_menu_option.h"
 #include "game/components/profile.h"
 #include "game/game_application.h"
@@ -9,6 +8,7 @@
 #include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
+
 
 ProfileSelectionMenuLayer::ProfileSelectionMenuLayer() : BaseMenuLayer(ui::Alignment::CENTER, true, 10.0f)
 {

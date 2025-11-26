@@ -1,13 +1,14 @@
 #include "game/layers/board_selection_menu.h"
-#include "engine/core/application.h"
 #include "engine/core/input_manager.h"
 #include "engine/ui/text_menu_option.h"
+#include "game/game_application.h"
 #include "game/layers/game.h"
 #include "game/layers/main_menu.h"
 #include <algorithm>
 #include <filesystem>
 #include <iostream>
 #include <string>
+
 
 BoardSelectionMenuLayer::BoardSelectionMenuLayer()
     : m_menu({(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2}, ui::AnchorPoint::TOP_LEFT,
@@ -55,15 +56,15 @@ void BoardSelectionMenuLayer::OnUpdate(float ts)
 {
     auto inputManager = engine::Application::GetInputManager();
 
-    if (inputManager->IsAction("move_down", engine::InputState::PRESSED))
+    if (inputManager.IsAction("move_down", engine::InputState::PRESSED))
     {
         m_menu.SelectNext();
     }
-    else if (inputManager->IsAction("move_up", engine::InputState::PRESSED))
+    else if (inputManager.IsAction("move_up", engine::InputState::PRESSED))
     {
         m_menu.SelectPrevious();
     }
-    else if (inputManager->IsAction("confirm", engine::InputState::PRESSED))
+    else if (inputManager.IsAction("confirm", engine::InputState::PRESSED))
     {
         m_menu.ConfirmSelection();
     }

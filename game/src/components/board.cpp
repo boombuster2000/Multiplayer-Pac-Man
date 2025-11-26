@@ -1,13 +1,14 @@
 #include <fstream>
 #include <stdexcept>
 
-#include "engine/core/application.h"
 #include "engine/serialization/json_converters.hpp"
 #include "engine/ui/enums.h"
 #include "game/components/board.h"
 #include "game/components/pellet.h"
+#include "game/game_application.h"
 #include "game/serialization/json_converters.hpp"
 #include <nlohmann/json.hpp>
+
 
 using json = nlohmann::json;
 

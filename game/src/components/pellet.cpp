@@ -1,5 +1,5 @@
 #include "game/components/pellet.h"
-#include "engine/core/application.h"
+#include "game/game_application.h"
 
 Pellet::Pellet() : RenderableObject(), m_type(Type::NONE), radius(3.0f)
 {

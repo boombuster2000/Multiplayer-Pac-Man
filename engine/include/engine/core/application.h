@@ -45,18 +45,18 @@ class Application
     ApplicationSpecification m_specification;
     bool m_running = false;
 
-    std::vector<std::unique_ptr<Layer>> m_layerStack;
-
+    static Application* s_application;
     static std::queue<LayerAction> s_pendingActions;
+
+    TexturesManager m_texturesManager;
+    InputManager m_inputManager;
+    std::vector<std::unique_ptr<Layer>> m_layerStack;
 
     void ProcessPendingActions();
 
   public:
-    Application(const ApplicationSpecification& specification = ApplicationSpecification());
+    explicit Application(const ApplicationSpecification& specification = ApplicationSpecification());
     ~Application();
-
-    static std::shared_ptr<TexturesManager> GetTexturesManager();
-    static std::shared_ptr<InputManager> GetInputManager();
 
     void Run();
     void Stop();
@@ -75,6 +75,10 @@ class Application
     static void QueueTransition(std::type_index fromType, std::unique_ptr<Layer> toLayer);
 
     static Application& Get();
+
+    static InputManager& GetInputManager();
+
+    static TexturesManager& GetTexturesManager();
 
     template <typename TLayer>
     TLayer* GetLayer()

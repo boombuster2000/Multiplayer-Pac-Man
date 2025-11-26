@@ -1,5 +1,4 @@
 #include "game/layers/create_profile.h"
-#include "engine/core/application.h"
 #include "engine/core/input_manager.h"
 #include "engine/ui/enums.h"
 #include "engine/ui/text_menu_option.h"
@@ -12,6 +11,7 @@
 #include "game/serialization/json_converters.hpp"
 #include <fstream>
 #include <nlohmann/json.hpp>
+
 
 void CreateProfileLayer::SetupMenuOptions()
 {
@@ -61,7 +61,7 @@ void CreateProfileLayer::OnUpdate(float ts)
 
         m_profileNameInput->Update();
 
-        if (inputManager->IsAction("confirm", engine::InputState::PRESSED))
+        if (inputManager.IsAction("confirm", engine::InputState::PRESSED))
         {
             m_profileNameInput->SetActive(false);
         }
