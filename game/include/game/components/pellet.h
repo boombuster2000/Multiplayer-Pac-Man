@@ -27,7 +27,7 @@ class Pellet : public ui::RenderableObject
 
   private:
     Type m_type;
-    float radius;
+    float radius = 3.0f;
 
     static inline TypePointValues s_typePoints{
         10, // Normal

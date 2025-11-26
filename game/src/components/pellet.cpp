@@ -1,12 +1,12 @@
 #include "game/components/pellet.h"
 #include "game/game_application.h"
 
-Pellet::Pellet() : RenderableObject(), m_type(Type::NONE), radius(3.0f)
+Pellet::Pellet() : RenderableObject(), m_type(Type::NONE)
 {
 }
 
 Pellet::Pellet(Vector2Ex<float> position, const Type type)
-    : RenderableObject(position, ui::AnchorPoint::MIDDLE), m_type(type), radius(3.0f)
+    : RenderableObject(position, ui::AnchorPoint::MIDDLE), m_type(type)
 {
 }
 
