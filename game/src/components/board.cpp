@@ -144,7 +144,8 @@ Board Board::LoadFromFile(std::string_view filename)
     std::ifstream file(filename.data());
     if (!file.is_open())
     {
-        throw std::runtime_error(std::format("Could not open file: {}", filename));
+        throw std::filesystem::filesystem_error("Failed to open file", std::filesystem::path(filename.data()),
+                                                std::error_code{});
     }
 
     json j;
