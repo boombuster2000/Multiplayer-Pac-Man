@@ -15,7 +15,7 @@ class Profile
 
   public:
     Profile() = default;
-    Profile(std::string username);
+    explicit Profile(std::string username);
 
     std::string GetUsername() const;
 
