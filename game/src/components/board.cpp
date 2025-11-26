@@ -154,18 +154,19 @@ Board Board::LoadFromFile(const std::string& filename)
 
 void Board::addBoundaries()
 {
+    using enum Tile::Type;
     const Vector2Ex<size_t>& boardSize = GetGridSize();
 
     for (int x = 0; x < boardSize.x; x++)
     {
-        GetTile(0, x).SetType(Tile::Type::WALL);
-        GetTile(boardSize.y - 1, x).SetType(Tile::Type::WALL);
+        GetTile(0, x).SetType(WALL);
+        GetTile(boardSize.y - 1, x).SetType(WALL);
     }
 
     for (int y = 0; y < boardSize.y; y++)
     {
-        GetTile(y, 0).SetType(Tile::Type::WALL);
-        GetTile(y, boardSize.x - 1).SetType(Tile::Type::WALL);
+        GetTile(y, 0).SetType(WALL);
+        GetTile(y, boardSize.x - 1).SetType(WALL);
     }
 }
 
