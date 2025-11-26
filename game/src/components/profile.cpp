@@ -5,7 +5,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
-Profile::Profile(std::string username) : m_username(username)
+Profile::Profile(const std::string& username) : m_username(username)
 {
 }
 
