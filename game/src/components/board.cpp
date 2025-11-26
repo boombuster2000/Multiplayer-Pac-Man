@@ -9,7 +9,6 @@
 #include "game/serialization/json_converters.hpp"
 #include <nlohmann/json.hpp>
 
-
 using json = nlohmann::json;
 
 Board::Board()
@@ -115,7 +114,7 @@ void Board::SaveHighscoresToFile() const
     }
 }
 
-std::unordered_map<std::string, int> Board::GetHighscores() const
+HighscoreMap Board::GetHighscores() const
 {
     return m_highScores;
 }

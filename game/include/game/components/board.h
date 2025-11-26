@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/core/transparentStringHasher.h"
 #include "engine/core/vector2ex.h"
 #include "engine/ui/grid.h"
 #include "game/components/tile.h"
@@ -7,6 +8,7 @@
 #include <string>
 #include <unordered_map>
 
+typedef std::unordered_map<std::string, int, TransparentStringHash, std::equal_to<>> HighscoreMap;
 using json = nlohmann::json;
 
 class Board : public ui::Grid<Tile>
@@ -16,7 +18,7 @@ class Board : public ui::Grid<Tile>
 
   private:
     std::string m_name;
-    std::unordered_map<std::string, int> m_highScores;
+    HighscoreMap m_highScores;
 
   private:
     void addBoundaries();
@@ -34,7 +36,7 @@ class Board : public ui::Grid<Tile>
 
     void SaveToFile() const;
 
-    std::unordered_map<std::string, int> GetHighscores() const;
+    HighscoreMap GetHighscores() const;
     void SetHighscore(const std::string& profileName, int score);
     void SaveHighscoresToFile() const;
 
