@@ -112,21 +112,25 @@ void Application::ProcessPendingActions()
             break;
 
         case LayerActionType::POP: {
-            auto it = std::find_if(m_layerStack.begin(), m_layerStack.end(), [&](const std::unique_ptr<Layer>& layer) {
+            auto it = std::ranges::find_if(m_layerStack, [&](const std::unique_ptr<Layer>& layer) {
                 return std::type_index(typeid(*layer)) == action.fromType;
             });
+
             if (it != m_layerStack.end())
                 m_layerStack.erase(it);
         }
+
         break;
 
         case LayerActionType::TRANSITION: {
-            auto it = std::find_if(m_layerStack.begin(), m_layerStack.end(), [&](const std::unique_ptr<Layer>& layer) {
+            auto it = std::ranges::find_if(m_layerStack, [&](const std::unique_ptr<Layer>& layer) {
                 return std::type_index(typeid(*layer)) == action.fromType;
             });
+
             if (it != m_layerStack.end())
                 *it = std::move(action.toLayer);
         }
+
         break;
         }
     }
