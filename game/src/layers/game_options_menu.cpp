@@ -6,7 +6,6 @@
 #include "game/layers/main_menu.h"
 #include <memory>
 
-
 GameOptionsMenuLayer::GameOptionsMenuLayer() : BaseMenuLayer(ui::Alignment::CENTER, true, 10.0f)
 {
     SetupMenuOptions();
@@ -43,7 +42,7 @@ void GameOptionsMenuLayer::OnUpdate(float ts)
 {
     BaseMenuLayer::OnUpdate(ts);
 
-    auto inputManager = engine::Application::GetInputManager();
+    const auto& inputManager = engine::Application::GetInputManager();
 
     if (inputManager.IsAction("pause", engine::InputState::PRESSED))
     {

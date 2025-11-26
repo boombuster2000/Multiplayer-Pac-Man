@@ -120,7 +120,7 @@ GameLayer::~GameLayer()
 void GameLayer::HandleKeyPresses()
 {
     using enum ui::Direction;
-    auto inputManager = game::GameApplication::GetInputManager();
+    const auto& inputManager = game::GameApplication::GetInputManager();
 
     if (inputManager.IsAction("move_up", engine::InputState::PRESSED))
         m_player.GetPacman().QueueDirection(UP);
