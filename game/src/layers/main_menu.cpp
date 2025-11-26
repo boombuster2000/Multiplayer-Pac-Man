@@ -5,7 +5,6 @@
 #include "game/game_application.h"
 #include "game/layers/board_selection_menu.h"
 
-
 MainMenuLayer::MainMenuLayer() : BaseMenuLayer(ui::Alignment::CENTER, true, 10.0f)
 {
     SetupMenuOptions();
@@ -21,7 +20,8 @@ void MainMenuLayer::SetupMenuOptions()
         TransistionTo(std::make_unique<BoardSelectionMenuLayer>());
     }));
 
-    m_menu.AddOption(std::make_unique<TextMenuOption>("Options", selectedStyle, unselectedStyle, false, []() {}));
+    // TODO: Implement options menu
+    m_menu.AddOption(std::make_unique<TextMenuOption>("Options", selectedStyle, unselectedStyle, false));
 
     m_menu.AddOption(std::make_unique<TextMenuOption>("Exit", selectedStyle, unselectedStyle, false,
                                                       []() { game::GameApplication::Get().Stop(); }));
