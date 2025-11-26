@@ -56,18 +56,23 @@ void TextBox::UpdateCursor()
 Vector2Ex<float> TextBox::CalculateTextPositionOffset(const Vector2Ex<float>& boxDimensions,
                                                       const Vector2Ex<float>& textDimensions) const
 {
+    using enum ui::Alignment;
+
     float x = 0.0f;
     switch (m_style.alignment)
     {
-    case Alignment::LEFT:
+    case LEFT:
         x = m_style.padding;
         break;
-    case Alignment::RIGHT:
+
+    case RIGHT:
         x = boxDimensions.x - textDimensions.x - m_style.padding;
         break;
-    case Alignment::CENTER:
+
+    case CENTER:
         x = (boxDimensions.x - textDimensions.x) / 2;
         break;
+
     default:
         break;
     }
