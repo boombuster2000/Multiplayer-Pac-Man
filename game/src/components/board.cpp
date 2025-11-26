@@ -123,8 +123,7 @@ HighscoreMap Board::GetHighscores() const
 
 void Board::SetHighscore(std::string_view profileName, int score)
 {
-    auto it = m_highScores.find(profileName);
-    if (it != m_highScores.end())
+    if (auto it = m_highScores.find(profileName); it != m_highScores.end())
     {
         // Profile exists, update if score is higher
         if (score > it->second)
