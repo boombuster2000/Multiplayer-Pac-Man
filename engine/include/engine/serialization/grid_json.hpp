@@ -3,6 +3,7 @@
 #include "engine/serialization/json_helpers.hpp"
 #include "engine/ui/grid.h"
 #include "raylib.h"
+#include <format>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 #include <string>
@@ -82,10 +83,8 @@ inline void from_json(const json& j, Grid<T>& grid)
                 }
                 catch (const json::exception& e)
                 {
-                    throw json::other_error::create(502,
-                                                    "Failed to deserialize Grid.grid[" + std::to_string(y) + "][" +
-                                                        std::to_string(x) + "]: " + e.what(),
-                                                    &row_j);
+                    throw json::other_error::create(
+                        502, std::format("Failed to deserialize Grid.grid[{}][{}]: {}", y, x, e.what()), &row_j);
                 }
             }
         }
