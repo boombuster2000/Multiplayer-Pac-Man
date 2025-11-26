@@ -31,7 +31,7 @@ class TextBox : public RenderableObject
 
   public:
     TextBox(Vector2Ex<float> position, Vector2Ex<float> dimensions, const TextBoxStyle& style,
-            const TextBoxStyle& activeStyle, const std::string& backgroundText = "",
+            const TextBoxStyle& activeStyle, std::string_view backgroundText = "",
             AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT, bool isActive = false, bool visible = true);
 
     void SetStyle(const TextBoxStyle& style);

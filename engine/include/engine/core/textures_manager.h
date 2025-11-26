@@ -11,14 +11,14 @@ class TexturesManager
 {
 
   private:
-    std::unordered_map<std::string, std::shared_ptr<Texture2D>> m_loadedTextures;
+    std::unordered_map<std::string_view, std::shared_ptr<Texture2D>> m_loadedTextures;
 
   public:
     TexturesManager();
     ~TexturesManager();
 
-    void AddTexture(const std::string& key, const std::string& filePath);
-    std::shared_ptr<Texture2D> GetTexture(const std::string& key) const;
+    void AddTexture(std::string_view key, std::string_view filePath);
+    std::shared_ptr<Texture2D> GetTexture(std::string_view key) const;
     void UnloadAll();
 
     TexturesManager(const TexturesManager&) = delete;

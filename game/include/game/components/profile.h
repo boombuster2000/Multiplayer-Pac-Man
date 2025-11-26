@@ -15,12 +15,12 @@ class Profile
 
   public:
     Profile() = default;
-    explicit Profile(const std::string& username);
+    explicit Profile(std::string_view username);
 
     std::string GetUsername() const;
 
     HighscoreMap GetPersonalHighscores() const;
-    void UpdateHighScore(const std::string& boardName, const int points);
+    void UpdateHighScore(std::string_view boardName, const int points);
     void Save() const;
 
     friend void to_json(json&, const Profile&);

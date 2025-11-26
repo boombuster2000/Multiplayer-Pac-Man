@@ -26,7 +26,7 @@ class Board : public ui::Grid<Tile>
 
   public:
     Board();
-    explicit Board(const std::string& filename);
+    explicit Board(std::string_view filename);
 
     std::string GetName() const;
 
@@ -37,8 +37,8 @@ class Board : public ui::Grid<Tile>
     void SaveToFile() const;
 
     HighscoreMap GetHighscores() const;
-    void SetHighscore(const std::string& profileName, int score);
+    void SetHighscore(std::string_view profileName, int score);
     void SaveHighscoresToFile() const;
 
-    static Board LoadFromFile(const std::string& filename);
+    static Board LoadFromFile(std::string_view filename);
 };

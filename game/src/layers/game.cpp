@@ -105,7 +105,7 @@ GameLayer::GameLayer()
 {
 }
 
-GameLayer::GameLayer(const std::string& boardPath)
+GameLayer::GameLayer(std::string_view boardPath)
     : m_board(boardPath), m_player(game::GameApplication::Get().GetProfile(),
                                    Pacman(m_board.GetPlayerSpawnPoint(), Vector2Ex<float>(50, 50), 400))
 {
@@ -219,7 +219,7 @@ void GameLayer::HandleCollisions(const float& deltaTime)
 
 void GameLayer::UpdateHighscores()
 {
-    const std::string& boardName = m_board.GetName();
+    std::string_view boardName = m_board.GetName();
 
     game::GameApplication::Get().GetProfile()->UpdateHighScore(boardName, m_player.GetPoints());
     m_board.SetHighscore(game::GameApplication::Get().GetProfile()->GetUsername(), m_player.GetPoints());
@@ -249,13 +249,14 @@ void GameLayer::OnRender()
 void GameLayer::RenderScores()
 {
     const int currentPoints = m_player.GetPoints();
-    const std::string& boardName = m_board.GetName();
+    std::string_view boardName = m_board.GetName();
     const auto& highscores = game::GameApplication::Get().GetProfile()->GetPersonalHighscores();
 
     int highscore = 0;
-    if (highscores.contains(boardName))
+    auto it = highscores.find(boardName);
+    if (it != highscores.end())
     {
-        highscore = highscores.at(boardName);
+        highscore = it->second;
     }
 
     const std::string currentPointsStr = "Score: " + std::to_string(currentPoints);

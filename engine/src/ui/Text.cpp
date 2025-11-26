@@ -3,7 +3,7 @@
 namespace ui
 {
 
-Text::Text(std::string text, TextStyle textStyle, Vector2Ex<float> anchorPointPosition, AnchorPoint anchorPoint,
+Text::Text(std::string_view text, TextStyle textStyle, Vector2Ex<float> anchorPointPosition, AnchorPoint anchorPoint,
            bool visible)
     : RenderableObject(anchorPointPosition, anchorPoint, visible), m_style(textStyle)
 {
@@ -13,7 +13,7 @@ Text::Text(std::string text, TextStyle textStyle, Vector2Ex<float> anchorPointPo
     SetOrigin(anchorPoint);
 }
 
-void Text::SetText(const std::string& text)
+void Text::SetText(std::string_view text)
 {
     m_text = text;
 }

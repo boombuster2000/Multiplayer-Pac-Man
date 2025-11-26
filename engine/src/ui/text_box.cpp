@@ -96,7 +96,7 @@ void TextBox::UpdateAllTextPositions()
 }
 
 TextBox::TextBox(Vector2Ex<float> position, Vector2Ex<float> dimensions, const TextBoxStyle& style,
-                 const TextBoxStyle& activeStyle, const std::string& backgroundText, AnchorPoint anchorPoint,
+                 const TextBoxStyle& activeStyle, std::string_view backgroundText, AnchorPoint anchorPoint,
                  bool isActive, bool visible)
     : RenderableObject(position, anchorPoint, visible), m_dimensions(dimensions),
       m_text("", style.typingTextStyle, position, AnchorPoint::TOP_LEFT, visible), m_style(style),

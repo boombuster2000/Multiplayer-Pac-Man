@@ -26,7 +26,7 @@ class GameLayer : public engine::Layer
 
   public:
     GameLayer();
-    explicit GameLayer(const std::string& boardPath);
+    explicit GameLayer(std::string_view boardPath);
     ~GameLayer() final;
 
     void HandleKeyPresses();

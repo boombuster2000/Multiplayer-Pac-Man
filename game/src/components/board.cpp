@@ -7,6 +7,7 @@
 #include "game/components/pellet.h"
 #include "game/game_application.h"
 #include "game/serialization/json_converters.hpp"
+#include <format>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -62,7 +63,7 @@ Board::Board()
         SetTileType({x, 11}, WALL);
 }
 
-Board::Board(const std::string& filename)
+Board::Board(std::string_view filename)
 {
     *this = Board::LoadFromFile(filename);
 }
@@ -120,28 +121,31 @@ HighscoreMap Board::GetHighscores() const
     return m_highScores;
 }
 
-void Board::SetHighscore(const std::string& profileName, int score)
+void Board::SetHighscore(std::string_view profileName, int score)
 {
-    if (m_highScores.contains(profileName))
+    auto it = m_highScores.find(profileName);
+    if (it != m_highScores.end())
     {
-        if (score > m_highScores.at(profileName))
+        // Profile exists, update if score is higher
+        if (score > it->second)
         {
-            m_highScores[profileName] = score;
+            it->second = score;
         }
     }
     else
     {
-        m_highScores[profileName] = score;
+        // Profile doesn't exist, insert new score
+        m_highScores.emplace(profileName, score);
     }
     SortHighscores();
 }
 
-Board Board::LoadFromFile(const std::string& filename)
+Board Board::LoadFromFile(std::string_view filename)
 {
-    std::ifstream file(filename);
+    std::ifstream file(filename.data());
     if (!file.is_open())
     {
-        throw std::runtime_error("Could not open file: " + filename);
+        throw std::runtime_error(std::format("Could not open file: {}", filename));
     }
 
     json j;

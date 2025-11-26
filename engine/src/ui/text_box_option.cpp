@@ -5,7 +5,7 @@ namespace ui
 
 TextBoxOption::TextBoxOption(Vector2Ex<float> dimensions, const TextBoxStyle& selectedStyle,
                              const TextBoxStyle& unselectedStyle, const TextBoxStyle& activeStyle,
-                             const std::string& backgroundText, AnchorPoint anchorPoint, bool isActive, bool visible,
+                             std::string_view backgroundText, AnchorPoint anchorPoint, bool isActive, bool visible,
                              bool isSelected, std::function<void()> callback)
     : MenuOption(isSelected, callback),
       m_textBox({0, 0}, dimensions, unselectedStyle, activeStyle, backgroundText, anchorPoint, isActive, visible),

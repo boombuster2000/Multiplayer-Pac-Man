@@ -5,7 +5,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
-Profile::Profile(const std::string& username) : m_username(username)
+Profile::Profile(std::string_view username) : m_username(username)
 {
 }
 
@@ -18,7 +18,7 @@ HighscoreMap Profile::GetPersonalHighscores() const
     return m_personalHighscores;
 }
 
-void Profile::UpdateHighScore(const std::string& boardName, const int points)
+void Profile::UpdateHighScore(std::string_view boardName, const int points)
 {
     if (boardName.empty())
         return;
@@ -27,17 +27,18 @@ void Profile::UpdateHighScore(const std::string& boardName, const int points)
         return;
 
     bool newHighScore = false;
-    if (m_personalHighscores.contains(boardName))
+    auto it = m_personalHighscores.find(boardName);
+    if (it != m_personalHighscores.end())
     {
-        if (m_personalHighscores.at(boardName) < points)
+        if (it->second < points)
         {
-            m_personalHighscores[boardName] = points;
+            it->second = points;
             newHighScore = true;
         }
     }
     else
     {
-        m_personalHighscores[boardName] = points;
+        m_personalHighscores.emplace(boardName, points);
         newHighScore = true;
     }
 

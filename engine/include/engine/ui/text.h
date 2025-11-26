@@ -18,10 +18,10 @@ class Text : public RenderableObject
     TextStyle m_style;
 
   public:
-    Text(std::string text, TextStyle style, Vector2Ex<float> anchorPointPosition, AnchorPoint AnchorPoint,
+    Text(std::string_view text, TextStyle style, Vector2Ex<float> anchorPointPosition, AnchorPoint anchorPoint,
          bool visible);
 
-    void SetText(const std::string& text);
+    void SetText(std::string_view text);
     std::string GetText() const;
 
     void SetFontSize(const float fontSize);
