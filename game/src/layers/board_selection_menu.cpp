@@ -9,7 +9,6 @@
 #include <iostream>
 #include <string>
 
-
 BoardSelectionMenuLayer::BoardSelectionMenuLayer()
     : m_menu({(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2}, ui::AnchorPoint::TOP_LEFT,
              ui::Alignment::CENTER, true, 10.0f),
@@ -26,7 +25,7 @@ void BoardSelectionMenuLayer::SetupMenuOptions()
     TextStyle boardUnselectedStyle = {30, DARKGRAY};
     TextStyle boardSelectedStyle = {40, ORANGE};
 
-    m_boardPaths.push_back("built-in");
+    m_boardPaths.emplace_back("built-in");
     m_menu.AddOption(std::make_unique<TextMenuOption>("built-in", boardSelectedStyle, boardUnselectedStyle, true,
                                                       [this]() { TransistionTo(std::make_unique<GameLayer>()); }));
 
@@ -37,7 +36,7 @@ void BoardSelectionMenuLayer::SetupMenuOptions()
         {
             std::string filename = entry.path().stem().string();
             std::string fullPath = entry.path().string();
-            m_boardPaths.push_back(fullPath);
+            m_boardPaths.emplace_back(fullPath);
             m_menu.AddOption(std::make_unique<TextMenuOption>(
                 filename, boardSelectedStyle, boardUnselectedStyle, false,
                 [this, fullPath]() { TransistionTo(std::make_unique<GameLayer>(fullPath)); }));
@@ -47,7 +46,7 @@ void BoardSelectionMenuLayer::SetupMenuOptions()
     TextStyle backButtonUnselectedStyle = {25, GRAY};
     TextStyle backButtonSelectedStyle = {30, ORANGE};
 
-    m_boardPaths.push_back("back"); // placeholder for back button
+    m_boardPaths.emplace_back("back"); // placeholder for back button
     m_menu.AddOption(std::make_unique<TextMenuOption>("Back", backButtonSelectedStyle, backButtonUnselectedStyle, false,
                                                       [this]() { TransistionTo(std::make_unique<MainMenuLayer>()); }));
 }
