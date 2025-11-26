@@ -24,7 +24,7 @@ class MenuOption
 
     bool IsSelected() const;
 
-    void Select();
+    void Select() const;
 
     virtual RenderableObject& GetRenderableObject() = 0;
     virtual const RenderableObject& GetRenderableObject() const = 0;
