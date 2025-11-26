@@ -15,7 +15,7 @@ class GameLayer : public engine::Layer
     Player m_player;
     ui::Direction m_queuedDirection;
 
-    float m_timePassedSinceLastSave;
+    float m_timePassedSinceLastSave = 0.0f;
 
   private:
     bool IsPacmanTouchingPellet(const Vector2Ex<float>& pacmanDimensions, const Vector2Ex<float>& pacmanPosition) const;

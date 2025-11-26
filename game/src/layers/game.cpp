@@ -101,15 +101,13 @@ bool GameLayer::TryApplyQueuedDirection(Vector2Ex<float>& currentPosition, ui::D
 
 GameLayer::GameLayer()
     : m_board(), m_player(game::GameApplication::Get().GetProfile(),
-                          Pacman(m_board.GetPlayerSpawnPoint(), Vector2Ex<float>(50, 50), 400)),
-      m_timePassedSinceLastSave(0)
+                          Pacman(m_board.GetPlayerSpawnPoint(), Vector2Ex<float>(50, 50), 400))
 {
 }
 
 GameLayer::GameLayer(const std::string& boardPath)
     : m_board(boardPath), m_player(game::GameApplication::Get().GetProfile(),
-                                   Pacman(m_board.GetPlayerSpawnPoint(), Vector2Ex<float>(50, 50), 400)),
-      m_timePassedSinceLastSave(0)
+                                   Pacman(m_board.GetPlayerSpawnPoint(), Vector2Ex<float>(50, 50), 400))
 {
 }
 
