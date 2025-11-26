@@ -4,7 +4,7 @@
 #include <string>
 #include <unordered_map>
 
-typedef std::unordered_map<std::string, int, TransparentStringHash, std::equal_to<>> HighscoreMap;
+using HighscoreMap = std::unordered_map<std::string, int, TransparentStringHash, std::equal_to<>>;
 using json = nlohmann::json;
 
 class Profile
