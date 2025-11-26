@@ -48,7 +48,7 @@ class Layer
     template <typename TLayer>
     void Push(std::unique_ptr<TLayer> layer) const;
 
-    void Pop();
+    void Pop() const;
 
     std::type_index GetTypeIndex() const
     {
