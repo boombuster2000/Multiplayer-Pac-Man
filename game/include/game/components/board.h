@@ -26,7 +26,7 @@ class Board : public ui::Grid<Tile>
 
   public:
     Board();
-    Board(const std::string& filename);
+    explicit Board(const std::string& filename);
 
     std::string GetName() const;
 
