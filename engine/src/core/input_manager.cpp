@@ -8,77 +8,100 @@ void InputManager::Update()
 {
     for (auto const& [name, actions] : m_actions)
     {
-        bool isDown = false;
-        float value = 0.0f;
+        auto [isDown, value] = GetActionStatus(actions);
+        UpdateActionState(name, isDown);
+        m_actionValues[name] = value;
+    }
+}
 
-        for (const auto& action : actions)
+std::pair<bool, float> InputManager::GetActionStatus(const std::vector<Action>& actions)
+{
+    bool isDown = false;
+    float value = 0.0f;
+
+    for (const auto& action : actions)
+    {
+        ProcessKeyboard(action, isDown, value);
+        ProcessGamepadButton(action, isDown, value);
+        ProcessGamepadAxis(action, isDown, value);
+    }
+
+    return {isDown, value};
+}
+
+void InputManager::ProcessKeyboard(const Action& action, bool& isDown, float& value)
+{
+    if (action.keyboardKey != -1)
+    {
+        if (IsKeyDown(action.keyboardKey))
         {
-            if (action.keyboardKey != -1)
-            {
-                if (IsKeyDown(action.keyboardKey))
-                {
-                    isDown = true;
-                    value = 1.0f;
-                }
-            }
-
-            if (action.gamepadButton != -1)
-            {
-                if (IsGamepadButtonDown(action.gamepadIndex, action.gamepadButton))
-                {
-                    isDown = true;
-                    value = 1.0f;
-                }
-            }
-
-            if (action.gamepadAxis != -1)
-            {
-                float axisValue = GetGamepadAxisMovement(action.gamepadIndex, action.gamepadAxis);
-                if (action.positive)
-                {
-                    if (axisValue > 0.5f)
-                    {
-                        isDown = true;
-                        value = axisValue;
-                    }
-                }
-                else
-                {
-                    if (axisValue < -0.5f)
-                    {
-                        isDown = true;
-                        value = -axisValue;
-                    }
-                }
-            }
+            isDown = true;
+            value = 1.0f;
         }
+    }
+}
 
-        InputState& state = m_actionStates[name];
-
-        if (isDown)
+void InputManager::ProcessGamepadButton(const Action& action, bool& isDown, float& value)
+{
+    if (action.gamepadButton != -1)
+    {
+        if (IsGamepadButtonDown(action.gamepadIndex, action.gamepadButton))
         {
-            if (state == InputState::UP || state == InputState::RELEASED)
+            isDown = true;
+            value = 1.0f;
+        }
+    }
+}
+
+void InputManager::ProcessGamepadAxis(const Action& action, bool& isDown, float& value)
+{
+    if (action.gamepadAxis != -1)
+    {
+        float axisValue = GetGamepadAxisMovement(action.gamepadIndex, action.gamepadAxis);
+        if (action.positive)
+        {
+            if (axisValue > 0.5f)
             {
-                state = InputState::PRESSED;
-            }
-            else
-            {
-                state = InputState::DOWN;
+                isDown = true;
+                value = axisValue;
             }
         }
         else
         {
-            if (state == InputState::DOWN || state == InputState::PRESSED)
+            if (axisValue < -0.5f)
             {
-                state = InputState::RELEASED;
-            }
-            else
-            {
-                state = InputState::UP;
+                isDown = true;
+                value = -axisValue;
             }
         }
+    }
+}
 
-        m_actionValues[name] = value;
+void InputManager::UpdateActionState(const std::string& name, bool isDown)
+{
+    InputState& state = m_actionStates[name];
+
+    if (isDown)
+    {
+        if (state == InputState::UP || state == InputState::RELEASED)
+        {
+            state = InputState::PRESSED;
+        }
+        else
+        {
+            state = InputState::DOWN;
+        }
+    }
+    else
+    {
+        if (state == InputState::DOWN || state == InputState::PRESSED)
+        {
+            state = InputState::RELEASED;
+        }
+        else
+        {
+            state = InputState::UP;
+        }
     }
 }
 

@@ -33,6 +33,12 @@ class InputManager
     std::unordered_map<std::string, InputState, TransparentStringHash, std::equal_to<>> m_actionStates;
     std::unordered_map<std::string, float, TransparentStringHash, std::equal_to<>> m_actionValues;
 
+    void ProcessKeyboard(const Action& action, bool& isDown, float& value);
+    void ProcessGamepadButton(const Action& action, bool& isDown, float& value);
+    void ProcessGamepadAxis(const Action& action, bool& isDown, float& value);
+    std::pair<bool, float> GetActionStatus(const std::vector<Action>& actions);
+    void UpdateActionState(const std::string& name, bool isDown);
+
   public:
     InputManager() = default;
     ~InputManager() = default;
