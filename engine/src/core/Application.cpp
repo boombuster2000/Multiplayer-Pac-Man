@@ -11,8 +11,7 @@ namespace engine
 Application* Application::s_application = nullptr;
 std::queue<LayerAction> Application::s_pendingActions;
 
-Application::Application(const ApplicationSpecification& specification)
-    : m_specification(specification), m_texturesManager(), m_inputManager()
+Application::Application(const ApplicationSpecification& specification) : m_specification(specification)
 {
     s_application = this;
 
