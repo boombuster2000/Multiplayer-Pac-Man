@@ -176,7 +176,7 @@ void Board::SortHighscores()
     std::vector<std::pair<std::string, int>> scoreVector(m_highScores.begin(), m_highScores.end());
 
     // Sort the vector based on scores in descending order
-    std::sort(scoreVector.begin(), scoreVector.end(), [](const auto& a, const auto& b) { return a.second > b.second; });
+    std::ranges::sort(scoreVector, [](const auto& a, const auto& b) { return a.second > b.second; });
 
     // Clear the original map and reinsert sorted entries
     m_highScores.clear();
