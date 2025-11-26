@@ -18,47 +18,48 @@ Board::Board()
            Vector2Ex<float>(0, 0), Vector2Ex<float>(50, 50)),
       m_name("test-file")
 {
+    using enum Tile::Type;
     addBoundaries();
 
     // Row 2 - top horizontal walls
     for (int x : {2, 4, 5, 6, 7, 8, 9, 10, 11})
-        SetTileType({x, 2}, Tile::Type::WALL);
+        SetTileType({x, 2}, WALL);
 
     // Row 3 - vertical pillars
     for (int x : {2, 11})
-        SetTileType({x, 3}, Tile::Type::WALL);
+        SetTileType({x, 3}, WALL);
 
     // Row 4 - inner walls with gaps
     for (int x : {2, 4, 5, 6, 7, 8, 9, 11})
-        SetTileType({x, 4}, Tile::Type::WALL);
+        SetTileType({x, 4}, WALL);
 
     // Row 5 - ghost house top
     for (int x : {0, 2, 4, 11})
-        SetTileType({x, 5}, Tile::Type::WALL);
+        SetTileType({x, 5}, WALL);
 
     // Row 6 - ghost house sides
     for (int x : {0, 2, 4, 5, 6, 7, 9, 11})
-        SetTileType({x, 6}, Tile::Type::WALL);
+        SetTileType({x, 6}, WALL);
 
     // Row 7 - ghost house sides
     for (int x : {0, 2, 4, 5, 6, 7, 9, 11})
-        SetTileType({x, 7}, Tile::Type::WALL);
+        SetTileType({x, 7}, WALL);
 
     // Row 8 - ghost house bottom
     for (int x : {0, 2, 4, 9, 11})
-        SetTileType({x, 8}, Tile::Type::WALL);
+        SetTileType({x, 8}, WALL);
 
     // Row 9 - inner walls with gaps
     for (int x : {2, 4, 5, 6, 7, 8, 9, 11})
-        SetTileType({x, 9}, Tile::Type::WALL);
+        SetTileType({x, 9}, WALL);
 
     // Row 10 - vertical pillars
     for (int x : {2, 11})
-        SetTileType({x, 10}, Tile::Type::WALL);
+        SetTileType({x, 10}, WALL);
 
     // Row 11 - bottom horizontal walls
     for (int x : {2, 3, 4, 5, 6, 7, 8, 9, 11})
-        SetTileType({x, 11}, Tile::Type::WALL);
+        SetTileType({x, 11}, WALL);
 }
 
 Board::Board(const std::string& filename)
