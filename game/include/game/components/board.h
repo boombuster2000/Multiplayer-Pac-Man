@@ -5,6 +5,7 @@
 #include "game/utils/highscore_utils.h"
 #include <nlohmann/json.hpp>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 
 using game::highscore_utils::HighscoreMap;
