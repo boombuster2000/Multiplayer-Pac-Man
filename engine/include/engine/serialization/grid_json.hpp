@@ -74,12 +74,16 @@ inline void from_json(const json& j, Grid<T>& grid)
             if (!row_j.is_array())
                 throw json::type_error::create(302, "Grid grid rows must be arrays.", &row_j);
 
+            if (row_j.size() != x_size)
+                throw json::type_error::create(
+                    302, std::format("Grid grid row {} has {} elements, expected {}.", y, row_j.size(), x_size),
+                    &row_j);
+
             for (size_t x = 0; x < x_size; ++x)
             {
                 try
                 {
-                    if (x < row_j.size())
-                        row_j.at(x).get_to(grid.m_grid[y][x]);
+                    row_j.at(x).get_to(grid.m_grid[y][x]);
                 }
                 catch (const json::exception& e)
                 {
