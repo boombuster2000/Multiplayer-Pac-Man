@@ -1,15 +1,14 @@
 #pragma once
-#include "engine/core/transparentStringHasher.h"
 #include "engine/core/vector2ex.h"
 #include "engine/ui/grid.h"
 #include "game/components/tile.h"
-#include "raylib.h"
+#include "game/utils/highscore_utils.h"
 #include <nlohmann/json.hpp>
 #include <string>
 #include <unordered_map>
 
-using HighscoreMap = std::unordered_map<std::string, int, TransparentStringHash, std::equal_to<>>;
-using json = nlohmann::json;
+using game::highscore_utils::HighscoreMap;
+using nlohmann::json;
 
 class Board : public ui::Grid<Tile>
 {
@@ -22,7 +21,6 @@ class Board : public ui::Grid<Tile>
 
   private:
     void addBoundaries();
-    void SortHighscores();
 
   public:
     Board();
