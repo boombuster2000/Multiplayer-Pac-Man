@@ -1,6 +1,5 @@
 #include "game/components/profile.h"
 #include "game/serialization/json_converters.hpp"
-#include "profile.h"
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
