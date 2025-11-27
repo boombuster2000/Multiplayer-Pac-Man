@@ -9,7 +9,6 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
-
 ProfileSelectionMenuLayer::ProfileSelectionMenuLayer() : BaseMenuLayer(ui::Alignment::CENTER, true, 10.0f)
 {
     SetupMenuOptions();
@@ -25,6 +24,18 @@ void ProfileSelectionMenuLayer::SetupMenuOptions()
     TextStyle buttonSelectedStyle = {30, ORANGE}; // Use for "Create Profile" and "Back"
 
     const std::string path = "profiles";
+    std::error_code ec;
+
+    if (!std::filesystem::exists(path, ec))
+    {
+        if (ec)
+            throw std::filesystem::filesystem_error("exists check failed", path, ec);
+
+        std::filesystem::create_directory(path, ec);
+
+        if (ec)
+            throw std::filesystem::filesystem_error("create_directory failed", path, ec);
+    }
 
     bool isFirstOption = true;
     for (const auto& entry : std::filesystem::directory_iterator(path))
@@ -32,7 +43,21 @@ void ProfileSelectionMenuLayer::SetupMenuOptions()
         if (entry.is_regular_file() && entry.path().extension() == ".json")
         {
             std::ifstream f(entry.path());
-            nlohmann::json data = nlohmann::json::parse(f);
+
+            if (!f.is_open())
+                continue;
+
+            nlohmann::json data;
+
+            try
+            {
+                data = nlohmann::json::parse(f);
+            }
+            catch (const nlohmann::json::parse_error& e)
+            {
+                continue;
+            }
+
             auto profile = std::make_shared<Profile>(data.get<Profile>());
 
             m_menu.AddOption(std::make_unique<TextMenuOption>(profile->GetUsername(), profileSelectedStyle,
