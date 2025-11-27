@@ -26,7 +26,7 @@ class Board : public ui::Grid<Tile>
     Board();
     explicit Board(std::string_view filename);
 
-    std::string GetName() const;
+    const std::string& GetName() const;
 
     Vector2Ex<float> GetPlayerSpawnPoint() const;
 

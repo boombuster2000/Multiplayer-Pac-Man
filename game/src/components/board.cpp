@@ -64,7 +64,7 @@ Board::Board(std::string_view filename)
     *this = Board::LoadFromFile(filename);
 }
 
-std::string Board::GetName() const
+const std::string& Board::GetName() const
 {
     return m_name;
 }
