@@ -1,9 +1,4 @@
 #include "game/layers/game.h"
-
-#include <array>
-#include <iostream>
-#include <stdexcept>
-
 #include "engine/core/input_manager.h"
 #include "game/game_application.h"
 #include "game/layers/game_options_menu.h"
@@ -11,6 +6,8 @@
 #include "raylib.h"
 #include <array>
 #include <format>
+#include <iostream>
+#include <stdexcept>
 #include <string>
 
 bool GameLayer::IsPacmanTouchingPellet(const Vector2Ex<float>& pacmanDimensions,
