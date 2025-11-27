@@ -1,11 +1,12 @@
 #pragma once
-#include "engine/core/transparentStringHasher.h"
+#include "engine/serialization/json_helpers.hpp"
+#include "game/utils/highscore_utils.h"
 #include <nlohmann/json.hpp>
 #include <string>
 #include <unordered_map>
 
-using HighscoreMap = std::unordered_map<std::string, int, TransparentStringHash, std::equal_to<>>;
-using json = nlohmann::json;
+using game::highscore_utils::HighscoreMap;
+using nlohmann::json;
 
 class Profile
 {
@@ -23,6 +24,6 @@ class Profile
     void UpdateHighScore(std::string_view boardName, const int points);
     void Save() const;
 
-    friend void to_json(json&, const Profile&);
-    friend void from_json(const json&, Profile&);
+    friend void to_json(json& j, const Profile& profile);
+    friend void from_json(const json& j, Profile& profile);
 };
