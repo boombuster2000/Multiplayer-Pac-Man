@@ -1,12 +1,13 @@
 #include "engine/ui/text_menu_option.h"
 #include "game/components/profile.h"
+#include "game/file_utils.h"
 #include "game/game_application.h"
 #include "game/layers/create_profile.h"
 #include "game/layers/main_menu.h"
 #include "game/layers/profile_selection_menu_layer.h"
 #include "game/serialization/json_converters.hpp"
 #include <filesystem>
-#include <fstream>
+#include <iostream>
 #include <nlohmann/json.hpp>
 
 ProfileSelectionMenuLayer::ProfileSelectionMenuLayer() : BaseMenuLayer(ui::Alignment::CENTER, true, 10.0f)
@@ -23,42 +24,15 @@ void ProfileSelectionMenuLayer::SetupMenuOptions()
     TextStyle buttonUnselectedStyle = {25, GRAY}; // Use for "Create Profile" and "Back"
     TextStyle buttonSelectedStyle = {30, ORANGE}; // Use for "Create Profile" and "Back"
 
-    const std::string path = "profiles";
-    std::error_code ec;
-
-    if (!std::filesystem::exists(path, ec))
-    {
-        if (ec)
-            throw std::filesystem::filesystem_error("exists check failed", path, ec);
-
-        std::filesystem::create_directory(path, ec);
-
-        if (ec)
-            throw std::filesystem::filesystem_error("create_directory failed", path, ec);
-    }
+    const std::filesystem::path path = "profiles";
+    std::vector<nlohmann::json> json_datas = game::file_utils::ReadJsonsFromDirectory(path);
 
     bool isFirstOption = true;
-    for (const auto& entry : std::filesystem::directory_iterator(path))
+    for (const auto& data : json_datas)
     {
-        if (entry.is_regular_file() && entry.path().extension() == ".json")
+        try
         {
-            std::ifstream f(entry.path());
-
-            if (!f.is_open())
-                continue;
-
-            nlohmann::json data;
-
-            try
-            {
-                data = nlohmann::json::parse(f);
-            }
-            catch (const nlohmann::json::parse_error& e)
-            {
-                continue;
-            }
-
-            auto profile = std::make_shared<Profile>(data.get<Profile>());
+            std::shared_ptr<Profile> profile = std::make_shared<Profile>(data.get<Profile>());
 
             m_menu.AddOption(std::make_unique<TextMenuOption>(profile->GetUsername(), profileSelectedStyle,
                                                               profileUnselectedStyle, isFirstOption, [this, profile]() {
@@ -66,6 +40,11 @@ void ProfileSelectionMenuLayer::SetupMenuOptions()
                                                                   TransistionTo(std::make_unique<MainMenuLayer>());
                                                               }));
             isFirstOption = false;
+        }
+        catch (const nlohmann::json::exception& e)
+        {
+            std::cerr << "Failed to load profile: " << e.what() << std::endl;
+            continue;
         }
     }
 

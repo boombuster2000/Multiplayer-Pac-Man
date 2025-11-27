@@ -1,7 +1,6 @@
 #include "game/components/profile.h"
+#include "game/file_utils.h"
 #include "game/serialization/json_converters.hpp"
-#include <fstream>
-#include <iostream>
 #include <nlohmann/json.hpp>
 
 Profile::Profile(std::string_view username) : m_username(username)
@@ -50,7 +49,11 @@ void Profile::UpdateHighScore(std::string_view boardName, const int points)
 void Profile::Save() const
 {
     using nlohmann::json;
+
+    const std::filesystem::path folder = "profiles";
+    const std::string filename = GetUsername() + ".json";
+
     json profile_json = *this;
-    std::ofstream o("profiles/" + GetUsername() + ".json");
-    o << std::setw(4) << profile_json << std::endl;
+
+    game::file_utils::SaveJson(profile_json, folder, filename);
 }
