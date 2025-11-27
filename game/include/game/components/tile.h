@@ -7,7 +7,7 @@
 
 #include <nlohmann/json.hpp>
 
-using json = nlohmann::json;
+using nlohmann::json;
 
 class Tile : public ui::GridTile
 {

@@ -4,7 +4,7 @@
 #include "game/components/board.h"
 #include <nlohmann/json.hpp>
 
-using json = nlohmann::json;
+using nlohmann::json;
 
 inline void to_json(json& j, const Board& board)
 {

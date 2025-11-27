@@ -4,7 +4,7 @@
 #include "engine/ui/enums.h"
 #include "raylib.h"
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
+using nlohmann::json;
 
 namespace ui
 {

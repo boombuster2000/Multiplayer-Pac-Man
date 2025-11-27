@@ -8,7 +8,7 @@
 #include "engine/ui/enums.h"
 #include "engine/ui/grid_tile.h"
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
+using nlohmann::json;
 
 namespace ui
 {

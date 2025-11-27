@@ -3,7 +3,7 @@
 #include "engine/ui/renderable_object.h"
 #include "raylib.h"
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
+using nlohmann::json;
 
 namespace ui
 {

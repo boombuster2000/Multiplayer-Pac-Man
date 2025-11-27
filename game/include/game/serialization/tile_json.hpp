@@ -7,7 +7,7 @@
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 
-using json = nlohmann::json;
+using nlohmann::json;
 
 inline void to_json(json& j, const Tile& v)
 {

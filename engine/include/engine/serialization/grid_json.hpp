@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <string>
 
-using json = nlohmann::json;
+using nlohmann::json;
 
 namespace ui
 {
