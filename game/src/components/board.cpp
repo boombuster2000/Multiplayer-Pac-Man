@@ -1,16 +1,12 @@
-#include <fstream>
-#include <stdexcept>
-
+#include "game/components/board.h"
 #include "engine/serialization/json_converters.hpp"
 #include "engine/ui/enums.h"
-#include "game/components/board.h"
 #include "game/components/pellet.h"
 #include "game/game_application.h"
 #include "game/serialization/json_converters.hpp"
 #include <format>
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
+#include <fstream>
+#include <stdexcept>
 
 Board::Board()
     : Grid(Vector2Ex<size_t>(14, 14), Vector2Ex<float>(50, 50),
@@ -136,7 +132,6 @@ void Board::SetHighscore(std::string_view profileName, int score)
         // Profile doesn't exist, insert new score
         m_highScores.emplace(profileName, score);
     }
-    SortHighscores();
 }
 
 Board Board::LoadFromFile(std::string_view filename)
@@ -152,7 +147,7 @@ Board Board::LoadFromFile(std::string_view filename)
     file >> j;
     file.close();
     Board board = j.get<Board>();
-    board.SortHighscores();
+    board.m_highScores = game::highscore_utils::SortHighscores(board.GetHighscores());
     return board;
 }
 
@@ -171,22 +166,6 @@ void Board::addBoundaries()
     {
         GetTile(y, 0).SetType(WALL);
         GetTile(y, boardSize.x - 1).SetType(WALL);
-    }
-}
-
-void Board::SortHighscores()
-{
-    // Convert unordered_map to vector of pairs
-    std::vector<std::pair<std::string, int>> scoreVector(m_highScores.begin(), m_highScores.end());
-
-    // Sort the vector based on scores in descending order
-    std::ranges::sort(scoreVector, [](const auto& a, const auto& b) { return a.second > b.second; });
-
-    // Clear the original map and reinsert sorted entries
-    m_highScores.clear();
-    for (const auto& [key, value] : scoreVector)
-    {
-        m_highScores[key] = value;
     }
 }
 
