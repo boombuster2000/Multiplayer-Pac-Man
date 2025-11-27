@@ -1,6 +1,6 @@
 #pragma once
 
-#include "transparentStringHasher.h"
+#include "transparent_string_hasher.h"
 #include <string>
 #include <unordered_map>
 #include <vector>
