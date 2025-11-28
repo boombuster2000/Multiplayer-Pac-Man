@@ -1,9 +1,11 @@
 #include "game/components/board.h"
 #include "engine/serialization/json_converters.hpp"
 #include "game/components/pellet.h"
+#include "game/file_paths.h"
 #include "game/serialization/json_converters.hpp"
 #include <filesystem>
 #include <fstream>
+#include <string_view>
 
 Board::Board()
     : Grid(Vector2Ex<size_t>(14, 14), Vector2Ex<float>(50, 50),
@@ -75,10 +77,10 @@ void Board::SaveToFile() const
 {
     json j = *this;
 
-    const std::string boardFolder = "./resources/boards/";
+    const path& boardFolder = FilePaths::s_BoardsDirectory;
     const std::string filename = m_name + std::string(".json");
 
-    std::ofstream file(boardFolder + filename);
+    std::ofstream file(boardFolder / filename);
     if (file.is_open())
     {
         file << j.dump(4);
@@ -88,10 +90,10 @@ void Board::SaveToFile() const
 
 void Board::SaveHighscoresToFile() const
 {
-    const std::string boardFolder = "./resources/boards/";
+    const path& boardFolder = FilePaths::s_BoardsDirectory;
     const std::string filename = m_name + std::string(".json");
 
-    Board originalBoard = Board::LoadFromFile(boardFolder + filename);
+    Board originalBoard = Board::LoadFromFile(boardFolder / filename);
 
     for (const auto& [profileName, score] : m_highScores)
     {
@@ -100,7 +102,7 @@ void Board::SaveHighscoresToFile() const
 
     json j = originalBoard;
 
-    std::ofstream file(boardFolder + filename);
+    std::ofstream file(boardFolder / filename);
 
     if (file.is_open())
     {
@@ -131,13 +133,12 @@ void Board::SetHighscore(std::string_view profileName, int score)
     }
 }
 
-Board Board::LoadFromFile(std::string_view filename)
+Board Board::LoadFromFile(const std::string& filename)
 {
-    const std::string filenameStr(filename);
-    std::ifstream file(filenameStr);
+    std::ifstream file(filename);
     if (!file.is_open())
     {
-        throw std::filesystem::filesystem_error("Failed to open file", std::filesystem::path(filename.data()),
+        throw std::filesystem::filesystem_error("Failed to open file", std::filesystem::path(filename),
                                                 std::error_code{});
     }
 
@@ -146,6 +147,11 @@ Board Board::LoadFromFile(std::string_view filename)
     file.close();
     Board board = j.get<Board>();
     return board;
+}
+
+Board Board::LoadFromFile(const std::filesystem::path& filepath)
+{
+    return Board::LoadFromFile(filepath.string());
 }
 
 void Board::addBoundaries()

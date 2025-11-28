@@ -1,6 +1,7 @@
 #include "game/layers/board_selection_menu.h"
 #include "engine/core/input_manager.h"
 #include "engine/ui/text_menu_option.h"
+#include "game/file_paths.h"
 #include "game/game_application.h"
 #include "game/layers/game.h"
 #include "game/layers/main_menu.h"
@@ -33,8 +34,8 @@ void BoardSelectionMenuLayer::SetupMenuOptions()
     m_menu.AddOption(std::make_unique<TextMenuOption>("built-in", boardSelectedStyle, boardUnselectedStyle, true,
                                                       [this]() { TransistionTo(std::make_unique<GameLayer>()); }));
 
-    const std::string path = "./resources/boards/";
-    for (const auto& entry : std::filesystem::directory_iterator(path))
+    const path& boardDirectory = FilePaths::s_BoardsDirectory;
+    for (const auto& entry : std::filesystem::directory_iterator(boardDirectory))
     {
         if (entry.is_regular_file() && entry.path().extension() == ".json")
         {

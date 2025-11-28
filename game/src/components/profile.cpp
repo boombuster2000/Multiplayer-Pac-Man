@@ -1,6 +1,8 @@
 #include "game/components/profile.h"
+#include "game/file_paths.h"
 #include "game/serialization/json_converters.hpp"
 #include "game/utils/file_utils.h"
+#include <filesystem>
 #include <format>
 #include <nlohmann/json.hpp>
 
@@ -50,7 +52,7 @@ void Profile::UpdateHighScore(std::string_view boardName, const int points)
 
 void Profile::Save() const
 {
-    const std::filesystem::path folder = "profiles";
+    const std::filesystem::path& folder = FilePaths::s_ProfilesDirectory;
     const std::string filename = std::format("{}.json", GetUsername());
 
     json profile_json = *this;

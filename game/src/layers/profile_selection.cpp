@@ -1,5 +1,6 @@
 #include "engine/ui/text_menu_option.h"
 #include "game/components/profile.h"
+#include "game/file_paths.h"
 #include "game/game_application.h"
 #include "game/layers/create_profile.h"
 #include "game/layers/main_menu.h"
@@ -24,7 +25,7 @@ void ProfileSelectionMenuLayer::SetupMenuOptions()
     TextStyle buttonUnselectedStyle = {25, GRAY}; // Use for "Create Profile" and "Back"
     TextStyle buttonSelectedStyle = {30, ORANGE}; // Use for "Create Profile" and "Back"
 
-    const std::filesystem::path path = "profiles";
+    const std::filesystem::path& path = FilePaths::s_ProfilesDirectory;
     std::vector<nlohmann::json> profile_jsons = game::file_utils::ReadJsonsFromDirectory(path);
 
     bool isFirstOption = true;

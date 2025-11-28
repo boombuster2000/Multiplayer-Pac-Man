@@ -3,6 +3,7 @@
 #include "engine/ui/grid.h"
 #include "game/components/tile.h"
 #include "game/utils/highscore_utils.h"
+#include <filesystem>
 #include <nlohmann/json.hpp>
 #include <string>
 #include <string_view>
@@ -39,5 +40,6 @@ class Board : public ui::Grid<Tile>
     void SetHighscore(std::string_view profileName, int score);
     void SaveHighscoresToFile() const;
 
-    static Board LoadFromFile(std::string_view filename);
+    static Board LoadFromFile(const std::string& filename);
+    static Board LoadFromFile(const std::filesystem::path& filepath);
 };

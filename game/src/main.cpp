@@ -1,4 +1,5 @@
 #include "game/game_application.h"
+#include "game/file_paths.h"
 #include "game/layers/overlay_layer.h"
 #include "game/layers/profile_selection_menu_layer.h"
 
@@ -6,9 +7,9 @@ void LoadAllTextures()
 {
     auto& texturesManager = game::GameApplication::GetTexturesManager();
 
-    texturesManager.AddTexture("wall", "./resources/textures/wall.png");
-    texturesManager.AddTexture("path", "./resources/textures/path.png");
-    texturesManager.AddTexture("pac-man", "./resources/textures/pac-man.png");
+    texturesManager.AddTexture("wall", FilePaths::s_TexturesDirectory / "wall.png");
+    texturesManager.AddTexture("path", FilePaths::s_TexturesDirectory / "path.png");
+    texturesManager.AddTexture("pac-man", FilePaths::s_TexturesDirectory / "pac-man.png");
 }
 
 void LoadKeyBinds()
