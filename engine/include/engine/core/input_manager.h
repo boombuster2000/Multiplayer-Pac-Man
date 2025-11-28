@@ -27,6 +27,23 @@ class InputManager
         int gamepadAxis = -1;
         int gamepadIndex = 0;
         bool positive = true;
+
+        // Keyboard Constructor
+        Action(const std::string& actionName, int key) : name(actionName), keyboardKey(key)
+        {
+        }
+
+        // Gamepad Button Constructor
+        Action(const std::string& actionName, int unused1, int button, int unused2, int index)
+            : name(actionName), gamepadButton(button), gamepadIndex(index)
+        {
+        }
+
+        // Gamepad Axis Constructor
+        Action(const std::string& actionName, int unused1, int unused2, int axis, int index, bool polarity)
+            : name(actionName), gamepadAxis(axis), gamepadIndex(index), positive(polarity)
+        {
+        }
     };
 
     std::unordered_map<std::string, std::vector<Action>, TransparentStringHash, std::equal_to<>> m_actions;
