@@ -3,11 +3,8 @@
 #include "game/components/profile.h"
 #include <algorithm>
 
-namespace game
+namespace game::highscore_utils
 {
-namespace highscore_utils
-{
-
 void SaveHighscore(::Board& board, ::Profile& profile, const int score)
 {
     if (score <= 0)
@@ -30,6 +27,4 @@ HighscoreVec GetSortedHighscores(const HighscoreMap& highscores)
     return sortedHighscores;
 }
 
-} // namespace highscore_utils
-
-} // namespace game
+} // namespace game::highscore_utils
