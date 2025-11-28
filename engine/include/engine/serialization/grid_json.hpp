@@ -103,6 +103,10 @@ inline void from_json(const json& j, Grid<T>& grid)
             }
         }
     }
+    catch (const json::other_error&)
+    {
+        throw; // Already wrapped with location info
+    }
     catch (const json::exception& e)
     {
         throw json::other_error::create(503, std::string("Failed to deserialize Grid.grid: ") + e.what(), &j);
