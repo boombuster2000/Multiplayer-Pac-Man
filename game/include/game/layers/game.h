@@ -15,7 +15,7 @@ class GameLayer : public engine::Layer
     Player m_player;
     ui::Direction m_queuedDirection;
 
-    float m_timePassedSinceLastSave;
+    float m_timePassedSinceLastSave = 0.0f;
 
   private:
     bool IsPacmanTouchingPellet(const Vector2Ex<float>& pacmanDimensions, const Vector2Ex<float>& pacmanPosition) const;
@@ -26,13 +26,13 @@ class GameLayer : public engine::Layer
 
   public:
     GameLayer();
-    GameLayer(const std::string& boardPath);
-    ~GameLayer();
+    explicit GameLayer(std::string_view boardPath);
+    ~GameLayer() final;
 
     void HandleKeyPresses();
     void HandleCollisions(const float& deltaTime);
     void UpdateHighscores();
 
-    virtual void OnUpdate(float ts) override;
-    virtual void OnRender() override;
+    void OnUpdate(float ts) final;
+    void OnRender() final;
 };

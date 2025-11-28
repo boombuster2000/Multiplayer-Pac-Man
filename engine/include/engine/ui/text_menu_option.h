@@ -3,7 +3,7 @@
 #include "menu_option.h"
 #include "text.h"
 #include "text_style.h"
-#include <string>
+#include <string_view>
 
 namespace ui
 {
@@ -15,13 +15,13 @@ class TextMenuOption : public MenuOption
     TextStyle m_unselectedStyle;
 
   public:
-    TextMenuOption(std::string text, TextStyle selectedStyle, TextStyle unselectedStyle, bool isSelected = false,
+    TextMenuOption(std::string_view text, TextStyle selectedStyle, TextStyle unselectedStyle, bool isSelected = false,
                    std::function<void()> callback = nullptr, Vector2Ex<float> position = {0, 0},
                    AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT, bool isVisible = true);
 
-    virtual void UpdateStyle() override;
+    void UpdateStyle() override;
 
-    virtual RenderableObject& GetRenderableObject() override;
-    virtual const RenderableObject& GetRenderableObject() const override;
+    RenderableObject& GetRenderableObject() override;
+    const RenderableObject& GetRenderableObject() const override;
 };
 } // namespace ui

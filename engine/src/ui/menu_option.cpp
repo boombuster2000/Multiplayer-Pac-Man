@@ -18,7 +18,7 @@ bool MenuOption::IsSelected() const
     return m_isSelected;
 }
 
-void MenuOption::Select()
+void MenuOption::Select() const
 {
     if (m_callback)
         m_callback();

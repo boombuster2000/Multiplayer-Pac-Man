@@ -1,5 +1,5 @@
 #include "game/components/pacman.h"
-#include "engine/core/application.h"
+#include "game/game_application.h"
 
 Pacman::Pacman() = default;
 
@@ -25,7 +25,8 @@ void Pacman::SetRotation(const ui::Direction& direction)
 }
 
 Pacman::Pacman(Vector2Ex<float> spawnPosition, Vector2Ex<float> dimensions, float speed)
-    : RenderableObject(spawnPosition), m_texture(engine::Application::GetTexturesManager()->GetTexture("pac-man")),
+    : RenderableObject(spawnPosition),
+      m_texture(game::GameApplication::Get().GetTexturesManager().GetTexture("pac-man")),
       m_spawnPosition(spawnPosition), m_dimensions(dimensions), m_speed(speed), m_Rotation(0),
       m_lastPosition(spawnPosition), m_currentDirection(LEFT), m_queuedDirection(m_currentDirection)
 {

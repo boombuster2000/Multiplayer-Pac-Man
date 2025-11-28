@@ -16,12 +16,13 @@ class Layer
         SUSPENDED_UPDATE_AND_RENDER,
     };
 
-  protected:
+  private:
     State m_state = State::ACTIVE;
 
   public:
     virtual ~Layer() = default;
 
+    // TODO: Need to build event system.
     virtual void OnEvent(Event& event)
     {
     }
@@ -41,11 +42,13 @@ class Layer
     State GetState() const;
 
     // Layer transition methods defined in Application.h
-    template <typename TLayer> void TransistionTo(std::unique_ptr<TLayer> layer);
+    template <typename TLayer>
+    void TransistionTo(std::unique_ptr<TLayer> layer) const;
 
-    template <typename TLayer> void Push(std::unique_ptr<TLayer> layer);
+    template <typename TLayer>
+    void Push(std::unique_ptr<TLayer> layer) const;
 
-    void Pop();
+    void Pop() const;
 
     std::type_index GetTypeIndex() const
     {

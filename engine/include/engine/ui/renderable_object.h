@@ -4,7 +4,7 @@
 #include "engine/ui/enums.h"
 #include "raylib.h"
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
+using nlohmann::json;
 
 namespace ui
 {
@@ -24,8 +24,8 @@ class RenderableObject
 
   public:
     RenderableObject();
-    RenderableObject(Vector2Ex<float> anchorPointPosition, AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT,
-                     bool visible = true);
+    explicit RenderableObject(Vector2Ex<float> anchorPointPosition, AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT,
+                              bool visible = true);
     virtual ~RenderableObject() = default;
 
     /// @return Returns the position of the orgin in the object (not in the 2d space).
@@ -70,7 +70,7 @@ class RenderableObject
     virtual void Move(Direction direction, float step = 1);
 
     virtual Vector2Ex<float> GetDimensions() const = 0;
-    virtual void Render(Vector2Ex<float> offset) const = 0;
+    virtual void Render(Vector2Ex<float> offset = {0, 0}) const = 0;
 
     friend void to_json(json&, const RenderableObject&);
     friend void from_json(const json&, RenderableObject&);

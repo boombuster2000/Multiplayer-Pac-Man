@@ -1,12 +1,12 @@
 #include "game/components/pellet.h"
-#include "engine/core/application.h"
+#include "game/game_application.h"
 
-Pellet::Pellet() : RenderableObject(), m_type(Type::NONE), radius(3.0f)
+Pellet::Pellet() : RenderableObject(), m_type(Type::NONE)
 {
 }
 
 Pellet::Pellet(Vector2Ex<float> position, const Type type)
-    : RenderableObject(position, ui::AnchorPoint::MIDDLE), m_type(type), radius(3.0f)
+    : RenderableObject(position, ui::AnchorPoint::MIDDLE), m_type(type)
 {
 }
 
@@ -27,17 +27,18 @@ int Pellet::GetValue() const
 
 int Pellet::GetTypePoints(const Type& t)
 {
+    using enum Type;
     switch (t)
     {
-    case Type::NORMAL:
+    case NORMAL:
         return s_typePoints.normal;
-    case Type::SUPER:
+    case SUPER:
         return s_typePoints.super;
-    case Type::NONE:
+    case NONE:
         return s_typePoints.none;
     }
 
-    throw std::runtime_error("Invalid Type");
+    throw std::invalid_argument("Invalid pellet type for getting type points.");
 }
 
 void Pellet::SetTypePoints(const TypePointValues& newValues)

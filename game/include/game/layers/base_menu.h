@@ -13,8 +13,7 @@ class BaseMenuLayer : public engine::Layer
 
   public:
     BaseMenuLayer(const ui::Alignment alignment, const bool IsVisible, const float spacing);
-    virtual ~BaseMenuLayer() = default;
 
-    virtual void OnUpdate(float ts) override;
-    virtual void OnRender() override;
+    void OnUpdate(float ts) override;
+    void OnRender() override;
 };

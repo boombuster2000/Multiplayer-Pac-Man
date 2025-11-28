@@ -4,7 +4,7 @@
 namespace game
 {
 
-static GameApplication* s_GameApplication = nullptr;
+GameApplication* GameApplication::s_GameApplication = nullptr;
 
 GameApplication::GameApplication(const engine::ApplicationSpecification& specification)
     : engine::Application(specification)

@@ -45,18 +45,24 @@ class Application
     ApplicationSpecification m_specification;
     bool m_running = false;
 
-    std::vector<std::unique_ptr<Layer>> m_layerStack;
-
+    static Application* s_application;
     static std::queue<LayerAction> s_pendingActions;
+
+    TexturesManager m_texturesManager{};
+    InputManager m_inputManager{};
+    std::vector<std::unique_ptr<Layer>> m_layerStack;
 
     void ProcessPendingActions();
 
-  public:
-    Application(const ApplicationSpecification& specification = ApplicationSpecification());
-    ~Application();
+    std::vector<std::unique_ptr<Layer>>::iterator FindLayerIt(std::type_index layerType);
 
-    static std::shared_ptr<TexturesManager> GetTexturesManager();
-    static std::shared_ptr<InputManager> GetInputManager();
+    static LayerAction MakePushAction(std::unique_ptr<Layer> layer);
+    static LayerAction MakePopAction(std::type_index layerType);
+    static LayerAction MakeTransitionAction(std::type_index fromType, std::unique_ptr<Layer> toLayer);
+
+  public:
+    explicit Application(const ApplicationSpecification& specification = ApplicationSpecification());
+    ~Application();
 
     void Run();
     void Stop();
@@ -65,7 +71,8 @@ class Application
 
     static void QueuePop(std::type_index layerType);
 
-    template <typename TLayer> static void QueuePop()
+    template <typename TLayer>
+    static void QueuePop()
     {
         static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
         QueuePop(std::type_index(typeid(TLayer)));
@@ -75,7 +82,12 @@ class Application
 
     static Application& Get();
 
-    template <typename TLayer> TLayer* GetLayer()
+    static InputManager& GetInputManager();
+
+    static TexturesManager& GetTexturesManager();
+
+    template <typename TLayer>
+    TLayer* GetLayer() const
     {
         static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
         for (const auto& layer : m_layerStack)
@@ -90,13 +102,15 @@ class Application
 };
 
 // Template implementations for Layer transition methods
-template <typename TLayer> void Layer::TransistionTo(std::unique_ptr<TLayer> layer)
+template <typename TLayer>
+void Layer::TransistionTo(std::unique_ptr<TLayer> layer) const
 {
     static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
     Application::QueueTransition(GetTypeIndex(), std::move(layer));
 }
 
-template <typename TLayer> void Layer::Push(std::unique_ptr<TLayer> layer)
+template <typename TLayer>
+void Layer::Push(std::unique_ptr<TLayer> layer) const
 {
     static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
     Application::QueuePush(std::move(layer));

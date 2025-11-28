@@ -24,7 +24,7 @@ Layer::State Layer::GetState() const
     return m_state;
 }
 
-void Layer::Pop()
+void Layer::Pop() const
 {
     Application::QueuePop(GetTypeIndex());
 }
