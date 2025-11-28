@@ -17,7 +17,7 @@ class TexturesManager
     TexturesManager();
     ~TexturesManager();
 
-    void AddTexture(const std::string& key, std::string_view filePath);
+    void AddTexture(const std::string& key, const std::string& filePath);
     std::shared_ptr<Texture2D> GetTexture(const std::string& key) const;
     void UnloadAll();
 

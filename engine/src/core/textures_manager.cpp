@@ -12,12 +12,12 @@ TexturesManager::~TexturesManager()
     UnloadAll();
 }
 
-void TexturesManager::AddTexture(const std::string& key, std::string_view filePath)
+void TexturesManager::AddTexture(const std::string& key, const std::string& filePath)
 {
     if (m_loadedTextures.find(key) != m_loadedTextures.end())
         return;
 
-    auto texture = std::make_shared<Texture2D>(LoadTexture(filePath.data()));
+    auto texture = std::make_shared<Texture2D>(LoadTexture(filePath.c_str()));
     m_loadedTextures[key] = texture;
 }
 
