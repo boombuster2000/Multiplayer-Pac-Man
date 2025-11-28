@@ -21,6 +21,11 @@ void TexturesManager::AddTexture(const std::string& key, const std::string& file
     m_loadedTextures[key] = texture;
 }
 
+void TexturesManager::AddTexture(const std::string& key, const std::filesystem::path& filePath)
+{
+    AddTexture(key, filePath.string());
+}
+
 std::shared_ptr<Texture2D> TexturesManager::GetTexture(const std::string& key) const
 {
     auto it = m_loadedTextures.find(key);

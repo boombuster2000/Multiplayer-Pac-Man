@@ -1,5 +1,6 @@
 #pragma once
 #include "raylib.h"
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -18,6 +19,7 @@ class TexturesManager
     ~TexturesManager();
 
     void AddTexture(const std::string& key, const std::string& filePath);
+    void AddTexture(const std::string& key, const std::filesystem::path& filePath);
     std::shared_ptr<Texture2D> GetTexture(const std::string& key) const;
     void UnloadAll();
 
