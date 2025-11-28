@@ -1,14 +1,9 @@
 #include "game/components/board.h"
 #include "engine/serialization/json_converters.hpp"
-#include "engine/ui/enums.h"
 #include "game/components/pellet.h"
-#include "game/game_application.h"
 #include "game/serialization/json_converters.hpp"
 #include <filesystem>
-#include <format>
 #include <fstream>
-#include <stdexcept>
-
 
 Board::Board()
     : Grid(Vector2Ex<size_t>(14, 14), Vector2Ex<float>(50, 50),
