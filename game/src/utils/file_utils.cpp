@@ -61,7 +61,9 @@ std::vector<nlohmann::json> ReadJsonsFromDirectory(const std::filesystem::path& 
 
         for (const auto& entry : std::filesystem::directory_iterator(directory_path))
         {
-            if (entry.is_regular_file() && entry.path().extension() == ".json")
+            std::string ext = entry.path().extension().string();
+            std::ranges::transform(ext, ext.begin(), ::tolower);
+            if (entry.is_regular_file() && ext == ".json")
             {
                 std::ifstream f(entry.path());
 
