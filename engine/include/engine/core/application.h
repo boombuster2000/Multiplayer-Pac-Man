@@ -87,7 +87,7 @@ class Application
     static TexturesManager& GetTexturesManager();
 
     template <typename TLayer>
-    TLayer* GetLayer()
+    TLayer* GetLayer() const
     {
         static_assert(std::is_base_of_v<Layer, TLayer>, "TLayer must derive from Layer");
         for (const auto& layer : m_layerStack)
