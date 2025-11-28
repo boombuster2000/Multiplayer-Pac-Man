@@ -10,7 +10,6 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
-
 ProfileSelectionMenuLayer::ProfileSelectionMenuLayer() : BaseMenuLayer(ui::Alignment::CENTER, true, 10.0f)
 {
     SetupMenuOptions();
@@ -26,10 +25,10 @@ void ProfileSelectionMenuLayer::SetupMenuOptions()
     TextStyle buttonSelectedStyle = {30, ORANGE}; // Use for "Create Profile" and "Back"
 
     const std::filesystem::path path = "profiles";
-    std::vector<nlohmann::json> json_datas = game::file_utils::ReadJsonsFromDirectory(path);
+    std::vector<nlohmann::json> profile_jsons = game::file_utils::ReadJsonsFromDirectory(path);
 
     bool isFirstOption = true;
-    for (const auto& data : json_datas)
+    for (const auto& data : profile_jsons)
     {
         try
         {
