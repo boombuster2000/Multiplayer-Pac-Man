@@ -4,9 +4,11 @@
 #include "game/components/pellet.h"
 #include "game/game_application.h"
 #include "game/serialization/json_converters.hpp"
+#include <filesystem>
 #include <format>
 #include <fstream>
 #include <stdexcept>
+
 
 Board::Board()
     : Grid(Vector2Ex<size_t>(14, 14), Vector2Ex<float>(50, 50),
@@ -136,7 +138,8 @@ void Board::SetHighscore(std::string_view profileName, int score)
 
 Board Board::LoadFromFile(std::string_view filename)
 {
-    std::ifstream file(filename.data());
+    const std::string filenameStr(filename);
+    std::ifstream file(filenameStr);
     if (!file.is_open())
     {
         throw std::filesystem::filesystem_error("Failed to open file", std::filesystem::path(filename.data()),
