@@ -2,7 +2,7 @@
 #include "engine/serialization/json_helpers.hpp"
 #include "game/utils/highscore_utils.h"
 #include <nlohmann/json.hpp>
-#include <string>
+#include <string_view>
 #include <unordered_map>
 
 using game::highscore_utils::HighscoreMap;
@@ -18,7 +18,7 @@ class Profile
     Profile() = default;
     explicit Profile(std::string_view username);
 
-    std::string GetUsername() const;
+    std::string_view GetUsername() const;
 
     HighscoreMap GetPersonalHighscores() const;
     void UpdateHighScore(std::string_view boardName, const int points);
