@@ -48,8 +48,8 @@ class Application
     static Application* s_application;
     static std::queue<LayerAction> s_pendingActions;
 
-    TexturesManager m_texturesManager = TexturesManager();
-    InputManager m_inputManager = InputManager();
+    TexturesManager m_texturesManager{};
+    InputManager m_inputManager{};
     std::vector<std::unique_ptr<Layer>> m_layerStack;
 
     void ProcessPendingActions();
