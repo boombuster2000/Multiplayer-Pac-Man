@@ -54,17 +54,18 @@ void BoardSelectionMenuLayer::SetupMenuOptions()
 
 void BoardSelectionMenuLayer::OnUpdate(float ts)
 {
-    const auto& inputManager = engine::Application::GetInputManager();
+    using enum engine::InputState;
+    const auto& inputManager = game::GameApplication::GetInputManager();
 
-    if (inputManager.IsAction("move_down", engine::InputState::PRESSED))
+    if (inputManager.IsAction("move_down", PRESSED))
     {
         m_menu.SelectNext();
     }
-    else if (inputManager.IsAction("move_up", engine::InputState::PRESSED))
+    else if (inputManager.IsAction("move_up", PRESSED))
     {
         m_menu.SelectPrevious();
     }
-    else if (inputManager.IsAction("confirm", engine::InputState::PRESSED))
+    else if (inputManager.IsAction("confirm", PRESSED))
     {
         m_menu.ConfirmSelection();
     }
