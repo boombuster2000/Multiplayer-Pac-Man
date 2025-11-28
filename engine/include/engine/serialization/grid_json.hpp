@@ -63,7 +63,17 @@ inline void from_json(const json& j, Grid<T>& grid)
             throw json::type_error::create(302, "Grid.grid must be an array of rows.", &grid_j);
 
         size_t y_size = grid_j.size();
-        size_t x_size = y_size > 0 ? grid_j.at(0).size() : 0;
+        size_t x_size = 0;
+
+        if (y_size > 0)
+        {
+            const auto& first_row = grid_j.at(0);
+
+            if (!first_row.is_array())
+                throw json::type_error::create(302, "Grid grid rows must be arrays.", &first_row);
+
+            x_size = first_row.size();
+        }
 
         grid.m_gridSize = {x_size, y_size};
         grid.m_grid.assign(y_size, std::vector<T>(x_size));
