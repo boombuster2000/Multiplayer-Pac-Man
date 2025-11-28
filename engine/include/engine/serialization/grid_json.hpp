@@ -44,7 +44,7 @@ inline void to_json(json& j, const Grid<T>& grid)
 template <typename T>
 inline void from_json(const json& j, Grid<T>& grid)
 {
-    static_assert(std::is_base_of_v<GridTile, T>, "T must derive from GridTile");
+    static_assert(std::is_base_of_v<GridTile, T>, "T must derive from ui::GridTile");
 
     serialization::require_object(j, "Grid");
 
