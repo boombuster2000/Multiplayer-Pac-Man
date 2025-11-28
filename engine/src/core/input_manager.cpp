@@ -80,7 +80,7 @@ void InputManager::ProcessGamepadAxis(const Action& action, bool& isDown, float&
 void InputManager::UpdateActionState(const std::string& name, bool isDown)
 {
     using enum InputState;
-    InputState& state = m_actionStates[name];
+    InputState& state = m_actionStates.try_emplace(name, UP).first->second;
 
     if (isDown)
     {
