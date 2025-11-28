@@ -4,11 +4,14 @@
 #include "game/game_application.h"
 #include "game/layers/game.h"
 #include "game/layers/main_menu.h"
+#include "game/utils/highscore_utils.h"
 #include <algorithm>
 #include <filesystem>
 #include <format>
 #include <iostream>
 #include <string>
+
+using game::highscore_utils::HighscoreVec;
 
 BoardSelectionMenuLayer::BoardSelectionMenuLayer()
     : m_menu({(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2}, ui::AnchorPoint::TOP_LEFT,
@@ -93,8 +96,7 @@ void BoardSelectionMenuLayer::UpdateLeaderboard()
     }
 
     auto highscores = board.GetHighscores();
-    std::vector<std::pair<std::string, int>> sortedScores(highscores.begin(), highscores.end());
-    std::ranges::sort(sortedScores, [](const auto& a, const auto& b) { return a.second > b.second; });
+    HighscoreVec sortedScores = game::highscore_utils::GetSortedHighscores(highscores);
 
     m_leaderboardScores.clear();
     m_leaderboardWidth = m_leaderboardTitle.GetDimensions().x;

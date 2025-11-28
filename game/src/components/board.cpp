@@ -145,7 +145,6 @@ Board Board::LoadFromFile(std::string_view filename)
     file >> j;
     file.close();
     Board board = j.get<Board>();
-    board.m_highScores = game::highscore_utils::SortHighscores(board.GetHighscores());
     return board;
 }
 
