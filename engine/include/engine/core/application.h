@@ -54,6 +54,8 @@ class Application
 
     void ProcessPendingActions();
 
+    std::vector<std::unique_ptr<Layer>>::iterator FindLayerIt(std::type_index layerType);
+
     static LayerAction MakePushAction(std::unique_ptr<Layer> layer);
     static LayerAction MakePopAction(std::type_index layerType);
     static LayerAction MakeTransitionAction(std::type_index fromType, std::unique_ptr<Layer> toLayer);

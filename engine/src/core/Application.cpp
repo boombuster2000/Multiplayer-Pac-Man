@@ -113,9 +113,7 @@ void Application::ProcessPendingActions()
             break;
 
         case LayerActionType::POP: {
-            auto it = std::ranges::find_if(m_layerStack, [&](const std::unique_ptr<Layer>& layer) {
-                return std::type_index(typeid(*layer)) == action.fromType;
-            });
+            auto it = FindLayerIt(action.fromType);
 
             if (it != m_layerStack.end())
                 m_layerStack.erase(it);
@@ -124,9 +122,7 @@ void Application::ProcessPendingActions()
         break;
 
         case LayerActionType::TRANSITION: {
-            auto it = std::ranges::find_if(m_layerStack, [&](const std::unique_ptr<Layer>& layer) {
-                return std::type_index(typeid(*layer)) == action.fromType;
-            });
+            auto it = FindLayerIt(action.fromType);
 
             if (it != m_layerStack.end())
                 *it = std::move(action.toLayer);
@@ -135,6 +131,14 @@ void Application::ProcessPendingActions()
         break;
         }
     }
+}
+
+std::vector<std::unique_ptr<Layer>>::iterator Application::FindLayerIt(std::type_index desiredType)
+{
+    // why: lambda variable name must not shadow function argument
+    return std::ranges::find_if(m_layerStack, [&](const std::unique_ptr<Layer>& layer) {
+        return std::type_index(typeid(*layer)) == desiredType;
+    });
 }
 
 LayerAction Application::MakePushAction(std::unique_ptr<Layer> layer)
