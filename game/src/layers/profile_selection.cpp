@@ -33,7 +33,7 @@ void ProfileSelectionMenuLayer::SetupMenuOptions()
     {
         try
         {
-            std::shared_ptr<Profile> profile = std::make_shared<Profile>(data.get<Profile>());
+            auto profile = std::make_shared<Profile>(data.get<Profile>());
 
             m_menu.AddOption(std::make_unique<TextMenuOption>(profile->GetUsername(), profileSelectedStyle,
                                                               profileUnselectedStyle, isFirstOption, [this, profile]() {
