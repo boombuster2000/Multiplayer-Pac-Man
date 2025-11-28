@@ -18,7 +18,7 @@ void GameOptionsMenuLayer::SetupMenuOptions()
     TextStyle selectedStyle = {40, ORANGE};
 
     m_menu.AddOption(std::make_unique<TextMenuOption>("Resume", selectedStyle, unselectedStyle, true, [this]() {
-        GameLayer* gameLayer = engine::Application::Get().GetLayer<GameLayer>();
+        GameLayer* gameLayer = game::GameApplication::Get().GetLayer<GameLayer>();
         if (gameLayer)
         {
             gameLayer->Resume();
@@ -29,7 +29,7 @@ void GameOptionsMenuLayer::SetupMenuOptions()
     m_menu.AddOption(std::make_unique<TextMenuOption>("Options", selectedStyle, unselectedStyle, false));
 
     m_menu.AddOption(std::make_unique<TextMenuOption>("Return To Menu", selectedStyle, unselectedStyle, false, []() {
-        GameLayer* gameLayer = engine::Application::Get().GetLayer<GameLayer>();
+        GameLayer* gameLayer = game::GameApplication::Get().GetLayer<GameLayer>();
         if (gameLayer)
         {
             gameLayer->TransistionTo(std::make_unique<MainMenuLayer>());
@@ -46,7 +46,7 @@ void GameOptionsMenuLayer::OnUpdate(float ts)
 
     if (inputManager.IsAction("pause", engine::InputState::PRESSED))
     {
-        GameLayer* gameLayer = engine::Application::Get().GetLayer<GameLayer>();
+        GameLayer* gameLayer = game::GameApplication::Get().GetLayer<GameLayer>();
         if (gameLayer)
         {
             gameLayer->Resume();
