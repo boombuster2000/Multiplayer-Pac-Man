@@ -21,7 +21,7 @@ class InputManager
   private:
     struct Action
     {
-        std::string_view name;
+        std::string name;
         int keyboardKey = -1;
         int gamepadButton = -1;
         int gamepadAxis = -1;
@@ -29,15 +29,15 @@ class InputManager
         bool positive = true;
     };
 
-    std::unordered_map<std::string_view, std::vector<Action>, TransparentStringHash, std::equal_to<>> m_actions;
-    std::unordered_map<std::string_view, InputState, TransparentStringHash, std::equal_to<>> m_actionStates;
-    std::unordered_map<std::string_view, float, TransparentStringHash, std::equal_to<>> m_actionValues;
+    std::unordered_map<std::string, std::vector<Action>, TransparentStringHash, std::equal_to<>> m_actions;
+    std::unordered_map<std::string, InputState, TransparentStringHash, std::equal_to<>> m_actionStates;
+    std::unordered_map<std::string, float, TransparentStringHash, std::equal_to<>> m_actionValues;
 
     void ProcessKeyboard(const Action& action, bool& isDown, float& value);
     void ProcessGamepadButton(const Action& action, bool& isDown, float& value);
     void ProcessGamepadAxis(const Action& action, bool& isDown, float& value);
     std::pair<bool, float> GetActionStatus(const std::vector<Action>& actions);
-    void UpdateActionState(std::string_view name, bool isDown);
+    void UpdateActionState(const std::string& name, bool isDown);
 
   public:
     InputManager() = default;
@@ -48,8 +48,8 @@ class InputManager
     bool IsAction(std::string_view action, InputState state) const;
     float GetActionValue(std::string_view action) const;
 
-    void AddKeyboardAction(std::string_view action, int keyboardKey);
-    void AddGamepadButtonAction(std::string_view action, int gamepadButton, int gamepadIndex = 0);
-    void AddGamepadAxisAction(std::string_view action, int gamepadAxis, int gamepadIndex = 0, bool positive = true);
+    void AddKeyboardAction(const std::string& action, int keyboardKey);
+    void AddGamepadButtonAction(const std::string& action, int gamepadButton, int gamepadIndex = 0);
+    void AddGamepadAxisAction(const std::string& action, int gamepadAxis, int gamepadIndex = 0, bool positive = true);
 };
 } // namespace engine

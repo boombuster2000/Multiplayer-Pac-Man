@@ -12,7 +12,7 @@ TexturesManager::~TexturesManager()
     UnloadAll();
 }
 
-void TexturesManager::AddTexture(std::string_view key, std::string_view filePath)
+void TexturesManager::AddTexture(const std::string& key, std::string_view filePath)
 {
     if (m_loadedTextures.find(key) != m_loadedTextures.end())
         return;
@@ -21,7 +21,7 @@ void TexturesManager::AddTexture(std::string_view key, std::string_view filePath
     m_loadedTextures[key] = texture;
 }
 
-std::shared_ptr<Texture2D> TexturesManager::GetTexture(std::string_view key) const
+std::shared_ptr<Texture2D> TexturesManager::GetTexture(const std::string& key) const
 {
     auto it = m_loadedTextures.find(key);
     if (it == m_loadedTextures.end())

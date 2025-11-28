@@ -77,7 +77,7 @@ void InputManager::ProcessGamepadAxis(const Action& action, bool& isDown, float&
     }
 }
 
-void InputManager::UpdateActionState(std::string_view name, bool isDown)
+void InputManager::UpdateActionState(const std::string& name, bool isDown)
 {
     using enum InputState;
     InputState& state = m_actionStates[name];
@@ -124,17 +124,17 @@ float InputManager::GetActionValue(std::string_view action) const
     return 0.0f;
 }
 
-void InputManager::AddKeyboardAction(std::string_view action, int keyboardKey)
+void InputManager::AddKeyboardAction(const std::string& action, int keyboardKey)
 {
     m_actions[action].emplace_back(action, keyboardKey);
 }
 
-void InputManager::AddGamepadButtonAction(std::string_view action, int gamepadButton, int gamepadIndex)
+void InputManager::AddGamepadButtonAction(const std::string& action, int gamepadButton, int gamepadIndex)
 {
     m_actions[action].emplace_back(action, -1, gamepadButton, -1, gamepadIndex);
 }
 
-void InputManager::AddGamepadAxisAction(std::string_view action, int gamepadAxis, int gamepadIndex, bool positive)
+void InputManager::AddGamepadAxisAction(const std::string& action, int gamepadAxis, int gamepadIndex, bool positive)
 {
     m_actions[action].emplace_back(action, -1, -1, gamepadAxis, gamepadIndex, positive);
 }
