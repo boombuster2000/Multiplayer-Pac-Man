@@ -55,28 +55,36 @@ std::vector<nlohmann::json> ReadJsonsFromDirectory(const std::filesystem::path& 
         return jsons;
     }
 
-    for (const auto& entry : std::filesystem::directory_iterator(directory_path))
+    try
     {
-        if (entry.is_regular_file() && entry.path().extension() == ".json")
+
+        for (const auto& entry : std::filesystem::directory_iterator(directory_path))
         {
-            std::ifstream f(entry.path());
+            if (entry.is_regular_file() && entry.path().extension() == ".json")
+            {
+                std::ifstream f(entry.path());
 
-            if (!f.is_open())
-            {
-                std::cerr << "I/O Error: Failed to open file " << entry.path() << std::endl;
-                continue;
-            }
+                if (!f.is_open())
+                {
+                    std::cerr << "I/O Error: Failed to open file " << entry.path() << std::endl;
+                    continue;
+                }
 
-            try
-            {
-                jsons.push_back(nlohmann::json::parse(f));
-            }
-            catch (const nlohmann::json::parse_error& e)
-            {
-                std::cerr << "JSON Parse Error: Failed to parse file " << entry.path() << ". Reason: " << e.what()
-                          << std::endl;
+                try
+                {
+                    jsons.push_back(nlohmann::json::parse(f));
+                }
+                catch (const nlohmann::json::parse_error& e)
+                {
+                    std::cerr << "JSON Parse Error: Failed to parse file " << entry.path() << ". Reason: " << e.what()
+                              << std::endl;
+                }
             }
         }
+    }
+    catch (const std::filesystem::filesystem_error& e)
+    {
+        std::cerr << "Filesystem Error while reading directory " << directory_path << ": " << e.what() << std::endl;
     }
 
     return jsons;
