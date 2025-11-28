@@ -51,7 +51,7 @@ CreateProfileLayer::CreateProfileLayer() : BaseMenuLayer(ui::Alignment::CENTER, 
 
 void CreateProfileLayer::OnUpdate(float ts)
 {
-    const auto& inputManager = engine::Application::GetInputManager();
+    const auto& inputManager = game::GameApplication::GetInputManager();
 
     if (!m_profileNameInput->IsActive())
         BaseMenuLayer::OnUpdate(ts);
