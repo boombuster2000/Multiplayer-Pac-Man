@@ -4,9 +4,7 @@
 #include <nlohmann/json_fwd.hpp>
 #include <vector>
 
-namespace game
-{
-namespace file_utils
+namespace game::file_utils
 {
 
 bool SaveJson(const nlohmann::json& json_data, const std::filesystem::path& folder,
@@ -14,5 +12,4 @@ bool SaveJson(const nlohmann::json& json_data, const std::filesystem::path& fold
 
 std::vector<nlohmann::json> ReadJsonsFromDirectory(const std::filesystem::path& path);
 
-} // namespace file_utils
-} // namespace game
+} // namespace game::file_utils
