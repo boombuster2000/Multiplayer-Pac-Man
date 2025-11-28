@@ -86,17 +86,17 @@ void Application::Stop()
 
 void Application::QueuePush(std::unique_ptr<Layer> layer)
 {
-    s_pendingActions.emplace(LayerActionType::PUSH, std::type_index(typeid(void)), std::move(layer));
+    s_pendingActions.emplace(MakePushAction(std::move(layer)));
 }
 
 void Application::QueuePop(std::type_index layerType)
 {
-    s_pendingActions.emplace(LayerActionType::POP, layerType, nullptr);
+    s_pendingActions.emplace(MakePopAction(layerType));
 }
 
 void Application::QueueTransition(std::type_index fromType, std::unique_ptr<Layer> toLayer)
 {
-    s_pendingActions.emplace(LayerActionType::TRANSITION, fromType, std::move(toLayer));
+    s_pendingActions.emplace(MakeTransitionAction(fromType, std::move(toLayer)));
 }
 
 void Application::ProcessPendingActions()
@@ -135,6 +135,21 @@ void Application::ProcessPendingActions()
         break;
         }
     }
+}
+
+LayerAction Application::MakePushAction(std::unique_ptr<Layer> layer)
+{
+    return LayerAction{LayerActionType::PUSH, std::type_index(typeid(void)), std::move(layer)};
+}
+
+LayerAction Application::MakePopAction(std::type_index layerType)
+{
+    return LayerAction{LayerActionType::POP, layerType, nullptr};
+}
+
+LayerAction Application::MakeTransitionAction(std::type_index fromType, std::unique_ptr<Layer> toLayer)
+{
+    return LayerAction{LayerActionType::TRANSITION, fromType, std::move(toLayer)};
 }
 
 Application& Application::Get()
