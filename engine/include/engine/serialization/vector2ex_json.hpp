@@ -17,6 +17,6 @@ template <NumberLike T>
 inline void from_json(const json& j, Vector2Ex<T>& v)
 {
     serialization::require_object(j, "Vector2Ex");
-    serialization::get_required_field(j, "x", v.x, "Vector2Ex", 500);
-    serialization::get_required_field(j, "y", v.y, "Vector2Ex", 501);
+    serialization::get_required_field(j, "x", v.x, "Vector2Ex");
+    serialization::get_required_field(j, "y", v.y, "Vector2Ex");
 }

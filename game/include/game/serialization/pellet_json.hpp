@@ -31,8 +31,8 @@ inline void from_json(const json& j, Pellet& pellet)
     from_json(j, static_cast<ui::RenderableObject&>(pellet));
 
     Vector2Ex<float> dims;
-    serialization::get_required_field(j, "dimensions", dims, "Pellet", 500);
+    serialization::get_required_field(j, "dimensions", dims, "Pellet");
     pellet.radius = dims.x;
 
-    serialization::get_required_field(j, "type", pellet.m_type, "Pellet", 501);
+    serialization::get_required_field(j, "type", pellet.m_type, "Pellet");
 }

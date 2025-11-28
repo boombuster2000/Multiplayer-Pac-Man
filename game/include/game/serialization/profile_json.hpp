@@ -14,6 +14,6 @@ inline void to_json(json& j, const Profile& profile)
 inline void from_json(const json& j, Profile& profile)
 {
     serialization::require_object(j, "Profile");
-    serialization::get_required_field(j, "username", profile.m_username, "Profile", 500);
-    serialization::get_required_field(j, "personal_highscores", profile.m_personalHighscores, "Profile", 501);
+    serialization::get_required_field(j, "username", profile.m_username, "Profile");
+    serialization::get_required_field(j, "personal_highscores", profile.m_personalHighscores, "Profile");
 }

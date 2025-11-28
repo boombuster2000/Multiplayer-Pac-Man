@@ -23,6 +23,6 @@ inline void from_json(const json& j, Tile& v)
 
     from_json(j, static_cast<ui::GridTile&>(v));
 
-    serialization::get_required_field(j, "type", v.m_type, "Tile", 500);
-    serialization::get_required_field(j, "pellet", v.m_pellet, "Tile", 501);
+    serialization::get_required_field(j, "type", v.m_type, "Tile");
+    serialization::get_required_field(j, "pellet", v.m_pellet, "Tile");
 }

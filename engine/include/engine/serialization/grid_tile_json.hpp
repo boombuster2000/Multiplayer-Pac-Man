@@ -26,7 +26,7 @@ inline void from_json(const json& j, GridTile& tile)
     from_json(j, static_cast<RenderableObject&>(tile));
 
     // Then deserialize the derived class's fields.
-    serialization::get_required_field(j, "dimensions", tile.m_dimensions, "GridTile", 500);
+    serialization::get_required_field(j, "dimensions", tile.m_dimensions, "GridTile");
 }
 
 } // namespace ui

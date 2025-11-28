@@ -20,6 +20,6 @@ inline void from_json(const json& j, Board& board)
     auto& grid = static_cast<ui::Grid<Tile>&>(board);
     from_json(j, grid);
 
-    serialization::get_required_field(j, "name", board.m_name, "Board", 500);
-    serialization::get_required_field(j, "highScores", board.m_highScores, "Board", 501);
+    serialization::get_required_field(j, "name", board.m_name, "Board");
+    serialization::get_required_field(j, "highScores", board.m_highScores, "Board");
 }

@@ -22,9 +22,9 @@ inline void to_json(json& j, const RenderableObject& obj)
 inline void from_json(const json& j, RenderableObject& obj)
 {
     serialization::require_object(j, "RenderableObject");
-    serialization::get_required_field(j, "worldOrigin", obj.m_worldOrigin, "RenderableObject", 500);
-    serialization::get_required_field(j, "objectOrigin", obj.m_objectOrigin, "RenderableObject", 501);
-    serialization::get_required_field(j, "visible", obj.m_visible, "RenderableObject", 502);
+    serialization::get_required_field(j, "worldOrigin", obj.m_worldOrigin, "RenderableObject");
+    serialization::get_required_field(j, "objectOrigin", obj.m_objectOrigin, "RenderableObject");
+    serialization::get_required_field(j, "visible", obj.m_visible, "RenderableObject");
 }
 
 } // namespace ui
