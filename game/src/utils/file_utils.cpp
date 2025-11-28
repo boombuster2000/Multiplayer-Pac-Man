@@ -15,9 +15,10 @@ bool SaveJson(const nlohmann::json& json_data, const std::filesystem::path& fold
     {
         std::filesystem::create_directories(folder);
 
-        std::ofstream o(path);
-        o.exceptions(std::ofstream::failbit | std::ofstream::badbit);
-        o << json_data.dump(4);
+        std::ofstream file;
+        file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+        file.open(path);
+        file << json_data.dump(4);
 
         std::cout << "File saved successfully to " << path << std::endl;
         return true;
