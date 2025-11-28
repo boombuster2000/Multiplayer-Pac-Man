@@ -13,6 +13,7 @@ std::queue<LayerAction> Application::s_pendingActions;
 
 Application::Application(const ApplicationSpecification& specification) : m_specification(specification)
 {
+    assert(!s_application && "Only one Application instance may exist at a time");
     s_application = this;
 
     InitWindow(specification.width, specification.height, specification.name.c_str());
@@ -24,6 +25,7 @@ Application::Application(const ApplicationSpecification& specification) : m_spec
 
 Application::~Application()
 {
+    assert(s_application == this && "Destroying unexpected Application instance");
     CloseWindow();
     s_application = nullptr;
 }
