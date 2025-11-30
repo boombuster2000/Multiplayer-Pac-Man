@@ -74,7 +74,9 @@ std::vector<nlohmann::json> ReadJsonsFromDirectory(const std::filesystem::path& 
         for (const auto& entry : std::filesystem::directory_iterator(directory_path))
         {
             std::string ext = entry.path().extension().string();
-            std::ranges::transform(ext, ext.begin(), [](unsigned char c) { return std::tolower(c); });
+            std::ranges::transform(ext, ext.begin(),
+                                   [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
             if (entry.is_regular_file() && ext == ".json")
             {
                 std::ifstream file(entry.path());
@@ -107,4 +109,5 @@ std::vector<nlohmann::json> ReadJsonsFromDirectory(const std::filesystem::path& 
 
     return jsons;
 }
+
 } // namespace game::file_utils
