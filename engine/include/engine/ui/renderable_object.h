@@ -24,7 +24,8 @@ class RenderableObject
 
   public:
     RenderableObject();
-    explicit RenderableObject(Vector2Ex<float> anchorPointPosition, AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT,
+    explicit RenderableObject(const Vector2Ex<float>& anchorPointPosition,
+                              AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT,
                               bool visible = true);
     virtual ~RenderableObject() = default;
 
