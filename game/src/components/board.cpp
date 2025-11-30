@@ -91,7 +91,7 @@ void Board::SaveToFile() const
 void Board::SaveHighscoresToFile() const
 {
     const std::filesystem::path& boardFolder = FilePaths::s_boardsDirectory;
-    const std::string filename = m_name + std::string(".json");
+    const std::filesystem::path filename = m_name + std::string(".json");
 
     Board originalBoard = Board::LoadFromFile(boardFolder / filename);
 
