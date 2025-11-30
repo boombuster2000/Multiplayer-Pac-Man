@@ -25,7 +25,7 @@ void ProfileSelectionMenuLayer::SetupMenuOptions()
     TextStyle buttonUnselectedStyle = {25, GRAY}; // Use for "Create Profile" and "Back"
     TextStyle buttonSelectedStyle = {30, ORANGE}; // Use for "Create Profile" and "Back"
 
-    const std::filesystem::path& path = FilePaths::s_ProfilesDirectory;
+    const std::filesystem::path& path = FilePaths::s_profilesDirectory;
     std::vector<nlohmann::json> profile_jsons = game::file_utils::ReadJsonsFromDirectory(path);
 
     bool isFirstOption = true;

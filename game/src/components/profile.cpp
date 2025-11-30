@@ -6,7 +6,6 @@
 #include <format>
 #include <nlohmann/json.hpp>
 
-
 Profile::Profile(std::string_view username) : m_username(username)
 {
 }
@@ -52,7 +51,7 @@ void Profile::UpdateHighScore(std::string_view boardName, const int points)
 
 void Profile::Save() const
 {
-    const std::filesystem::path& folder = FilePaths::s_ProfilesDirectory;
+    const std::filesystem::path& folder = FilePaths::s_profilesDirectory;
     const std::string filename = std::format("{}.json", GetUsername());
 
     json profile_json = *this;
