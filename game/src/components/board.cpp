@@ -7,12 +7,17 @@
 #include <fstream>
 #include <string_view>
 
-Board::Board()
-    : Grid(Vector2Ex<size_t>(14, 14), Vector2Ex<float>(50, 50),
-           Vector2Ex<float>(static_cast<float>(GetScreenWidth()) / 2, static_cast<float>(GetScreenHeight()) / 2),
-           ui::AnchorPoint::MIDDLE, Vector2Ex<float>(0, 0), Tile::Type::PATH, Pellet::Type::NORMAL,
-           Vector2Ex<float>(0, 0), Vector2Ex<float>(50, 50)),
-      m_name("test-file")
+Board::Board() :
+    Grid(Vector2Ex<size_t>(14, 14),
+         Vector2Ex<float>(50, 50),
+         Vector2Ex<float>(static_cast<float>(GetScreenWidth()) / 2, static_cast<float>(GetScreenHeight()) / 2),
+         ui::AnchorPoint::MIDDLE,
+         Vector2Ex<float>(0, 0),
+         Tile::Type::PATH,
+         Pellet::Type::NORMAL,
+         Vector2Ex<float>(0, 0),
+         Vector2Ex<float>(50, 50)),
+    m_name("test-file")
 {
     using enum Tile::Type;
     addBoundaries();
@@ -138,7 +143,8 @@ Board Board::LoadFromFile(const std::string& filename)
     std::ifstream file(filename);
     if (!file.is_open())
     {
-        throw std::filesystem::filesystem_error("Failed to open file", std::filesystem::path(filename),
+        throw std::filesystem::filesystem_error("Failed to open file",
+                                                std::filesystem::path(filename),
                                                 std::error_code{});
     }
 
@@ -175,4 +181,9 @@ void Board::addBoundaries()
 Vector2Ex<float> Board::GetPlayerSpawnPoint() const
 {
     return GetPositionFromIndex({1, 1});
+}
+
+Vector2Ex<float> Board::GetSpeedyGhostSpawnPoint() const
+{
+    return GetPositionFromIndex({5, 8});
 }

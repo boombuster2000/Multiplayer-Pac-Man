@@ -32,6 +32,8 @@ class Board : public ui::Grid<Tile>
 
     Vector2Ex<float> GetPlayerSpawnPoint() const;
 
+    Vector2Ex<float> GetSpeedyGhostSpawnPoint() const;
+
     void SetTileType(const Vector2Ex<int>& index, const Tile::Type& type);
 
     void SaveToFile() const;
