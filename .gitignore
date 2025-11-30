@@ -2,6 +2,7 @@
 /out
 .vscode
 *.afdesign
+*.af
 .vs
 .env
 .cmake_cache
