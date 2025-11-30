@@ -31,7 +31,7 @@ void CreateProfileLayer::SetupMenuOptions()
 CreateProfileLayer::CreateProfileLayer() : BaseMenuLayer(ui::Alignment::CENTER, true, 10.0f)
 {
     using namespace ui;
-    const Vector2Ex centreOfScreen = {GetScreenWidth() * 0.5f, (float)GetScreenHeight() * 0.5f};
+    const Vector2Ex centreOfScreen = {GetScreenWidth() * 0.5f, GetScreenHeight() * 0.5f};
 
     TextBoxStyle selectedBoxStyle = {2.0f, ORANGE, WHITE, {20.0f, GRAY}, {20.0f, BLACK}, Alignment::CENTER, 2.0f};
     TextBoxStyle unselectedBoxStyle = {2.0f, BLACK, WHITE, {20.0f, GRAY}, {20.0f, BLACK}, Alignment::CENTER, 2.0f};
