@@ -2,7 +2,6 @@
 #include "engine/serialization/json_helpers.hpp"
 #include "game/components/profile.h"
 #include <nlohmann/json.hpp>
-#include <stdexcept>
 
 using nlohmann::json;
 
