@@ -97,15 +97,27 @@ bool GameLayer::TryApplyQueuedDirection(Vector2Ex<float>& currentPosition, ui::D
     return false;
 }
 
-GameLayer::GameLayer()
-    : m_board(), m_player(game::GameApplication::Get().GetProfile(),
-                          Pacman(m_board.GetPlayerSpawnPoint(), Vector2Ex<float>(50, 50), 400))
+GameLayer::GameLayer() :
+    m_board(),
+    m_player(game::GameApplication::Get().GetProfile(),
+             Pacman(m_board.GetPlayerSpawnPoint(), m_board.GetTileDimensions(), 400)),
+    m_speedy(m_board.GetSpeedyGhostSpawnPoint(),
+             Vector2Ex<float>(100, 100),
+             {35, m_board.GetTileDimensions().y},
+             ui::Direction::RIGHT,
+             game::GameApplication::Get().GetTexturesManager().GetTexture("speedy"))
 {
 }
 
-GameLayer::GameLayer(std::string_view boardPath)
-    : m_board(boardPath), m_player(game::GameApplication::Get().GetProfile(),
-                                   Pacman(m_board.GetPlayerSpawnPoint(), Vector2Ex<float>(50, 50), 400))
+GameLayer::GameLayer(std::string_view boardPath) :
+    m_board(boardPath),
+    m_player(game::GameApplication::Get().GetProfile(),
+             Pacman(m_board.GetPlayerSpawnPoint(), m_board.GetTileDimensions(), 400)),
+    m_speedy(m_board.GetSpeedyGhostSpawnPoint(),
+             Vector2Ex<float>(100, 100),
+             {35, m_board.GetTileDimensions().y},
+             ui::Direction::RIGHT,
+             game::GameApplication::Get().GetTexturesManager().GetTexture("speedy"))
 {
 }
 
@@ -241,6 +253,7 @@ void GameLayer::OnRender()
 {
     m_board.Render();
     m_player.GetPacman().Render();
+    m_speedy.Render();
     RenderScores();
 }
 

@@ -4,6 +4,7 @@
 #include "engine/core/vector2ex.h"
 #include "engine/ui/enums.h"
 #include "game/components/board.h"
+#include "game/components/ghost.h"
 #include "game/components/pacman.h"
 #include "game/components/player.h"
 
@@ -14,6 +15,7 @@ class GameLayer : public engine::Layer
     Board m_board;
     Player m_player;
     ui::Direction m_queuedDirection;
+    Ghost m_speedy;
 
     float m_timePassedSinceLastSave = 0.0f;
 
