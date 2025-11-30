@@ -10,17 +10,15 @@ class CreateProfileLayer : public BaseMenuLayer
     ui::TextBoxOption* m_profileNameInput;
 
   private:
-    virtual void SetupMenuOptions() override;
+    void SetupMenuOptions() final;
 
-    void OnTextBoxClicked();
     void OnContinueClicked();
     void OnBackClicked();
 
   public:
     CreateProfileLayer();
-    virtual ~CreateProfileLayer() = default;
 
-    virtual void OnUpdate(float ts) override;
+    void OnUpdate(float ts) final;
 
-    void OnRender();
+    void OnRender() final;
 };

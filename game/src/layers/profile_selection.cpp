@@ -1,13 +1,14 @@
-#include "engine/core/application.h"
 #include "engine/ui/text_menu_option.h"
 #include "game/components/profile.h"
+#include "game/file_paths.h"
 #include "game/game_application.h"
 #include "game/layers/create_profile.h"
 #include "game/layers/main_menu.h"
 #include "game/layers/profile_selection_menu_layer.h"
 #include "game/serialization/json_converters.hpp"
+#include "game/utils/file_utils.h"
 #include <filesystem>
-#include <fstream>
+#include <iostream>
 #include <nlohmann/json.hpp>
 
 ProfileSelectionMenuLayer::ProfileSelectionMenuLayer() : BaseMenuLayer(ui::Alignment::CENTER, true, 10.0f)
@@ -24,15 +25,14 @@ void ProfileSelectionMenuLayer::SetupMenuOptions()
     TextStyle buttonUnselectedStyle = {25, GRAY}; // Use for "Create Profile" and "Back"
     TextStyle buttonSelectedStyle = {30, ORANGE}; // Use for "Create Profile" and "Back"
 
-    const std::string path = "profiles";
+    const std::filesystem::path& path = FilePaths::s_profilesDirectory;
+    std::vector<nlohmann::json> profile_jsons = game::file_utils::ReadJsonsFromDirectory(path);
 
     bool isFirstOption = true;
-    for (const auto& entry : std::filesystem::directory_iterator(path))
+    for (const auto& data : profile_jsons)
     {
-        if (entry.is_regular_file() && entry.path().extension() == ".json")
+        try
         {
-            std::ifstream f(entry.path());
-            nlohmann::json data = nlohmann::json::parse(f);
             auto profile = std::make_shared<Profile>(data.get<Profile>());
 
             m_menu.AddOption(std::make_unique<TextMenuOption>(profile->GetUsername(), profileSelectedStyle,
@@ -41,6 +41,11 @@ void ProfileSelectionMenuLayer::SetupMenuOptions()
                                                                   TransistionTo(std::make_unique<MainMenuLayer>());
                                                               }));
             isFirstOption = false;
+        }
+        catch (const nlohmann::json::exception& e)
+        {
+            std::cerr << "Failed to load profile: " << e.what() << std::endl;
+            continue;
         }
     }
 

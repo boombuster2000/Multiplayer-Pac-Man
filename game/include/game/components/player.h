@@ -7,7 +7,7 @@
 class Player
 {
   private:
-    int m_points;
+    int m_points = 0;
     std::shared_ptr<Profile> m_profile;
     Pacman m_pacman;
 

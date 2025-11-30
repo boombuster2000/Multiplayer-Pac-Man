@@ -1,7 +1,7 @@
 #include "game/layers/game_options_menu.h"
-#include "engine/core/application.h"
 #include "engine/core/input_manager.h"
 #include "engine/ui/text_menu_option.h"
+#include "game/game_application.h"
 #include "game/layers/game.h"
 #include "game/layers/main_menu.h"
 #include <memory>
@@ -18,7 +18,7 @@ void GameOptionsMenuLayer::SetupMenuOptions()
     TextStyle selectedStyle = {40, ORANGE};
 
     m_menu.AddOption(std::make_unique<TextMenuOption>("Resume", selectedStyle, unselectedStyle, true, [this]() {
-        GameLayer* gameLayer = engine::Application::Get().GetLayer<GameLayer>();
+        GameLayer* gameLayer = game::GameApplication::Get().GetLayer<GameLayer>();
         if (gameLayer)
         {
             gameLayer->Resume();
@@ -29,7 +29,7 @@ void GameOptionsMenuLayer::SetupMenuOptions()
     m_menu.AddOption(std::make_unique<TextMenuOption>("Options", selectedStyle, unselectedStyle, false));
 
     m_menu.AddOption(std::make_unique<TextMenuOption>("Return To Menu", selectedStyle, unselectedStyle, false, []() {
-        GameLayer* gameLayer = engine::Application::Get().GetLayer<GameLayer>();
+        GameLayer* gameLayer = game::GameApplication::Get().GetLayer<GameLayer>();
         if (gameLayer)
         {
             gameLayer->TransistionTo(std::make_unique<MainMenuLayer>());
@@ -42,11 +42,11 @@ void GameOptionsMenuLayer::OnUpdate(float ts)
 {
     BaseMenuLayer::OnUpdate(ts);
 
-    auto inputManager = engine::Application::GetInputManager();
+    const auto& inputManager = engine::Application::GetInputManager();
 
-    if (inputManager->IsAction("pause", engine::InputState::PRESSED))
+    if (inputManager.IsAction("pause", engine::InputState::PRESSED))
     {
-        GameLayer* gameLayer = engine::Application::Get().GetLayer<GameLayer>();
+        GameLayer* gameLayer = game::GameApplication::Get().GetLayer<GameLayer>();
         if (gameLayer)
         {
             gameLayer->Resume();

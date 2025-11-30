@@ -24,7 +24,6 @@ class Pacman : public ui::RenderableObject
   public:
     Pacman();
     Pacman(Vector2Ex<float> spawnPosition, Vector2Ex<float> dimensions, float Speed);
-    ~Pacman() = default;
 
     ui::Direction GetCurrentDirection() const;
     ui::Direction GetQueuedDirection() const;
@@ -32,7 +31,7 @@ class Pacman : public ui::RenderableObject
     void QueueDirection(ui::Direction direction);
     void ApplyQueuedDirection();
 
-    void SetPosition(const Vector2Ex<float> position);
+    void SetPosition(const Vector2Ex<float> position) final;
     Vector2Ex<float> GetNextPosition(const ui::Direction& direction, const float& deltaTime) const;
     Vector2Ex<float> GetNextPositionWithStep(const ui::Direction& direction, const float step) const;
 
@@ -40,8 +39,8 @@ class Pacman : public ui::RenderableObject
 
     bool IsStationary() const;
 
-    virtual Vector2Ex<float> GetDimensions() const override;
+    Vector2Ex<float> GetDimensions() const final;
     void SetDimensions(const Vector2Ex<float>& dimensions);
 
-    virtual void Render(Vector2Ex<float> offset = {0, 0}) const override;
+    void Render(Vector2Ex<float> offset = {0, 0}) const final;
 };

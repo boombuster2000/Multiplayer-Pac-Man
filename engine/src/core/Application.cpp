@@ -8,41 +8,13 @@
 namespace engine
 {
 
-static Application* s_application = nullptr;
-static std::shared_ptr<TexturesManager> s_texturesManager = nullptr;
-static std::shared_ptr<InputManager> s_inputManager = nullptr;
+Application* Application::s_application = nullptr;
 std::queue<LayerAction> Application::s_pendingActions;
 
 Application::Application(const ApplicationSpecification& specification) : m_specification(specification)
 {
+    assert(!s_application && "Only one Application instance may exist at a time");
     s_application = this;
-    s_texturesManager = std::make_shared<TexturesManager>();
-    s_inputManager = std::make_shared<InputManager>();
-
-    // Keyboard
-    s_inputManager->AddKeyboardAction("move_up", KEY_W);
-    s_inputManager->AddKeyboardAction("move_up", KEY_UP);
-    s_inputManager->AddKeyboardAction("move_down", KEY_S);
-    s_inputManager->AddKeyboardAction("move_down", KEY_DOWN);
-    s_inputManager->AddKeyboardAction("move_left", KEY_A);
-    s_inputManager->AddKeyboardAction("move_left", KEY_LEFT);
-    s_inputManager->AddKeyboardAction("move_right", KEY_D);
-    s_inputManager->AddKeyboardAction("move_right", KEY_RIGHT);
-    s_inputManager->AddKeyboardAction("confirm", KEY_ENTER);
-    s_inputManager->AddKeyboardAction("pause", KEY_ESCAPE);
-
-    // Gamepad
-    s_inputManager->AddGamepadButtonAction("move_up", GAMEPAD_BUTTON_LEFT_FACE_UP, 0);
-    s_inputManager->AddGamepadButtonAction("move_down", GAMEPAD_BUTTON_LEFT_FACE_DOWN, 0);
-    s_inputManager->AddGamepadButtonAction("move_left", GAMEPAD_BUTTON_LEFT_FACE_LEFT, 0);
-    s_inputManager->AddGamepadButtonAction("move_right", GAMEPAD_BUTTON_LEFT_FACE_RIGHT, 0);
-    s_inputManager->AddGamepadButtonAction("confirm", GAMEPAD_BUTTON_RIGHT_FACE_DOWN, 0);
-    s_inputManager->AddGamepadButtonAction("pause", GAMEPAD_BUTTON_MIDDLE_LEFT, 0);
-
-    s_inputManager->AddGamepadAxisAction("move_up", GAMEPAD_AXIS_LEFT_Y, 0, false);
-    s_inputManager->AddGamepadAxisAction("move_down", GAMEPAD_AXIS_LEFT_Y, 0, true);
-    s_inputManager->AddGamepadAxisAction("move_left", GAMEPAD_AXIS_LEFT_X, 0, false);
-    s_inputManager->AddGamepadAxisAction("move_right", GAMEPAD_AXIS_LEFT_X, 0, true);
 
     InitWindow(specification.width, specification.height, specification.name.c_str());
     SetExitKey(specification.programExitKey);
@@ -53,18 +25,19 @@ Application::Application(const ApplicationSpecification& specification) : m_spec
 
 Application::~Application()
 {
+    assert(s_application == this && "Destroying unexpected Application instance");
     CloseWindow();
     s_application = nullptr;
 }
 
-std::shared_ptr<TexturesManager> Application::GetTexturesManager()
+TexturesManager& Application::GetTexturesManager()
 {
-    return s_texturesManager;
+    return Get().m_texturesManager;
 }
 
-std::shared_ptr<InputManager> Application::GetInputManager()
+InputManager& Application::GetInputManager()
 {
-    return s_inputManager;
+    return Get().m_inputManager;
 }
 
 void Application::Run()
@@ -82,7 +55,7 @@ void Application::Run()
             break;
         }
 
-        s_inputManager->Update();
+        m_inputManager.Update();
 
         ProcessPendingActions();
 
@@ -113,17 +86,17 @@ void Application::Stop()
 
 void Application::QueuePush(std::unique_ptr<Layer> layer)
 {
-    s_pendingActions.push({LayerActionType::PUSH, std::type_index(typeid(void)), std::move(layer)});
+    s_pendingActions.emplace(MakePushAction(std::move(layer)));
 }
 
 void Application::QueuePop(std::type_index layerType)
 {
-    s_pendingActions.push({LayerActionType::POP, layerType, nullptr});
+    s_pendingActions.emplace(MakePopAction(layerType));
 }
 
 void Application::QueueTransition(std::type_index fromType, std::unique_ptr<Layer> toLayer)
 {
-    s_pendingActions.push({LayerActionType::TRANSITION, fromType, std::move(toLayer)});
+    s_pendingActions.emplace(MakeTransitionAction(fromType, std::move(toLayer)));
 }
 
 void Application::ProcessPendingActions()
@@ -140,24 +113,47 @@ void Application::ProcessPendingActions()
             break;
 
         case LayerActionType::POP: {
-            auto it = std::find_if(m_layerStack.begin(), m_layerStack.end(), [&](const std::unique_ptr<Layer>& layer) {
-                return std::type_index(typeid(*layer)) == action.fromType;
-            });
+            auto it = FindLayerIt(action.fromType);
+
             if (it != m_layerStack.end())
                 m_layerStack.erase(it);
         }
+
         break;
 
         case LayerActionType::TRANSITION: {
-            auto it = std::find_if(m_layerStack.begin(), m_layerStack.end(), [&](const std::unique_ptr<Layer>& layer) {
-                return std::type_index(typeid(*layer)) == action.fromType;
-            });
+            auto it = FindLayerIt(action.fromType);
+
             if (it != m_layerStack.end())
                 *it = std::move(action.toLayer);
         }
+
         break;
         }
     }
+}
+
+std::vector<std::unique_ptr<Layer>>::iterator Application::FindLayerIt(std::type_index desiredType)
+{
+    // why: lambda variable name must not shadow function argument
+    return std::ranges::find_if(m_layerStack, [&](const std::unique_ptr<Layer>& layer) {
+        return std::type_index(typeid(*layer)) == desiredType;
+    });
+}
+
+LayerAction Application::MakePushAction(std::unique_ptr<Layer> layer)
+{
+    return LayerAction{LayerActionType::PUSH, std::type_index(typeid(void)), std::move(layer)};
+}
+
+LayerAction Application::MakePopAction(std::type_index layerType)
+{
+    return LayerAction{LayerActionType::POP, layerType, nullptr};
+}
+
+LayerAction Application::MakeTransitionAction(std::type_index fromType, std::unique_ptr<Layer> toLayer)
+{
+    return LayerAction{LayerActionType::TRANSITION, fromType, std::move(toLayer)};
 }
 
 Application& Application::Get()
@@ -165,5 +161,4 @@ Application& Application::Get()
     assert(s_application);
     return *s_application;
 }
-
 } // namespace engine

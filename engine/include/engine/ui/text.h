@@ -18,24 +18,23 @@ class Text : public RenderableObject
     TextStyle m_style;
 
   public:
-    Text(std::string text, TextStyle style, Vector2Ex<float> anchorPointPosition, AnchorPoint AnchorPoint,
+    Text(std::string_view text, TextStyle style, Vector2Ex<float> anchorPointPosition, AnchorPoint anchorPoint,
          bool visible);
-    ~Text() = default;
 
-    void SetText(std::string text);
+    void SetText(std::string_view text);
     std::string GetText() const;
 
-    void SetFontSize(float fontSize);
+    void SetFontSize(const float fontSize);
     float GetFontSize() const;
 
-    void SetColor(Color color);
+    void SetColor(const Color& color);
     Color GetColor() const;
 
-    void SetStyle(TextStyle style);
+    void SetStyle(const TextStyle& style);
     TextStyle GetStyle() const;
 
-    virtual Vector2Ex<float> GetDimensions() const override;
-    virtual void Render(Vector2Ex<float> offset = {0, 0}) const override;
+    Vector2Ex<float> GetDimensions() const override;
+    void Render(Vector2Ex<float> offset = {0, 0}) const override;
 };
 
 } // namespace ui

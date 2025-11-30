@@ -1,7 +1,7 @@
 #pragma once
+#include "engine/serialization/json_helpers.hpp"
 #include "game/components/profile.h"
 #include <nlohmann/json.hpp>
-#include <stdexcept>
 
 using nlohmann::json;
 
@@ -12,27 +12,7 @@ inline void to_json(json& j, const Profile& profile)
 
 inline void from_json(const json& j, Profile& profile)
 {
-    if (!j.is_object())
-        throw std::runtime_error("Failed to deserialize Profile: JSON is not an object.");
-
-    try
-    {
-        j.at("username").get_to(profile.m_username);
-    }
-    catch (const std::exception& e)
-    {
-        throw std::runtime_error("Failed to deserialize Profile.username: " + std::string(e.what()));
-    }
-
-    if (!j["personal_highscores"].is_object())
-        throw std::runtime_error("Failed to deserialize Profile: JSON.personal_highscores is not an object");
-
-    try
-    {
-        j.at("personal_highscores").get_to(profile.m_personalHighscores);
-    }
-    catch (const std::exception& e)
-    {
-        throw std::runtime_error("Failed to deserialize Profile.personalHighscores: " + std::string(e.what()));
-    }
+    serialization::require_object(j, "Profile");
+    serialization::get_required_field(j, "username", profile.m_username, "Profile");
+    serialization::get_required_field(j, "personal_highscores", profile.m_personalHighscores, "Profile");
 }

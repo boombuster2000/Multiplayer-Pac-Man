@@ -16,7 +16,7 @@ class BoardSelectionMenuLayer : public engine::Layer
 
     ui::Text m_leaderboardTitle;
     std::vector<ui::Text> m_leaderboardScores;
-    float m_leaderboardWidth = 0.f;
+    float m_leaderboardWidth = 0.0f;
 
     void SetupMenuOptions();
     void UpdateLeaderboard();
@@ -24,8 +24,7 @@ class BoardSelectionMenuLayer : public engine::Layer
 
   public:
     BoardSelectionMenuLayer();
-    ~BoardSelectionMenuLayer() = default;
 
-    void OnUpdate(float ts) override;
-    void OnRender() override;
+    void OnUpdate(float ts) final;
+    void OnRender() final;
 };

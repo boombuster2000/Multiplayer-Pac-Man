@@ -56,18 +56,23 @@ void TextBox::UpdateCursor()
 Vector2Ex<float> TextBox::CalculateTextPositionOffset(const Vector2Ex<float>& boxDimensions,
                                                       const Vector2Ex<float>& textDimensions) const
 {
+    using enum ui::Alignment;
+
     float x = 0.0f;
     switch (m_style.alignment)
     {
-    case Alignment::LEFT:
+    case LEFT:
         x = m_style.padding;
         break;
-    case Alignment::RIGHT:
+
+    case RIGHT:
         x = boxDimensions.x - textDimensions.x - m_style.padding;
         break;
-    case Alignment::CENTER:
+
+    case CENTER:
         x = (boxDimensions.x - textDimensions.x) / 2;
         break;
+
     default:
         break;
     }
@@ -91,13 +96,13 @@ void TextBox::UpdateAllTextPositions()
 }
 
 TextBox::TextBox(Vector2Ex<float> position, Vector2Ex<float> dimensions, const TextBoxStyle& style,
-                 const TextBoxStyle& activeStyle, const std::string& backgroundText, AnchorPoint anchorPoint,
+                 const TextBoxStyle& activeStyle, std::string_view backgroundText, AnchorPoint anchorPoint,
                  bool isActive, bool visible)
     : RenderableObject(position, anchorPoint, visible), m_dimensions(dimensions),
       m_text("", style.typingTextStyle, position, AnchorPoint::TOP_LEFT, visible), m_style(style),
       m_activeStyle(activeStyle), m_renderStyle(isActive ? activeStyle : style),
       m_backgroundText(backgroundText, style.backgroundTextStyle, position, AnchorPoint::TOP_LEFT, visible),
-      m_isActive(isActive), m_cursorVisible(isActive), m_cursorTimer(0.0f)
+      m_cursorVisible(isActive), m_isActive(isActive)
 {
     SetOrigin(anchorPoint);
     UpdateAllTextPositions();

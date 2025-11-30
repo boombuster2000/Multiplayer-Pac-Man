@@ -1,24 +1,25 @@
 #include "game/components/profile.h"
+#include "game/file_paths.h"
 #include "game/serialization/json_converters.hpp"
-#include "profile.h"
-#include <fstream>
-#include <iostream>
+#include "game/utils/file_utils.h"
+#include <filesystem>
+#include <format>
 #include <nlohmann/json.hpp>
 
-Profile::Profile(std::string username) : m_username(username), m_personalHighscores()
+Profile::Profile(std::string_view username) : m_username(username)
 {
 }
 
-std::string Profile::GetUsername() const
+std::string_view Profile::GetUsername() const
 {
     return m_username;
 }
-std::unordered_map<std::string, int> Profile::GetPersonalHighscores() const
+HighscoreMap Profile::GetPersonalHighscores() const
 {
     return m_personalHighscores;
 }
 
-void Profile::UpdateHighScore(const std::string& boardName, const int points)
+void Profile::UpdateHighScore(std::string_view boardName, const int points)
 {
     if (boardName.empty())
         return;
@@ -27,17 +28,18 @@ void Profile::UpdateHighScore(const std::string& boardName, const int points)
         return;
 
     bool newHighScore = false;
-    if (m_personalHighscores.contains(boardName))
+
+    if (auto it = m_personalHighscores.find(boardName); it != m_personalHighscores.end())
     {
-        if (m_personalHighscores.at(boardName) < points)
+        if (it->second < points)
         {
-            m_personalHighscores[boardName] = points;
+            it->second = points;
             newHighScore = true;
         }
     }
     else
     {
-        m_personalHighscores[boardName] = points;
+        m_personalHighscores.emplace(boardName, points);
         newHighScore = true;
     }
 
@@ -47,10 +49,12 @@ void Profile::UpdateHighScore(const std::string& boardName, const int points)
     }
 }
 
-void Profile::Save()
+void Profile::Save() const
 {
-    using nlohmann::json;
+    const std::filesystem::path& folder = FilePaths::s_profilesDirectory;
+    const std::string filename = std::format("{}.json", GetUsername());
+
     json profile_json = *this;
-    std::ofstream o("profiles/" + GetUsername() + ".json");
-    o << std::setw(4) << profile_json << std::endl;
+
+    game::file_utils::SaveJson(profile_json, folder, filename);
 }

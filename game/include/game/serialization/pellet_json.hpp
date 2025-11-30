@@ -1,9 +1,9 @@
 #pragma once
+#include "engine/serialization/json_helpers.hpp"
 #include "engine/serialization/renderable_object_json.hpp"
 #include "engine/serialization/vector2ex_json.hpp"
 #include "game/components/pellet.h"
 #include <nlohmann/json.hpp>
-#include <stdexcept>
 
 using nlohmann::json;
 
@@ -24,28 +24,14 @@ inline void to_json(json& j, const Pellet& pellet)
 
 inline void from_json(const json& j, Pellet& pellet)
 {
-    if (!j.is_object())
-        throw std::runtime_error("Failed to deserialize Pellet: JSON is not an object.");
+    serialization::require_object(j, "Pellet");
 
     // Deserialize base fields
     from_json(j, static_cast<ui::RenderableObject&>(pellet));
 
-    try
-    {
-        Vector2Ex<float> dims = j.at("dimensions").get<Vector2Ex<float>>();
-        pellet.radius = dims.x;
-    }
-    catch (const std::exception& e)
-    {
-        throw std::runtime_error("Failed to deserialize Pellet.dimensions: " + std::string(e.what()));
-    }
+    Vector2Ex<float> dims;
+    serialization::get_required_field(j, "dimensions", dims, "Pellet");
+    pellet.radius = dims.x;
 
-    try
-    {
-        j.at("type").get_to(pellet.m_type);
-    }
-    catch (const std::exception& e)
-    {
-        throw std::runtime_error("Failed to deserialize Pellet.type: " + std::string(e.what()));
-    }
+    serialization::get_required_field(j, "type", pellet.m_type, "Pellet");
 }

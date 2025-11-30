@@ -18,7 +18,7 @@ class TextBoxOption : public MenuOption
 
   public:
     TextBoxOption(Vector2Ex<float> dimensions, const TextBoxStyle& selectedStyle, const TextBoxStyle& unselectedStyle,
-                  const TextBoxStyle& activeStyle, const std::string& backgroundText = "",
+                  const TextBoxStyle& activeStyle, std::string_view backgroundText = "",
                   AnchorPoint anchorPoint = AnchorPoint::TOP_LEFT, bool isActive = false, bool visible = true,
                   bool isSelected = false, std::function<void()> callback = nullptr);
 

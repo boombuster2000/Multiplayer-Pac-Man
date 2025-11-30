@@ -1,9 +1,10 @@
 #pragma once
 #include "engine/serialization/grid_json.hpp"
+#include "engine/serialization/json_helpers.hpp"
 #include "game/components/board.h"
 #include <nlohmann/json.hpp>
 
-using json = nlohmann::json;
+using nlohmann::json;
 
 inline void to_json(json& j, const Board& board)
 {
@@ -19,13 +20,6 @@ inline void from_json(const json& j, Board& board)
     auto& grid = static_cast<ui::Grid<Tile>&>(board);
     from_json(j, grid);
 
-    if (!j.contains("name"))
-        throw std::runtime_error("Failed to deserialize Board: missing field 'name'");
-
-    j.at("name").get_to(board.m_name);
-
-    if (!j.contains("highScores"))
-        throw std::runtime_error("Failed to deserialize Board: missing field 'highScores'");
-
-    j.at("highScores").get_to(board.m_highScores);
+    serialization::get_required_field(j, "name", board.m_name, "Board");
+    serialization::get_required_field(j, "highScores", board.m_highScores, "Board");
 }

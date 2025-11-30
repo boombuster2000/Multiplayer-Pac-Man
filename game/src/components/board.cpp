@@ -1,15 +1,11 @@
-#include <fstream>
-#include <stdexcept>
-
-#include "engine/core/application.h"
-#include "engine/serialization/json_converters.hpp"
-#include "engine/ui/enums.h"
 #include "game/components/board.h"
+#include "engine/serialization/json_converters.hpp"
 #include "game/components/pellet.h"
+#include "game/file_paths.h"
 #include "game/serialization/json_converters.hpp"
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
+#include <filesystem>
+#include <fstream>
+#include <string_view>
 
 Board::Board()
     : Grid(Vector2Ex<size_t>(14, 14), Vector2Ex<float>(50, 50),
@@ -18,55 +14,56 @@ Board::Board()
            Vector2Ex<float>(0, 0), Vector2Ex<float>(50, 50)),
       m_name("test-file")
 {
+    using enum Tile::Type;
     addBoundaries();
 
     // Row 2 - top horizontal walls
     for (int x : {2, 4, 5, 6, 7, 8, 9, 10, 11})
-        SetTileType({x, 2}, Tile::Type::WALL);
+        SetTileType({x, 2}, WALL);
 
     // Row 3 - vertical pillars
     for (int x : {2, 11})
-        SetTileType({x, 3}, Tile::Type::WALL);
+        SetTileType({x, 3}, WALL);
 
     // Row 4 - inner walls with gaps
     for (int x : {2, 4, 5, 6, 7, 8, 9, 11})
-        SetTileType({x, 4}, Tile::Type::WALL);
+        SetTileType({x, 4}, WALL);
 
     // Row 5 - ghost house top
     for (int x : {0, 2, 4, 11})
-        SetTileType({x, 5}, Tile::Type::WALL);
+        SetTileType({x, 5}, WALL);
 
     // Row 6 - ghost house sides
     for (int x : {0, 2, 4, 5, 6, 7, 9, 11})
-        SetTileType({x, 6}, Tile::Type::WALL);
+        SetTileType({x, 6}, WALL);
 
     // Row 7 - ghost house sides
     for (int x : {0, 2, 4, 5, 6, 7, 9, 11})
-        SetTileType({x, 7}, Tile::Type::WALL);
+        SetTileType({x, 7}, WALL);
 
     // Row 8 - ghost house bottom
     for (int x : {0, 2, 4, 9, 11})
-        SetTileType({x, 8}, Tile::Type::WALL);
+        SetTileType({x, 8}, WALL);
 
     // Row 9 - inner walls with gaps
     for (int x : {2, 4, 5, 6, 7, 8, 9, 11})
-        SetTileType({x, 9}, Tile::Type::WALL);
+        SetTileType({x, 9}, WALL);
 
     // Row 10 - vertical pillars
     for (int x : {2, 11})
-        SetTileType({x, 10}, Tile::Type::WALL);
+        SetTileType({x, 10}, WALL);
 
     // Row 11 - bottom horizontal walls
     for (int x : {2, 3, 4, 5, 6, 7, 8, 9, 11})
-        SetTileType({x, 11}, Tile::Type::WALL);
+        SetTileType({x, 11}, WALL);
 }
 
-Board::Board(const std::string& filename)
+Board::Board(std::string_view filename)
 {
     *this = Board::LoadFromFile(filename);
 }
 
-std::string Board::GetName() const
+const std::string& Board::GetName() const
 {
     return m_name;
 }
@@ -80,10 +77,10 @@ void Board::SaveToFile() const
 {
     json j = *this;
 
-    const std::string boardFolder = "./resources/boards/";
+    const std::filesystem::path& boardFolder = FilePaths::s_boardsDirectory;
     const std::string filename = m_name + std::string(".json");
 
-    std::ofstream file(boardFolder + filename);
+    std::ofstream file(boardFolder / filename);
     if (file.is_open())
     {
         file << j.dump(4);
@@ -93,10 +90,10 @@ void Board::SaveToFile() const
 
 void Board::SaveHighscoresToFile() const
 {
-    const std::string boardFolder = "./resources/boards/";
-    const std::string filename = m_name + std::string(".json");
+    const std::filesystem::path& boardFolder = FilePaths::s_boardsDirectory;
+    const std::filesystem::path filename = m_name + std::string(".json");
 
-    Board originalBoard = Board::LoadFromFile(boardFolder + filename);
+    Board originalBoard = Board::LoadFromFile(boardFolder / filename);
 
     for (const auto& [profileName, score] : m_highScores)
     {
@@ -105,7 +102,7 @@ void Board::SaveHighscoresToFile() const
 
     json j = originalBoard;
 
-    std::ofstream file(boardFolder + filename);
+    std::ofstream file(boardFolder / filename);
 
     if (file.is_open())
     {
@@ -114,25 +111,26 @@ void Board::SaveHighscoresToFile() const
     }
 }
 
-std::unordered_map<std::string, int> Board::GetHighscores() const
+HighscoreMap Board::GetHighscores() const
 {
     return m_highScores;
 }
 
-void Board::SetHighscore(const std::string& profileName, int score)
+void Board::SetHighscore(std::string_view profileName, int score)
 {
-    if (m_highScores.contains(profileName))
+    if (auto it = m_highScores.find(profileName); it != m_highScores.end())
     {
-        if (score > m_highScores.at(profileName))
+        // Profile exists, update if score is higher
+        if (score > it->second)
         {
-            m_highScores[profileName] = score;
+            it->second = score;
         }
     }
     else
     {
-        m_highScores[profileName] = score;
+        // Profile doesn't exist, insert new score
+        m_highScores.emplace(profileName, score);
     }
-    SortHighscores();
 }
 
 Board Board::LoadFromFile(const std::string& filename)
@@ -140,47 +138,37 @@ Board Board::LoadFromFile(const std::string& filename)
     std::ifstream file(filename);
     if (!file.is_open())
     {
-        throw std::runtime_error("Could not open file: " + filename);
+        throw std::filesystem::filesystem_error("Failed to open file", std::filesystem::path(filename),
+                                                std::error_code{});
     }
 
     json j;
     file >> j;
     file.close();
     Board board = j.get<Board>();
-    board.SortHighscores();
     return board;
+}
+
+Board Board::LoadFromFile(const std::filesystem::path& filepath)
+{
+    return Board::LoadFromFile(filepath.string());
 }
 
 void Board::addBoundaries()
 {
+    using enum Tile::Type;
     const Vector2Ex<size_t>& boardSize = GetGridSize();
 
     for (int x = 0; x < boardSize.x; x++)
     {
-        GetTile(0, x).SetType(Tile::Type::WALL);
-        GetTile(boardSize.y - 1, x).SetType(Tile::Type::WALL);
+        GetTile(0, x).SetType(WALL);
+        GetTile(boardSize.y - 1, x).SetType(WALL);
     }
 
     for (int y = 0; y < boardSize.y; y++)
     {
-        GetTile(y, 0).SetType(Tile::Type::WALL);
-        GetTile(y, boardSize.x - 1).SetType(Tile::Type::WALL);
-    }
-}
-
-void Board::SortHighscores()
-{
-    // Convert unordered_map to vector of pairs
-    std::vector<std::pair<std::string, int>> scoreVector(m_highScores.begin(), m_highScores.end());
-
-    // Sort the vector based on scores in descending order
-    std::sort(scoreVector.begin(), scoreVector.end(), [](const auto& a, const auto& b) { return a.second > b.second; });
-
-    // Clear the original map and reinsert sorted entries
-    m_highScores.clear();
-    for (const auto& pair : scoreVector)
-    {
-        m_highScores[pair.first] = pair.second;
+        GetTile(y, 0).SetType(WALL);
+        GetTile(y, boardSize.x - 1).SetType(WALL);
     }
 }
 

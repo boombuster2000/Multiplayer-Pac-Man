@@ -1,14 +1,13 @@
 #include "game/layers/game.h"
-
-#include <array>
-#include <iostream>
-#include <stdexcept>
-
 #include "engine/core/input_manager.h"
 #include "game/game_application.h"
 #include "game/layers/game_options_menu.h"
 #include "game/layers/main_menu.h"
 #include "raylib.h"
+#include <array>
+#include <format>
+#include <iostream>
+#include <stdexcept>
 #include <string>
 
 bool GameLayer::IsPacmanTouchingPellet(const Vector2Ex<float>& pacmanDimensions,
@@ -43,24 +42,26 @@ bool GameLayer::CanMoveInDirection(const Vector2Ex<float>& position, const ui::D
 {
     using namespace ui;
     using enum AnchorPoint;
+    using enum Direction;
     const Vector2Ex<float> pacmanDimensions = m_player.GetPacman().GetDimensions();
 
-    Vector2Ex<float> cornersToCheck[2];
+    std::array<Vector2Ex<float>, 2> cornersToCheck;
+
     switch (direction)
     {
-    case Direction::UP:
+    case UP:
         cornersToCheck[0] = position;
         cornersToCheck[1] = position + RenderableObject::CalculateAnchorOffset(TOP_RIGHT, pacmanDimensions);
         break;
-    case Direction::DOWN:
+    case DOWN:
         cornersToCheck[0] = position + RenderableObject::CalculateAnchorOffset(BOTTOM_LEFT, pacmanDimensions);
         cornersToCheck[1] = position + RenderableObject::CalculateAnchorOffset(BOTTOM_RIGHT, pacmanDimensions);
         break;
-    case Direction::LEFT:
+    case LEFT:
         cornersToCheck[0] = position;
         cornersToCheck[1] = position + RenderableObject::CalculateAnchorOffset(BOTTOM_LEFT, pacmanDimensions);
         break;
-    case Direction::RIGHT:
+    case RIGHT:
         cornersToCheck[0] = position + RenderableObject::CalculateAnchorOffset(TOP_RIGHT, pacmanDimensions);
         cornersToCheck[1] = position + RenderableObject::CalculateAnchorOffset(BOTTOM_RIGHT, pacmanDimensions);
         break;
@@ -98,15 +99,13 @@ bool GameLayer::TryApplyQueuedDirection(Vector2Ex<float>& currentPosition, ui::D
 
 GameLayer::GameLayer()
     : m_board(), m_player(game::GameApplication::Get().GetProfile(),
-                          Pacman(m_board.GetPlayerSpawnPoint(), Vector2Ex<float>(50, 50), 400)),
-      m_timePassedSinceLastSave(0)
+                          Pacman(m_board.GetPlayerSpawnPoint(), Vector2Ex<float>(50, 50), 400))
 {
 }
 
-GameLayer::GameLayer(const std::string& boardPath)
+GameLayer::GameLayer(std::string_view boardPath)
     : m_board(boardPath), m_player(game::GameApplication::Get().GetProfile(),
-                                   Pacman(m_board.GetPlayerSpawnPoint(), Vector2Ex<float>(50, 50), 400)),
-      m_timePassedSinceLastSave(0)
+                                   Pacman(m_board.GetPlayerSpawnPoint(), Vector2Ex<float>(50, 50), 400))
 {
 }
 
@@ -118,24 +117,24 @@ GameLayer::~GameLayer()
 void GameLayer::HandleKeyPresses()
 {
     using enum ui::Direction;
-    auto inputManager = game::GameApplication::GetInputManager();
+    const auto& inputManager = game::GameApplication::GetInputManager();
 
-    if (inputManager->IsAction("move_up", engine::InputState::PRESSED))
+    if (inputManager.IsAction("move_up", engine::InputState::PRESSED))
         m_player.GetPacman().QueueDirection(UP);
 
-    if (inputManager->IsAction("move_down", engine::InputState::PRESSED))
+    if (inputManager.IsAction("move_down", engine::InputState::PRESSED))
         m_player.GetPacman().QueueDirection(DOWN);
 
-    if (inputManager->IsAction("move_left", engine::InputState::PRESSED))
+    if (inputManager.IsAction("move_left", engine::InputState::PRESSED))
         m_player.GetPacman().QueueDirection(LEFT);
 
-    if (inputManager->IsAction("move_right", engine::InputState::PRESSED))
+    if (inputManager.IsAction("move_right", engine::InputState::PRESSED))
         m_player.GetPacman().QueueDirection(RIGHT);
 
     if (IsKeyPressed(KEY_F1))
         m_board.SaveToFile();
 
-    if (inputManager->IsAction("pause", engine::InputState::PRESSED))
+    if (inputManager.IsAction("pause", engine::InputState::PRESSED))
     {
         SuspendUpdate();
         Push(std::make_unique<GameOptionsMenuLayer>());
@@ -218,7 +217,7 @@ void GameLayer::HandleCollisions(const float& deltaTime)
 
 void GameLayer::UpdateHighscores()
 {
-    const std::string& boardName = m_board.GetName();
+    std::string_view boardName = m_board.GetName();
 
     game::GameApplication::Get().GetProfile()->UpdateHighScore(boardName, m_player.GetPoints());
     m_board.SetHighscore(game::GameApplication::Get().GetProfile()->GetUsername(), m_player.GetPoints());
@@ -248,17 +247,18 @@ void GameLayer::OnRender()
 void GameLayer::RenderScores()
 {
     const int currentPoints = m_player.GetPoints();
-    const std::string& boardName = m_board.GetName();
+    std::string_view boardName = m_board.GetName();
     const auto& highscores = game::GameApplication::Get().GetProfile()->GetPersonalHighscores();
 
     int highscore = 0;
-    if (highscores.contains(boardName))
+    auto it = highscores.find(boardName);
+    if (it != highscores.end())
     {
-        highscore = highscores.at(boardName);
+        highscore = it->second;
     }
 
-    const std::string currentPointsStr = "Score: " + std::to_string(currentPoints);
-    const std::string highscoreStr = "Highscore: " + std::to_string(highscore);
+    const std::string currentPointsStr = std::format("Score: {}", currentPoints);
+    const std::string highscoreStr = std::format("Highscore: {}", highscore);
 
     DrawText(highscoreStr.c_str(), 10, 10, 20, BLACK);
     DrawText(currentPointsStr.c_str(), 10, 40, 20, BLACK);

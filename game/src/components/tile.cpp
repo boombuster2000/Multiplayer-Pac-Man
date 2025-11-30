@@ -1,5 +1,5 @@
 #include "game/components/tile.h"
-#include "engine/core/application.h"
+#include "game/game_application.h"
 
 Tile::Tile()
     : GridTile(), m_type(Type::NONE), m_pellet(GetPositionAtAnchor(ui::AnchorPoint::MIDDLE), Pellet::Type::NONE)
@@ -38,7 +38,7 @@ const Pellet& Tile::GetPellet() const
     return m_pellet;
 }
 
-void Tile::SetPosition(const Vector2Ex<float>& position)
+void Tile::SetPosition(Vector2Ex<float> position)
 {
     RenderableObject::SetPosition(position);
     m_pellet.SetPosition(GetPositionAtAnchor(ui::AnchorPoint::MIDDLE));
@@ -48,8 +48,8 @@ void Tile::Render(Vector2Ex<float> offset) const
 {
     Vector2Ex<float> position = GetPositionAtAnchor();
     Vector2Ex<float> size = GetDimensions();
-    std::shared_ptr<Texture2D> pathTexture = engine::Application::GetTexturesManager()->GetTexture("path");
-    std::shared_ptr<Texture2D> wallTexture = engine::Application::GetTexturesManager()->GetTexture("wall");
+    std::shared_ptr<Texture2D> pathTexture = engine::Application::GetTexturesManager().GetTexture("path");
+    std::shared_ptr<Texture2D> wallTexture = engine::Application::GetTexturesManager().GetTexture("wall");
 
     if (m_type == Type::WALL)
     {

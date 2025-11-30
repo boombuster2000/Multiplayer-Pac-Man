@@ -8,14 +8,14 @@
 #include "engine/ui/enums.h"
 #include "engine/ui/grid_tile.h"
 #include <nlohmann/json.hpp>
-using json = nlohmann::json;
+using nlohmann::json;
 
 namespace ui
 {
 template <class T = GridTile>
 class Grid : public RenderableObject
 {
-    static_assert(std::is_base_of<GridTile, T>::value, "T must derive from ui::GridTile");
+    static_assert(std::is_base_of_v<GridTile, T>, "T must derive from ui::GridTile");
 
   private:
     using GridType = std::vector<std::vector<T>>;
@@ -65,8 +65,6 @@ class Grid : public RenderableObject
         }
         SetOrigin(anchorPoint);
     }
-
-    ~Grid() = default;
 
     std::vector<T>& operator[](size_t y)
     {
@@ -213,7 +211,7 @@ class Grid : public RenderableObject
         return true;
     }
 
-    virtual void Render(Vector2Ex<float> offset = {0, 0}) const override
+    void Render(Vector2Ex<float> offset = {0, 0}) const override
     {
         for (const auto& row : m_grid)
             for (const auto& tile : row)

@@ -2,12 +2,15 @@
 #include "engine/core/vector2ex.h"
 #include "engine/ui/grid.h"
 #include "game/components/tile.h"
-#include "raylib.h"
+#include "game/utils/highscore_utils.h"
+#include <filesystem>
 #include <nlohmann/json.hpp>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 
-using json = nlohmann::json;
+using game::highscore_utils::HighscoreMap;
+using nlohmann::json;
 
 class Board : public ui::Grid<Tile>
 {
@@ -16,17 +19,16 @@ class Board : public ui::Grid<Tile>
 
   private:
     std::string m_name;
-    std::unordered_map<std::string, int> m_highScores;
+    HighscoreMap m_highScores;
 
   private:
     void addBoundaries();
-    void SortHighscores();
 
   public:
     Board();
-    Board(const std::string& filename);
+    explicit Board(std::string_view filename);
 
-    std::string GetName() const;
+    const std::string& GetName() const;
 
     Vector2Ex<float> GetPlayerSpawnPoint() const;
 
@@ -34,9 +36,10 @@ class Board : public ui::Grid<Tile>
 
     void SaveToFile() const;
 
-    std::unordered_map<std::string, int> GetHighscores() const;
-    void SetHighscore(const std::string& profileName, int score);
+    HighscoreMap GetHighscores() const;
+    void SetHighscore(std::string_view profileName, int score);
     void SaveHighscoresToFile() const;
 
     static Board LoadFromFile(const std::string& filename);
+    static Board LoadFromFile(const std::filesystem::path& filepath);
 };

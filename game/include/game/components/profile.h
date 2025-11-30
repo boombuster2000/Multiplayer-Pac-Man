@@ -1,26 +1,29 @@
 #pragma once
+#include "engine/serialization/json_helpers.hpp"
+#include "game/utils/highscore_utils.h"
 #include <nlohmann/json.hpp>
-#include <string>
+#include <string_view>
 #include <unordered_map>
 
-using json = nlohmann::json;
+using game::highscore_utils::HighscoreMap;
+using nlohmann::json;
 
 class Profile
 {
   private:
     std::string m_username;
-    std::unordered_map<std::string, int> m_personalHighscores;
+    HighscoreMap m_personalHighscores{};
 
   public:
     Profile() = default;
-    Profile(std::string username);
+    explicit Profile(std::string_view username);
 
-    std::string GetUsername() const;
+    std::string_view GetUsername() const;
 
-    std::unordered_map<std::string, int> GetPersonalHighscores() const;
-    void UpdateHighScore(const std::string& boardName, const int points);
-    void Save();
+    HighscoreMap GetPersonalHighscores() const;
+    void UpdateHighScore(std::string_view boardName, const int points);
+    void Save() const;
 
-    friend void to_json(json&, const Profile&);
-    friend void from_json(const json&, Profile&);
+    friend void to_json(json& j, const Profile& profile);
+    friend void from_json(const json& j, Profile& profile);
 };

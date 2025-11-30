@@ -14,16 +14,15 @@ class Menu : public RenderableObject
   private:
     std::vector<std::unique_ptr<MenuOption>> m_options;
 
-    int m_selectedIndex;
+    int m_selectedIndex = 0;
+    bool m_isUIupdateNeeded = true;
     float m_spacing;
     Alignment m_alignment;
     AnchorPoint m_anchorPoint;
-    bool m_isUIupdateNeeded;
 
   public:
     Menu(Vector2Ex<float> anchorPointPosition, AnchorPoint AnchorPoint, Alignment alignment, bool visible,
          float spacing);
-    ~Menu() = default;
 
     void AddOption(std::unique_ptr<MenuOption> option);
     void DeleteOption(int index);
@@ -38,8 +37,8 @@ class Menu : public RenderableObject
 
     bool IsUIUpdateNeeded() const;
     void UpdateOptionsAnchorPointPositions();
-    virtual Vector2Ex<float> GetDimensions() const override;
-    virtual void Render(Vector2Ex<float> offset = {0, 0}) const override;
+    Vector2Ex<float> GetDimensions() const override;
+    void Render(Vector2Ex<float> offset = {0, 0}) const override;
 };
 
 } // namespace ui

@@ -1,5 +1,4 @@
 #include "game/layers/create_profile.h"
-#include "engine/core/application.h"
 #include "engine/core/input_manager.h"
 #include "engine/ui/enums.h"
 #include "engine/ui/text_menu_option.h"
@@ -32,7 +31,7 @@ void CreateProfileLayer::SetupMenuOptions()
 CreateProfileLayer::CreateProfileLayer() : BaseMenuLayer(ui::Alignment::CENTER, true, 10.0f)
 {
     using namespace ui;
-    const Vector2Ex<float> centreOfScreen = {(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2};
+    const Vector2Ex centreOfScreen = {GetScreenWidth() * 0.5f, GetScreenHeight() * 0.5f};
 
     TextBoxStyle selectedBoxStyle = {2.0f, ORANGE, WHITE, {20.0f, GRAY}, {20.0f, BLACK}, Alignment::CENTER, 2.0f};
     TextBoxStyle unselectedBoxStyle = {2.0f, BLACK, WHITE, {20.0f, GRAY}, {20.0f, BLACK}, Alignment::CENTER, 2.0f};
@@ -52,7 +51,7 @@ CreateProfileLayer::CreateProfileLayer() : BaseMenuLayer(ui::Alignment::CENTER, 
 
 void CreateProfileLayer::OnUpdate(float ts)
 {
-    auto inputManager = engine::Application::GetInputManager();
+    const auto& inputManager = game::GameApplication::GetInputManager();
 
     if (!m_profileNameInput->IsActive())
         BaseMenuLayer::OnUpdate(ts);
@@ -61,7 +60,7 @@ void CreateProfileLayer::OnUpdate(float ts)
 
         m_profileNameInput->Update();
 
-        if (inputManager->IsAction("confirm", engine::InputState::PRESSED))
+        if (inputManager.IsAction("confirm", engine::InputState::PRESSED))
         {
             m_profileNameInput->SetActive(false);
         }
@@ -71,10 +70,6 @@ void CreateProfileLayer::OnUpdate(float ts)
 void CreateProfileLayer::OnRender()
 {
     BaseMenuLayer::OnRender();
-}
-
-void CreateProfileLayer::OnTextBoxClicked()
-{
 }
 
 void CreateProfileLayer::OnContinueClicked()

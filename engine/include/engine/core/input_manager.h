@@ -1,5 +1,6 @@
 #pragma once
 
+#include "transparent_string_hasher.h"
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -28,18 +29,24 @@ class InputManager
         bool positive = true;
     };
 
-    std::unordered_map<std::string, std::vector<Action>> m_actions;
-    std::unordered_map<std::string, InputState> m_actionStates;
-    std::unordered_map<std::string, float> m_actionValues;
+    std::unordered_map<std::string, std::vector<Action>, TransparentStringHash, std::equal_to<>> m_actions;
+    std::unordered_map<std::string, InputState, TransparentStringHash, std::equal_to<>> m_actionStates;
+    std::unordered_map<std::string, float, TransparentStringHash, std::equal_to<>> m_actionValues;
+
+    void ProcessKeyboard(const Action& action, bool& isDown, float& value);
+    void ProcessGamepadButton(const Action& action, bool& isDown, float& value);
+    void ProcessGamepadAxis(const Action& action, bool& isDown, float& value);
+    std::pair<bool, float> GetActionStatus(const std::vector<Action>& actions);
+    void UpdateActionState(const std::string& name, bool isDown);
 
   public:
-    InputManager();
+    InputManager() = default;
     ~InputManager() = default;
 
     void Update();
 
-    bool IsAction(const std::string& action, InputState state) const;
-    float GetActionValue(const std::string& action) const;
+    bool IsAction(std::string_view action, InputState state) const;
+    float GetActionValue(std::string_view action) const;
 
     void AddKeyboardAction(const std::string& action, int keyboardKey);
     void AddGamepadButtonAction(const std::string& action, int gamepadButton, int gamepadIndex = 0);

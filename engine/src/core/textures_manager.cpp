@@ -1,4 +1,5 @@
 #include "engine/core/textures_manager.h"
+#include <format>
 #include <stdexcept>
 
 namespace engine
@@ -20,13 +21,16 @@ void TexturesManager::AddTexture(const std::string& key, const std::string& file
     m_loadedTextures[key] = texture;
 }
 
+void TexturesManager::AddTexture(const std::string& key, const std::filesystem::path& filePath)
+{
+    AddTexture(key, filePath.string());
+}
+
 std::shared_ptr<Texture2D> TexturesManager::GetTexture(const std::string& key) const
 {
     auto it = m_loadedTextures.find(key);
     if (it == m_loadedTextures.end())
-    {
-        throw std::runtime_error("Texture not found: " + key);
-    }
+        throw std::out_of_range(std::format("Texture not found: {}", key));
 
     return it->second;
 }
