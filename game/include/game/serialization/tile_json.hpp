@@ -5,7 +5,6 @@
 #include "game/serialization/pellet_json.hpp"
 #include "tile_type_json.hpp"
 #include <nlohmann/json.hpp>
-#include <stdexcept>
 
 using nlohmann::json;
 
