@@ -34,7 +34,7 @@ void BoardSelectionMenuLayer::SetupMenuOptions()
     m_menu.AddOption(std::make_unique<TextMenuOption>("built-in", boardSelectedStyle, boardUnselectedStyle, true,
                                                       [this]() { TransistionTo(std::make_unique<GameLayer>()); }));
 
-    const path& boardDirectory = FilePaths::s_boardsDirectory;
+    const std::filesystem::path& boardDirectory = FilePaths::s_boardsDirectory;
     for (const auto& entry : std::filesystem::directory_iterator(boardDirectory))
     {
         if (entry.is_regular_file() && entry.path().extension() == ".json")
