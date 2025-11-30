@@ -4,7 +4,6 @@
 #include "engine/serialization/vector2ex_json.hpp"
 #include "game/components/pellet.h"
 #include <nlohmann/json.hpp>
-#include <stdexcept>
 
 using nlohmann::json;
 
