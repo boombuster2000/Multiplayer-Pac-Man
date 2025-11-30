@@ -7,6 +7,8 @@
 namespace game::file_utils
 {
 
+bool TryParseJsonFromFile(std::ifstream& file, nlohmann::json& out_json);
+
 bool SaveJson(const nlohmann::json& json_data, const std::filesystem::path& folder,
               const std::filesystem::path& filename);
 

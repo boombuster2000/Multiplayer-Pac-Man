@@ -5,6 +5,20 @@
 
 namespace game::file_utils
 {
+
+bool TryParseJsonFromFile(std::ifstream& file, nlohmann::json& out_json)
+{
+    try
+    {
+        out_json = nlohmann::json::parse(file);
+        return true;
+    }
+    catch (const nlohmann::json::exception& e)
+    {
+        return false;
+    }
+}
+
 bool SaveJson(const nlohmann::json& json_data, const std::filesystem::path& folder,
               const std::filesystem::path& filename)
 {
@@ -63,23 +77,26 @@ std::vector<nlohmann::json> ReadJsonsFromDirectory(const std::filesystem::path& 
             std::ranges::transform(ext, ext.begin(), [](unsigned char c) { return std::tolower(c); });
             if (entry.is_regular_file() && ext == ".json")
             {
-                std::ifstream f(entry.path());
+                std::ifstream file(entry.path());
 
-                if (!f.is_open())
+                if (!file.is_open())
                 {
                     std::cerr << "I/O Error: Failed to open file " << entry.path() << std::endl;
                     continue;
                 }
 
-                try
+                nlohmann::json json_data;
+                if (TryParseJsonFromFile(file, json_data))
                 {
-                    jsons.push_back(nlohmann::json::parse(f));
+                    jsons.push_back(std::move(json_data));
                 }
-                catch (const nlohmann::json::exception& e)
+                else
                 {
-                    std::cerr << "JSON Error while parsing file " << entry.path() << ": " << e.what() << std::endl;
+                    std::cerr << "JSON Error: Failed to parse JSON from file " << entry.path() << std::endl;
                     continue;
                 }
+
+                file.close();
             }
         }
     }
