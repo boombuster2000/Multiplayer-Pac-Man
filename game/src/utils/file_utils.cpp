@@ -60,7 +60,7 @@ std::vector<nlohmann::json> ReadJsonsFromDirectory(const std::filesystem::path& 
         for (const auto& entry : std::filesystem::directory_iterator(directory_path))
         {
             std::string ext = entry.path().extension().string();
-            std::ranges::transform(ext, ext.begin(), ::tolower);
+            std::ranges::transform(ext, ext.begin(), [](unsigned char c) { return std::tolower(c); });
             if (entry.is_regular_file() && ext == ".json")
             {
                 std::ifstream f(entry.path());
@@ -71,17 +71,21 @@ std::vector<nlohmann::json> ReadJsonsFromDirectory(const std::filesystem::path& 
                     continue;
                 }
 
-                jsons.push_back(nlohmann::json::parse(f));
+                try
+                {
+                    jsons.push_back(nlohmann::json::parse(f));
+                }
+                catch (const nlohmann::json::exception& e)
+                {
+                    std::cerr << "JSON Error while parsing file " << entry.path() << ": " << e.what() << std::endl;
+                    continue;
+                }
             }
         }
     }
     catch (const std::filesystem::filesystem_error& e)
     {
         std::cerr << "Filesystem Error while reading directory " << directory_path << ": " << e.what() << std::endl;
-    }
-    catch (const nlohmann::json::parse_error& e)
-    {
-        std::cerr << "JSON Parse Error: Failed to parse file. Reason: " << e.what() << std::endl;
     }
 
     return jsons;
