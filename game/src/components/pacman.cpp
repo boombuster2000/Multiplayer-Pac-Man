@@ -24,11 +24,16 @@ void Pacman::SetRotation(const ui::Direction& direction)
     }
 }
 
-Pacman::Pacman(Vector2Ex<float> spawnPosition, Vector2Ex<float> dimensions, float speed)
-    : RenderableObject(spawnPosition),
-      m_texture(game::GameApplication::Get().GetTexturesManager().GetTexture("pac-man")),
-      m_spawnPosition(spawnPosition), m_dimensions(dimensions), m_speed(speed), m_Rotation(0),
-      m_lastPosition(spawnPosition), m_currentDirection(LEFT), m_queuedDirection(m_currentDirection)
+Pacman::Pacman(Vector2Ex<float> spawnPosition, Vector2Ex<float> dimensions, float speed) :
+    RenderableObject(spawnPosition),
+    m_texture(game::GameApplication::Get().GetTexturesManager().GetTexture("pac-man")),
+    m_spawnPosition(spawnPosition),
+    m_dimensions(dimensions),
+    m_speed(speed),
+    m_Rotation(0),
+    m_lastPosition(spawnPosition),
+    m_currentDirection(LEFT),
+    m_queuedDirection(m_currentDirection)
 {
 }
 
@@ -157,7 +162,9 @@ void Pacman::Render(Vector2Ex<float> offset) const
     const float& textureHeight = static_cast<float>(m_texture->height);
 
     Rectangle sourceRect = {0.0f, 0.0f, textureWidth, textureHeight};
-    Rectangle destRect = {centerPosition.x + offset.x, centerPosition.y + offset.y, m_texture->width * scale,
+    Rectangle destRect = {centerPosition.x + offset.x,
+                          centerPosition.y + offset.y,
+                          m_texture->width * scale,
                           m_texture->height * scale};
 
     // Center of rotation (pivot)
