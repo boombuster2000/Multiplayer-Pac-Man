@@ -103,7 +103,7 @@ GameLayer::GameLayer() :
              Pacman(m_board.GetPlayerSpawnPoint(), m_board.GetTileDimensions(), 400)),
     m_speedy(m_board.GetSpeedyGhostSpawnPoint(),
              Vector2Ex<float>(100, 100),
-             {35, m_board.GetTileDimensions().y},
+             m_board.GetTileDimensions(),
              ui::Direction::RIGHT,
              game::GameApplication::Get().GetTexturesManager().GetTexture("speedy"))
 {
@@ -115,7 +115,7 @@ GameLayer::GameLayer(std::string_view boardPath) :
              Pacman(m_board.GetPlayerSpawnPoint(), m_board.GetTileDimensions(), 400)),
     m_speedy(m_board.GetSpeedyGhostSpawnPoint(),
              Vector2Ex<float>(100, 100),
-             {35, m_board.GetTileDimensions().y},
+             m_board.GetTileDimensions(),
              ui::Direction::RIGHT,
              game::GameApplication::Get().GetTexturesManager().GetTexture("speedy"))
 {
@@ -132,16 +132,16 @@ void GameLayer::HandleKeyPresses()
     const auto& inputManager = game::GameApplication::GetInputManager();
 
     if (inputManager.IsAction("move_up", engine::InputState::PRESSED))
-        m_player.GetPacman().QueueDirection(UP);
+        m_player.GetPacman().SetQueuedDirection(UP);
 
     if (inputManager.IsAction("move_down", engine::InputState::PRESSED))
-        m_player.GetPacman().QueueDirection(DOWN);
+        m_player.GetPacman().SetQueuedDirection(DOWN);
 
     if (inputManager.IsAction("move_left", engine::InputState::PRESSED))
-        m_player.GetPacman().QueueDirection(LEFT);
+        m_player.GetPacman().SetQueuedDirection(LEFT);
 
     if (inputManager.IsAction("move_right", engine::InputState::PRESSED))
-        m_player.GetPacman().QueueDirection(RIGHT);
+        m_player.GetPacman().SetQueuedDirection(RIGHT);
 
     if (IsKeyPressed(KEY_F1))
         m_board.SaveToFile();
@@ -158,7 +158,7 @@ void GameLayer::HandleCollisions(const float& deltaTime)
     using namespace ui;
 
     Vector2Ex<float> currentPosition = m_player.GetPacman().GetPositionAtAnchor();
-    Direction currentDirection = m_player.GetPacman().GetCurrentDirection();
+    Direction currentDirection = m_player.GetPacman().GetDirection();
 
     // Collect pellet at starting position
     CollectPelletAtPosition(currentPosition);
@@ -177,7 +177,7 @@ void GameLayer::HandleCollisions(const float& deltaTime)
     if (TryApplyQueuedDirection(currentPosition, currentDirection))
     {
         // Direction changed, update current direction for the pacman
-        currentDirection = m_player.GetPacman().GetCurrentDirection();
+        currentDirection = m_player.GetPacman().GetDirection();
     }
 
     if (totalDistance <= 0)
@@ -206,7 +206,7 @@ void GameLayer::HandleCollisions(const float& deltaTime)
             // Direction changed, update position and direction, then continue in new direction
             lastValidPosition = intermediatePosition;
             currentPosition = intermediatePosition;
-            currentDirection = m_player.GetPacman().GetCurrentDirection();
+            currentDirection = m_player.GetPacman().GetDirection();
             continue;
         }
 
