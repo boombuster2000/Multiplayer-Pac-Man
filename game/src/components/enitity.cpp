@@ -65,6 +65,11 @@ void Entity::SetQueuedDirection(const ui::Direction& direction)
     m_queuedDirection = direction;
 }
 
+void Entity::ApplyQueuedDirection()
+{
+    m_direction = m_queuedDirection;
+}
+
 Vector2Ex<float> Entity::GetDimensions() const
 {
     return m_dimensions;
@@ -83,6 +88,66 @@ std::shared_ptr<Texture2D> Entity::GetTexture() const
 void Entity::SetTexture(const std::shared_ptr<Texture2D>& texture)
 {
     m_texture = texture;
+}
+
+Vector2Ex<float> Entity::GetNextPosition(const ui::Direction& direction, const float deltaTime) const
+{
+    using enum ui::Direction;
+    Vector2Ex<float> nextPosition = GetPositionAtAnchor();
+
+    switch (direction)
+    {
+    case UP:
+        nextPosition.y -= m_speed.y * deltaTime;
+        break;
+
+    case DOWN:
+        nextPosition.y += m_speed.y * deltaTime;
+        break;
+
+    case LEFT:
+        nextPosition.x -= m_speed.x * deltaTime;
+        break;
+
+    case RIGHT:
+        nextPosition.x += m_speed.x * deltaTime;
+        break;
+
+    default:
+        break;
+    }
+
+    return nextPosition;
+}
+
+Vector2Ex<float> Entity::GetNextPositionWithStep(const ui::Direction& direction, const float step) const
+{
+    using enum ui::Direction;
+    Vector2Ex<float> nextPosition = GetPositionAtAnchor();
+
+    switch (direction)
+    {
+    case UP:
+        nextPosition.y -= step;
+        break;
+
+    case DOWN:
+        nextPosition.y += step;
+        break;
+
+    case LEFT:
+        nextPosition.x -= step;
+        break;
+
+    case RIGHT:
+        nextPosition.x += step;
+        break;
+
+    default:
+        break;
+    }
+
+    return nextPosition;
 }
 
 void Entity::Render(Vector2Ex<float> offset) const

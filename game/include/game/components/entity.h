@@ -38,13 +38,17 @@ class Entity : public ui::RenderableObject
     void SetDirection(const ui::Direction& direction);
 
     ui::Direction GetQueuedDirection() const;
-    void SetQueuedDirection(const ui::Direction& direction);
+    virtual void SetQueuedDirection(const ui::Direction& direction);
+    virtual void ApplyQueuedDirection();
 
     Vector2Ex<float> GetDimensions() const final;
     void SetDimensions(const Vector2Ex<float>& dimensions);
 
     std::shared_ptr<Texture2D> GetTexture() const;
     void SetTexture(const std::shared_ptr<Texture2D>& texture);
+
+    Vector2Ex<float> GetNextPosition(const ui::Direction& direction, const float deltaTime) const;
+    Vector2Ex<float> GetNextPositionWithStep(const ui::Direction& direction, const float step) const;
 
     void Render(Vector2Ex<float> offset = {0, 0}) const final;
 };
