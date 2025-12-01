@@ -38,12 +38,14 @@ void GameLayer::CollectPelletAtPosition(const Vector2Ex<float>& position)
     }
 }
 
-bool GameLayer::CanMoveInDirection(const Vector2Ex<float>& position, const ui::Direction& direction) const
+bool GameLayer::CanMoveInDirection(Entity* entity,
+                                   const Vector2Ex<float>& position,
+                                   const ui::Direction& direction) const
 {
     using namespace ui;
     using enum AnchorPoint;
     using enum Direction;
-    const Vector2Ex<float> pacmanDimensions = m_player.GetPacman().GetDimensions();
+    const Vector2Ex<float> pacmanDimensions = entity->GetDimensions();
 
     std::array<Vector2Ex<float>, 2> cornersToCheck;
 
@@ -77,9 +79,11 @@ bool GameLayer::CanMoveInDirection(const Vector2Ex<float>& position, const ui::D
     return true;
 }
 
-bool GameLayer::TryApplyQueuedDirection(Vector2Ex<float>& currentPosition, ui::Direction& currentDirection)
+bool GameLayer::TryApplyQueuedDirection(Entity* entity,
+                                        Vector2Ex<float>& currentPosition,
+                                        ui::Direction& currentDirection)
 {
-    ui::Direction queuedDir = m_player.GetPacman().GetQueuedDirection();
+    ui::Direction queuedDir = entity->GetQueuedDirection();
 
     if (queuedDir == currentDirection)
         return false;
@@ -87,9 +91,9 @@ bool GameLayer::TryApplyQueuedDirection(Vector2Ex<float>& currentPosition, ui::D
     const Vector2Ex<float> queuedVec = Vector2Ex<float>::GetDirectionVector(queuedDir);
     const Vector2Ex<float> peekPosition = currentPosition + queuedVec;
 
-    if (CanMoveInDirection(peekPosition, queuedDir))
+    if (CanMoveInDirection(entity, peekPosition, queuedDir))
     {
-        m_player.GetPacman().ApplyQueuedDirection();
+        entity->ApplyQueuedDirection();
         currentDirection = queuedDir;
         return true;
     }
@@ -102,7 +106,7 @@ GameLayer::GameLayer() :
     m_player(game::GameApplication::Get().GetProfile(),
              Pacman(m_board.GetPlayerSpawnPoint(), m_board.GetTileDimensions(), 400)),
     m_speedy(m_board.GetSpeedyGhostSpawnPoint(),
-             Vector2Ex<float>(100, 100),
+             Vector2Ex<float>(300, 300),
              m_board.GetTileDimensions(),
              ui::Direction::RIGHT,
              game::GameApplication::Get().GetTexturesManager().GetTexture("speedy"))
@@ -114,7 +118,7 @@ GameLayer::GameLayer(std::string_view boardPath) :
     m_player(game::GameApplication::Get().GetProfile(),
              Pacman(m_board.GetPlayerSpawnPoint(), m_board.GetTileDimensions(), 400)),
     m_speedy(m_board.GetSpeedyGhostSpawnPoint(),
-             Vector2Ex<float>(100, 100),
+             Vector2Ex<float>(300, 300),
              m_board.GetTileDimensions(),
              ui::Direction::RIGHT,
              game::GameApplication::Get().GetTexturesManager().GetTexture("speedy"))
@@ -153,18 +157,18 @@ void GameLayer::HandleKeyPresses()
     }
 }
 
-void GameLayer::HandleCollisions(const float& deltaTime)
+void GameLayer::HandleCollisions(Entity* entity, const float& deltaTime, const bool collectPellets)
 {
     using namespace ui;
 
-    Vector2Ex<float> currentPosition = m_player.GetPacman().GetPositionAtAnchor();
-    Direction currentDirection = m_player.GetPacman().GetDirection();
+    Vector2Ex<float> currentPosition = entity->GetPositionAtAnchor();
+    Direction currentDirection = entity->GetDirection();
 
     // Collect pellet at starting position
     CollectPelletAtPosition(currentPosition);
 
     // Calculate desired movement
-    const Vector2Ex<float> targetPosition = m_player.GetPacman().GetNextPosition(currentDirection, deltaTime);
+    const Vector2Ex<float> targetPosition = entity->GetNextPosition(currentDirection, deltaTime);
     const Vector2Ex<float> movementDelta = targetPosition - currentPosition;
 
     // Number of intermediate steps to check
@@ -174,15 +178,15 @@ void GameLayer::HandleCollisions(const float& deltaTime)
 
     // Try to apply queued direction at start if stationary or at current position
     float remainingDistance = totalDistance;
-    if (TryApplyQueuedDirection(currentPosition, currentDirection))
+    if (TryApplyQueuedDirection(entity, currentPosition, currentDirection))
     {
         // Direction changed, update current direction for the pacman
-        currentDirection = m_player.GetPacman().GetDirection();
+        currentDirection = entity->GetDirection();
     }
 
     if (totalDistance <= 0)
     {
-        m_player.GetPacman().SetPosition(currentPosition);
+        entity->SetPosition(currentPosition);
         return;
     }
 
@@ -199,19 +203,20 @@ void GameLayer::HandleCollisions(const float& deltaTime)
         Vector2Ex<float> intermediatePosition = currentPosition + (directionVector * stepSize);
 
         // Try to apply queued direction at this position
-        if (TryApplyQueuedDirection(intermediatePosition, currentDirection))
+        if (TryApplyQueuedDirection(entity, intermediatePosition, currentDirection))
         {
-            CollectPelletAtPosition(intermediatePosition);
+            if (collectPellets)
+                CollectPelletAtPosition(intermediatePosition);
 
             // Direction changed, update position and direction, then continue in new direction
             lastValidPosition = intermediatePosition;
             currentPosition = intermediatePosition;
-            currentDirection = m_player.GetPacman().GetDirection();
+            currentDirection = entity->GetDirection();
             continue;
         }
 
         // Check collision
-        if (!CanMoveInDirection(intermediatePosition, currentDirection))
+        if (!CanMoveInDirection(entity, intermediatePosition, currentDirection))
         {
             // Hit a wall, stop at last valid position
             break;
@@ -224,7 +229,7 @@ void GameLayer::HandleCollisions(const float& deltaTime)
         remainingDistance -= stepSize;
     }
 
-    m_player.GetPacman().SetPosition(lastValidPosition);
+    entity->SetPosition(lastValidPosition);
 }
 
 void GameLayer::UpdateHighscores()
@@ -246,7 +251,10 @@ void GameLayer::OnUpdate(float ts)
     }
 
     HandleKeyPresses();
-    HandleCollisions(ts);
+    HandleCollisions(&m_player.GetPacman(), ts, true);
+
+    m_speedy.UpdateQueuedDirection(m_player.GetPacman().GetPositionAtAnchor());
+    HandleCollisions(&m_speedy, ts, false);
 }
 
 void GameLayer::OnRender()

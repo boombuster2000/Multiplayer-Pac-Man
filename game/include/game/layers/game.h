@@ -4,9 +4,11 @@
 #include "engine/core/vector2ex.h"
 #include "engine/ui/enums.h"
 #include "game/components/board.h"
+#include "game/components/entity.h"
 #include "game/components/ghost_speedy.h"
 #include "game/components/pacman.h"
 #include "game/components/player.h"
+
 
 class GameLayer : public engine::Layer
 {
@@ -22,8 +24,8 @@ class GameLayer : public engine::Layer
   private:
     bool IsPacmanTouchingPellet(const Vector2Ex<float>& pacmanDimensions, const Vector2Ex<float>& pacmanPosition) const;
     void CollectPelletAtPosition(const Vector2Ex<float>& position);
-    bool CanMoveInDirection(const Vector2Ex<float>& position, const ui::Direction& direction) const;
-    bool TryApplyQueuedDirection(Vector2Ex<float>& currentPosition, ui::Direction& currentDirection);
+    bool CanMoveInDirection(Entity* entity, const Vector2Ex<float>& position, const ui::Direction& direction) const;
+    bool TryApplyQueuedDirection(Entity* entity, Vector2Ex<float>& currentPosition, ui::Direction& currentDirection);
     void RenderScores();
 
   public:
@@ -32,7 +34,7 @@ class GameLayer : public engine::Layer
     ~GameLayer() final;
 
     void HandleKeyPresses();
-    void HandleCollisions(const float& deltaTime);
+    void HandleCollisions(Entity* entity, const float& deltaTime, const bool collectPellets);
     void UpdateHighscores();
 
     void OnUpdate(float ts) final;
