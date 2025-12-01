@@ -9,7 +9,7 @@ Speedy::Speedy(const Vector2Ex<float>& spawnPosition,
 {
 }
 
-void Speedy::UpdateQueuedDirection(const float deltaTime, const Vector2Ex<float>& targetPosition)
+void Speedy::UpdateQueuedDirection(const Vector2Ex<float>& targetPosition)
 {
     Vector2Ex<float> currentPosition = GetPositionAtAnchor();
     Vector2Ex<float> directionToTarget = targetPosition - currentPosition;

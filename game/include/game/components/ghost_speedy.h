@@ -10,5 +10,5 @@ class Speedy : public Ghost
            const ui::Direction& direction,
            const std::shared_ptr<Texture2D>& texture);
 
-    void UpdateQueuedDirection(const float deltaTime, const Vector2Ex<float>& targetPosition) final;
+    void UpdateQueuedDirection(const Vector2Ex<float>& targetPosition) final;
 };
