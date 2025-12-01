@@ -1,15 +1,19 @@
-#include "game/components/ghost_speedy.h"
+#include "game/components/ghost_blinky.h"
+#include "game/game_application.h"
 
-Speedy::Speedy(const Vector2Ex<float>& spawnPosition,
+Blinky::Blinky(const Vector2Ex<float>& spawnPosition,
                const Vector2Ex<float>& speed,
                const Vector2Ex<float>& dimensions,
-               const ui::Direction& direction,
-               const std::shared_ptr<Texture2D>& texture) :
-    Ghost(spawnPosition, speed, dimensions, direction, texture)
+               const ui::Direction& direction) :
+    Ghost(spawnPosition,
+          speed,
+          dimensions,
+          direction,
+          game::GameApplication::Get().GetTexturesManager().GetTexture("blinky"))
 {
 }
 
-void Speedy::UpdateQueuedDirection(const Vector2Ex<float>& targetPosition)
+void Blinky::UpdateQueuedDirection(const Vector2Ex<float>& targetPosition)
 {
     Vector2Ex<float> currentPosition = GetPositionAtAnchor();
     Vector2Ex<float> directionToTarget = targetPosition - currentPosition;

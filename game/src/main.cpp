@@ -10,7 +10,7 @@ void LoadAllTextures()
     texturesManager.AddTexture("wall", FilePaths::s_texturesDirectory / "wall.png");
     texturesManager.AddTexture("path", FilePaths::s_texturesDirectory / "path.png");
     texturesManager.AddTexture("pac-man", FilePaths::s_texturesDirectory / "pac-man.png");
-    texturesManager.AddTexture("speedy", FilePaths::s_texturesDirectory / "speedy.png");
+    texturesManager.AddTexture("blinky", FilePaths::s_texturesDirectory / "blinky.png");
 }
 
 void LoadKeyBinds()

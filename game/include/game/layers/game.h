@@ -5,10 +5,9 @@
 #include "engine/ui/enums.h"
 #include "game/components/board.h"
 #include "game/components/entity.h"
-#include "game/components/ghost_speedy.h"
+#include "game/components/ghost_blinky.h"
 #include "game/components/pacman.h"
 #include "game/components/player.h"
-
 
 class GameLayer : public engine::Layer
 {
@@ -17,7 +16,7 @@ class GameLayer : public engine::Layer
     Board m_board;
     Player m_player;
     ui::Direction m_queuedDirection;
-    Speedy m_speedy;
+    Blinky m_blinky;
 
     float m_timePassedSinceLastSave = 0.0f;
 

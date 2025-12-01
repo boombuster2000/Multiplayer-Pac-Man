@@ -105,11 +105,10 @@ GameLayer::GameLayer() :
     m_board(),
     m_player(game::GameApplication::Get().GetProfile(),
              Pacman(m_board.GetPlayerSpawnPoint(), m_board.GetTileDimensions(), 400)),
-    m_speedy(m_board.GetSpeedyGhostSpawnPoint(),
+    m_blinky(m_board.GetSpeedyGhostSpawnPoint(),
              Vector2Ex<float>(300, 300),
              m_board.GetTileDimensions(),
-             ui::Direction::RIGHT,
-             game::GameApplication::Get().GetTexturesManager().GetTexture("speedy"))
+             ui::Direction::RIGHT)
 {
 }
 
@@ -117,11 +116,10 @@ GameLayer::GameLayer(std::string_view boardPath) :
     m_board(boardPath),
     m_player(game::GameApplication::Get().GetProfile(),
              Pacman(m_board.GetPlayerSpawnPoint(), m_board.GetTileDimensions(), 400)),
-    m_speedy(m_board.GetSpeedyGhostSpawnPoint(),
+    m_blinky(m_board.GetSpeedyGhostSpawnPoint(),
              Vector2Ex<float>(300, 300),
              m_board.GetTileDimensions(),
-             ui::Direction::RIGHT,
-             game::GameApplication::Get().GetTexturesManager().GetTexture("speedy"))
+             ui::Direction::RIGHT)
 {
 }
 
@@ -253,15 +251,15 @@ void GameLayer::OnUpdate(float ts)
     HandleKeyPresses();
     HandleCollisions(&m_player.GetPacman(), ts, true);
 
-    m_speedy.UpdateQueuedDirection(m_player.GetPacman().GetPositionAtAnchor());
-    HandleCollisions(&m_speedy, ts, false);
+    m_blinky.UpdateQueuedDirection(m_player.GetPacman().GetPositionAtAnchor());
+    HandleCollisions(&m_blinky, ts, false);
 }
 
 void GameLayer::OnRender()
 {
     m_board.Render();
     m_player.GetPacman().Render();
-    m_speedy.Render();
+    m_blinky.Render();
     RenderScores();
 }
 
