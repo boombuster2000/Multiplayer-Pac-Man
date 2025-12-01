@@ -15,5 +15,5 @@ class Ghost : public Entity
 
     virtual ~Ghost() = default;
 
-    virtual void UpdateQueuedDirection(const float deltaTime, const Vector2Ex<float>& targetPosition) = 0;
+    virtual void UpdateQueuedDirection(const Vector2Ex<float>& targetPosition) = 0;
 };
