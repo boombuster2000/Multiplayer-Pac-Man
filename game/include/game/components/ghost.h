@@ -1,7 +1,9 @@
+#include "board.h"
 #include "engine/core/vector2ex.h"
 #include "engine/ui/enums.h"
 #include "entity.h"
 #include "game/components/pacman.h"
+
 
 class Ghost : public Entity
 {
@@ -15,5 +17,5 @@ class Ghost : public Entity
 
     virtual ~Ghost() = default;
 
-    virtual void UpdateQueuedDirection(const Vector2Ex<float>& targetPosition) = 0;
+    virtual void UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& targetPosition) = 0;
 };
