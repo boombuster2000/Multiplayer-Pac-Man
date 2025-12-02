@@ -17,7 +17,7 @@ concept NumberLike = requires(T a, T b) {
     // Binary operators
     { a + b } -> std::convertible_to<T>;
     { a - b } -> std::convertible_to<T>;
-    { a* b } -> std::convertible_to<T>;
+    { a * b } -> std::convertible_to<T>;
     { a / b } -> std::convertible_to<T>;
     { a == b } -> std::convertible_to<bool>;
 
@@ -34,11 +34,15 @@ class Vector2Ex
 
   public:
     // Constructors/Deconstructors
-    constexpr Vector2Ex(T x = 0, T y = 0) : x(x), y(y)
+    constexpr Vector2Ex(T x = 0, T y = 0) :
+        x(x),
+        y(y)
     {
     }
 
-    constexpr Vector2Ex(const Vector2& v) : x(static_cast<T>(v.x)), y(static_cast<T>(v.y))
+    constexpr Vector2Ex(const Vector2& v) :
+        x(static_cast<T>(v.x)),
+        y(static_cast<T>(v.y))
     {
     }
 
@@ -50,63 +54,79 @@ class Vector2Ex
         return {static_cast<float>(x), static_cast<float>(y)};
     }
 
-    // Mathmatical Operators
-    constexpr Vector2Ex operator+(const Vector2Ex& o) const
+    // ---------------------------------------
+    // Cross-type binary operators
+    // ---------------------------------------
+    template <NumberLike U>
+    constexpr Vector2Ex operator+(const Vector2Ex<U>& o) const
     {
-        return {x + o.x, y + o.y};
+        return {static_cast<T>(x + o.x), static_cast<T>(y + o.y)};
     }
 
-    constexpr Vector2Ex operator-(const Vector2Ex& o) const
+    template <NumberLike U>
+    constexpr Vector2Ex operator-(const Vector2Ex<U>& o) const
     {
-        return {x - o.x, y - o.y};
+        return {static_cast<T>(x - o.x), static_cast<T>(y - o.y)};
     }
 
-    constexpr Vector2Ex operator*(const Vector2Ex& o) const
+    template <NumberLike U>
+    constexpr Vector2Ex operator*(const Vector2Ex<U>& o) const
     {
-        return {x * o.x, y * o.y};
+        return {static_cast<T>(x * o.x), static_cast<T>(y * o.y)};
     }
 
-    constexpr Vector2Ex operator/(const Vector2Ex& o) const
+    template <NumberLike U>
+    constexpr Vector2Ex operator/(const Vector2Ex<U>& o) const
     {
-        return {x / o.x, y / o.y};
+        return {static_cast<T>(x / o.x), static_cast<T>(y / o.y)};
     }
 
-    // Assignment operators
-    constexpr Vector2Ex& operator+=(const Vector2Ex& o)
+    // ---------------------------------------
+    // Cross-type assignment operators
+    // ---------------------------------------
+    template <NumberLike U>
+    constexpr Vector2Ex& operator+=(const Vector2Ex<U>& o)
     {
-        x += o.x;
-        y += o.y;
+        x = static_cast<T>(x + o.x); // why: avoid narrowing and allow U!=T
+        y = static_cast<T>(y + o.y);
         return *this;
     }
 
-    constexpr Vector2Ex& operator-=(const Vector2Ex& o)
+    template <NumberLike U>
+    constexpr Vector2Ex& operator-=(const Vector2Ex<U>& o)
     {
-        x -= o.x;
-        y -= o.y;
+        x = static_cast<T>(x - o.x);
+        y = static_cast<T>(y - o.y);
         return *this;
     }
 
-    constexpr Vector2Ex& operator*=(const Vector2Ex& o)
+    template <NumberLike U>
+    constexpr Vector2Ex& operator*=(const Vector2Ex<U>& o)
     {
-        x *= o.x;
-        y *= o.y;
+        x = static_cast<T>(x * o.x);
+        y = static_cast<T>(y * o.y);
         return *this;
     }
 
-    constexpr Vector2Ex& operator/=(const Vector2Ex& o)
+    template <NumberLike U>
+    constexpr Vector2Ex& operator/=(const Vector2Ex<U>& o)
     {
-        x /= o.x;
-        y /= o.y;
+        x = static_cast<T>(x / o.x);
+        y = static_cast<T>(y / o.y);
         return *this;
     }
 
+    // ---------------------------------------
     // Unary minus
+    // ---------------------------------------
     constexpr Vector2Ex operator-() const
     {
         return {-x, -y};
     }
 
-    // Comparison operators
+    // ---------------------------------------
+    // Comparison
+    // ---------------------------------------
     constexpr bool operator==(const Vector2Ex& o) const
     {
         return x == o.x && y == o.y;
@@ -117,7 +137,9 @@ class Vector2Ex
         return !(*this == o);
     }
 
-    // Scalar operators
+    // ---------------------------------------
+    // Scalar ops
+    // ---------------------------------------
     template <NumberLike U>
     constexpr Vector2Ex operator*(const U& scalar) const
     {
@@ -139,16 +161,17 @@ class Vector2Ex
         switch (direction)
         {
         case UP:
-            return {0, -1};
+            return {static_cast<T>(0), static_cast<T>(-1)};
         case DOWN:
-            return {0, 1};
+            return {static_cast<T>(0), static_cast<T>(1)};
         case LEFT:
-            return {-1, 0};
+            return {static_cast<T>(-1), static_cast<T>(0)};
         case RIGHT:
-            return {1, 0};
+            return {static_cast<T>(1), static_cast<T>(0)};
+
         default:
-            return {0, 0}; // neutral / no movement
-        }
+            return {static_cast<T>(0), static_cast<T>(0)}; // neutral / no movement
+        };
     }
 
     Vector2Ex<T> GetShiftedVector(const ui::Direction& directionOffset, const Vector2Ex<T>& offset) const
