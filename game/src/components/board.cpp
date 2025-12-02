@@ -75,9 +75,90 @@ const std::string& Board::GetName() const
     return m_name;
 }
 
-const std::unordered_map<Vector2Ex<size_t>, Node*>& Board::GetNodes() const
+const std::unordered_map<Vector2Ex<size_t>, Node*>& Board::GetNodeMap() const
 {
     return m_nodes;
+}
+
+std::vector<Node*> Board::GetNodes() const
+{
+    std::vector<Node*> nodes(m_nodes.size());
+
+    for (const auto& [_, node] : m_nodes)
+        nodes.push_back(node);
+
+    return nodes;
+}
+
+bool Board::HasLineOfSight(const Vector2Ex<float>& pos1, const Vector2Ex<float>& pos2) const
+{
+    Vector2Ex<float> line = pos2 - pos1;
+    float length = line.GetLength();
+
+    if (length == 0.0f)
+        return true;
+
+    Vector2Ex<float> direction = line / length;
+
+    // Walk along the line in small steps (e.g., 1 pixel at a time)
+    for (float i = 0.0f; i < length; i += 1.0f)
+    {
+        Vector2Ex<float> currentPoint = pos1 + direction * i;
+        const Tile& tile = GetTileFromPosition(currentPoint);
+        if (tile.GetType() == Tile::Type::WALL)
+            return false;
+    }
+
+    // Check the final point as well to be safe
+    const Tile& endTile = GetTileFromPosition(pos2);
+    if (endTile.GetType() == Tile::Type::WALL)
+        return false;
+
+    return true;
+}
+
+Node* Board::GetClosestNode(const Vector2Ex<float> position) const
+{
+    if (m_nodes.empty())
+    {
+        return nullptr;
+    }
+
+    Node* closestNode = nullptr;
+    float smallestDistanceSq = std::numeric_limits<float>::max();
+
+    for (const auto& [_, node] : m_nodes)
+    {
+        // Only consider nodes with a clear line of sight
+        if (!HasLineOfSight(position, node->GetPosition()))
+        {
+            continue;
+        }
+
+        float distanceSq = (position - node->GetPosition()).GetLengthSqr();
+        if (distanceSq < smallestDistanceSq)
+        {
+            smallestDistanceSq = distanceSq;
+            closestNode = node;
+        }
+    }
+
+    // Fallback: if no node has LOS, find the closest one regardless of walls.
+    // This can prevent entities from getting stuck if they are in a bad spot.
+    if (closestNode == nullptr)
+    {
+        for (const auto& [_, node] : m_nodes)
+        {
+            float distanceSq = (position - node->GetPosition()).GetLengthSqr();
+            if (distanceSq < smallestDistanceSq)
+            {
+                smallestDistanceSq = distanceSq;
+                closestNode = node;
+            }
+        }
+    }
+
+    return closestNode;
 }
 
 void Board::SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type)

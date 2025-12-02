@@ -31,6 +31,7 @@ class Board : public ui::Grid<Tile>
     void CreateNodes();
 
     bool IsTileJunction(const Vector2Ex<size_t>& index) const;
+    bool HasLineOfSight(const Vector2Ex<float>& pos1, const Vector2Ex<float>& pos2) const;
 
     Vector2Ex<size_t> GetIndexOfNextJunction(const Vector2Ex<size_t>& startIndex, const ui::Direction& direction) const;
 
@@ -42,7 +43,11 @@ class Board : public ui::Grid<Tile>
 
     const std::string& GetName() const;
 
-    const std::unordered_map<Vector2Ex<size_t>, Node*>& GetNodes() const;
+    const std::unordered_map<Vector2Ex<size_t>, Node*>& GetNodeMap() const;
+
+    std::vector<Node*> GetNodes() const;
+
+    Node* GetClosestNode(const Vector2Ex<float> position) const;
 
     Vector2Ex<float> GetPlayerSpawnPoint() const;
 
