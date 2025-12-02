@@ -1,11 +1,13 @@
 #include "game/components/entity.h"
 
-Entity::Entity(const Vector2Ex<float>& spawnPosition,
+Entity::Entity(const EntityType entityType,
+               const Vector2Ex<float>& spawnPosition,
                const Vector2Ex<float>& speed,
                const Vector2Ex<float>& dimensions,
                const ui::Direction& direction,
                const std::shared_ptr<Texture2D>& texture) :
     RenderableObject(spawnPosition),
+    m_entityType(entityType),
     m_spawnPosition(spawnPosition),
     m_speed(speed),
     m_dimensions(dimensions),
@@ -13,6 +15,11 @@ Entity::Entity(const Vector2Ex<float>& spawnPosition,
     m_queuedDirection(direction),
     m_texture(texture)
 {
+}
+
+EntityType Entity::GetEntityType() const
+{
+    return m_entityType;
 }
 
 Vector2Ex<float> Entity::GetSpawnPosition() const
