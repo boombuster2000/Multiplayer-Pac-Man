@@ -20,7 +20,8 @@ float Pacman::ConvertDirectionToRotation(const ui::Direction& direction) const
 }
 
 Pacman::Pacman(Vector2Ex<float> spawnPosition, Vector2Ex<float> dimensions, float speed) :
-    Entity(spawnPosition,
+    Entity(EntityType::PACMAN,
+           spawnPosition,
            Vector2Ex<float>(speed, speed),
            dimensions,
            ui::Direction::LEFT,
