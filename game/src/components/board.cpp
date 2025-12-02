@@ -20,47 +20,49 @@ Board::Board() :
     m_name("test-file")
 {
     using enum Tile::Type;
-    addBoundaries();
+    AddBoundaries();
 
     // Row 2 - top horizontal walls
-    for (int x : {2, 4, 5, 6, 7, 8, 9, 10, 11})
+    for (size_t x : {2, 4, 5, 6, 7, 8, 9, 10, 11})
         SetTileType({x, 2}, WALL);
 
     // Row 3 - vertical pillars
-    for (int x : {2, 11})
+    for (size_t x : {2, 11})
         SetTileType({x, 3}, WALL);
 
     // Row 4 - inner walls with gaps
-    for (int x : {2, 4, 5, 6, 7, 8, 9, 11})
+    for (size_t x : {2, 4, 5, 6, 7, 8, 9, 11})
         SetTileType({x, 4}, WALL);
 
     // Row 5 - ghost house top
-    for (int x : {0, 2, 4, 11})
+    for (size_t x : {0, 2, 4, 11})
         SetTileType({x, 5}, WALL);
 
     // Row 6 - ghost house sides
-    for (int x : {0, 2, 4, 5, 6, 7, 9, 11})
+    for (size_t x : {0, 2, 4, 5, 6, 7, 9, 11})
         SetTileType({x, 6}, WALL);
 
     // Row 7 - ghost house sides
-    for (int x : {0, 2, 4, 5, 6, 7, 9, 11})
+    for (size_t x : {0, 2, 4, 5, 6, 7, 9, 11})
         SetTileType({x, 7}, WALL);
 
     // Row 8 - ghost house bottom
-    for (int x : {0, 2, 4, 9, 11})
+    for (size_t x : {0, 2, 4, 9, 11})
         SetTileType({x, 8}, WALL);
 
     // Row 9 - inner walls with gaps
-    for (int x : {2, 4, 5, 6, 7, 8, 9, 11})
+    for (size_t x : {2, 4, 5, 6, 7, 8, 9, 11})
         SetTileType({x, 9}, WALL);
 
     // Row 10 - vertical pillars
-    for (int x : {2, 11})
+    for (size_t x : {2, 11})
         SetTileType({x, 10}, WALL);
 
     // Row 11 - bottom horizontal walls
-    for (int x : {2, 3, 4, 5, 6, 7, 8, 9, 11})
+    for (size_t x : {2, 3, 4, 5, 6, 7, 8, 9, 11})
         SetTileType({x, 11}, WALL);
+
+    CreateNodesAndArcs();
 }
 
 Board::Board(std::string_view filename)
@@ -73,7 +75,12 @@ const std::string& Board::GetName() const
     return m_name;
 }
 
-void Board::SetTileType(const Vector2Ex<int>& index, const Tile::Type& type)
+const std::unordered_map<Vector2Ex<size_t>, Node*>& Board::GetNodes() const
+{
+    return m_nodes;
+}
+
+void Board::SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type)
 {
     Grid::GetTile(index).SetType(type);
 }
@@ -160,7 +167,7 @@ Board Board::LoadFromFile(const std::filesystem::path& filepath)
     return Board::LoadFromFile(filepath.string());
 }
 
-void Board::addBoundaries()
+void Board::AddBoundaries()
 {
     using enum Tile::Type;
     const Vector2Ex<size_t>& boardSize = GetGridSize();
@@ -176,6 +183,108 @@ void Board::addBoundaries()
         GetTile(y, 0).SetType(WALL);
         GetTile(y, boardSize.x - 1).SetType(WALL);
     }
+}
+
+void Board::AddArcsToNode(Node* node, const Vector2Ex<size_t>& index)
+{
+    using enum ui::Direction;
+
+    // Connect to node on the RIGHT
+    Vector2Ex<size_t> rightIndex = GetIndexOfNextJunction(index, RIGHT);
+    if (rightIndex != index)
+    {
+        Node* rightNode = m_nodes.at(rightIndex);
+        node->SetRightArc({node, rightNode});
+    }
+
+    // Connect to node on the LEFT
+    Vector2Ex<size_t> leftIndex = GetIndexOfNextJunction(index, LEFT);
+    if (leftIndex != index)
+    {
+        Node* leftNode = m_nodes.at(leftIndex);
+        node->SetLeftArc({node, leftNode});
+    }
+
+    // Connect to node BELOW
+    Vector2Ex<size_t> downIndex = GetIndexOfNextJunction(index, DOWN);
+    if (downIndex != index)
+    {
+        Node* downNode = m_nodes.at(downIndex);
+        node->SetDownArc({node, downNode});
+    }
+
+    // Connect to node ABOVE
+    Vector2Ex<size_t> upIndex = GetIndexOfNextJunction(index, UP);
+    if (upIndex != index)
+    {
+        Node* upNode = m_nodes.at(upIndex);
+        node->SetUpArc({node, upNode});
+    }
+}
+
+void Board::CreateNodes()
+{
+    for (size_t y = 0; y < GetGridSize().y; y++)
+    {
+        for (size_t x = 0; x < GetGridSize().x; x++)
+        {
+            const Vector2Ex<size_t> index(x, y);
+            if (IsTileJunction(index))
+                m_nodes[index] = new Node(GetPositionFromIndex(index), index);
+        }
+    }
+}
+
+bool Board::IsTileJunction(const Vector2Ex<size_t>& index) const
+{
+    if (GetTile(index).GetType() != Tile::Type::PATH)
+    {
+        return false;
+    }
+
+    const auto isPath = [&](size_t y, size_t x) {
+        return IsValidIndex({x, y}) && GetTile({x, y}).GetType() == Tile::Type::PATH;
+    };
+
+    const bool up = isPath(index.y - 1, index.x);
+    const bool down = isPath(index.y + 1, index.x);
+    const bool left = isPath(index.y, index.x - 1);
+    const bool right = isPath(index.y, index.x + 1);
+
+    // It's a straight corridor if it has exactly two exits opposite each other.
+    const bool isHorizontalCorridor = left && right && !up && !down;
+    const bool isVerticalCorridor = up && down && !left && !right;
+
+    // A junction is any path tile that is NOT part of a straight corridor.
+    return !(isHorizontalCorridor || isVerticalCorridor) || (isHorizontalCorridor && isVerticalCorridor);
+}
+
+Vector2Ex<size_t> Board::GetIndexOfNextJunction(const Vector2Ex<size_t>& startIndex,
+                                                const ui::Direction& direction) const
+{
+    const Vector2Ex<int> step = Vector2Ex<int>::GetDirectionVector(direction);
+    Vector2Ex<size_t> steppedIndex = startIndex;
+
+    while (true)
+    {
+        steppedIndex += step;
+
+        const Tile& tile = GetTile(steppedIndex);
+
+        if (tile.GetType() == Tile::Type::WALL)
+            return steppedIndex - step; // hit a wall, return last valid
+
+        if (IsTileJunction(steppedIndex))
+            return steppedIndex; // found junction
+    }
+}
+
+void Board::CreateNodesAndArcs()
+{
+    CreateNodes();
+
+    for (auto const& [index, node] : m_nodes)
+        AddArcsToNode(node, index);
 }
 
 Vector2Ex<float> Board::GetPlayerSpawnPoint() const

@@ -1,8 +1,10 @@
 #pragma once
 #include "engine/core/vector2ex.h"
+#include "engine/core/vector2ex_hasher.h"
 #include "engine/ui/grid.h"
 #include "game/components/tile.h"
 #include "game/utils/highscore_utils.h"
+#include "node_system.h"
 #include <filesystem>
 #include <nlohmann/json.hpp>
 #include <string>
@@ -20,9 +22,19 @@ class Board : public ui::Grid<Tile>
   private:
     std::string m_name;
     HighscoreMap m_highScores;
+    std::unordered_map<Vector2Ex<size_t>, Node*> m_nodes;
 
   private:
-    void addBoundaries();
+    void AddBoundaries();
+
+    void AddArcsToNode(Node* node, const Vector2Ex<size_t>& index);
+    void CreateNodes();
+
+    bool IsTileJunction(const Vector2Ex<size_t>& index) const;
+
+    Vector2Ex<size_t> GetIndexOfNextJunction(const Vector2Ex<size_t>& startIndex, const ui::Direction& direction) const;
+
+    void CreateNodesAndArcs();
 
   public:
     Board();
@@ -30,11 +42,13 @@ class Board : public ui::Grid<Tile>
 
     const std::string& GetName() const;
 
+    const std::unordered_map<Vector2Ex<size_t>, Node*>& GetNodes() const;
+
     Vector2Ex<float> GetPlayerSpawnPoint() const;
 
     Vector2Ex<float> GetSpeedyGhostSpawnPoint() const;
 
-    void SetTileType(const Vector2Ex<int>& index, const Tile::Type& type);
+    void SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type);
 
     void SaveToFile() const;
 
