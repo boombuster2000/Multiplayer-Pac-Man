@@ -103,7 +103,7 @@ bool GameLayer::TryApplyQueuedDirection(Entity* entity,
 
 void GameLayer::RenderNodes() const
 {
-    const auto& nodes = m_board.GetNodes();
+    const auto& nodes = m_board.GetNodeMap();
     for (const auto& [index, node] : nodes)
     {
         DrawCircleV(node->GetPosition(), 5, RED);
@@ -272,7 +272,7 @@ void GameLayer::OnUpdate(float ts)
     HandleKeyPresses();
     HandleCollisions(&m_player.GetPacman(), ts, true);
 
-    m_blinky.UpdateQueuedDirection(m_player.GetPacman().GetPositionAtAnchor());
+    m_blinky.UpdateQueuedDirection(m_board, m_player.GetPacman().GetPositionAtAnchor());
     HandleCollisions(&m_blinky, ts, false);
 }
 
