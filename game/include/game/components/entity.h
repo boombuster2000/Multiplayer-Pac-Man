@@ -5,8 +5,15 @@
 #include "raylib.h"
 #include <memory>
 
+enum class EntityType
+{
+    PACMAN,
+    GHOST
+};
+
 class Entity : public ui::RenderableObject
 {
+    EntityType m_entityType;
     Vector2Ex<float> m_spawnPosition;
     Vector2Ex<float> m_speed;
     Vector2Ex<float> m_dimensions;
@@ -19,11 +26,14 @@ class Entity : public ui::RenderableObject
     Entity() = default;
 
   public:
-    Entity(const Vector2Ex<float>& spawnPosition,
+    Entity(const EntityType entityType,
+           const Vector2Ex<float>& spawnPosition,
            const Vector2Ex<float>& speed,
            const Vector2Ex<float>& dimensions,
            const ui::Direction& direction,
            const std::shared_ptr<Texture2D>& texture);
+
+    EntityType GetEntityType() const;
 
     Vector2Ex<float> GetSpawnPosition() const;
     void SetSpawnPosition(const Vector2Ex<float>& position);
