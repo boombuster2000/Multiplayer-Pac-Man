@@ -1,5 +1,6 @@
 #pragma once
 #include "engine/core/vector2ex.h"
+#include "entity.h"
 #include <vector>
 
 class Node;
@@ -9,6 +10,7 @@ class Arc
   private:
     Node* m_startNode = nullptr;
     Node* m_endNode = nullptr;
+    std::vector<Entity*> m_entities = {};
 
   public:
     Arc() = default;
@@ -16,6 +18,10 @@ class Arc
 
     Node* GetStartNode() const;
     Node* GetEndNode() const;
+    float GetLength() const;
+
+    const std::vector<Entity*>& GetEntities() const;
+    void AddEntity(Entity* entity);
 };
 
 class Node
@@ -46,6 +52,5 @@ class Node
     void SetDownArc(const Arc& arc);
 
     const Vector2Ex<float>& GetPosition() const;
-
     const Vector2Ex<size_t>& GetIndex() const;
 };
