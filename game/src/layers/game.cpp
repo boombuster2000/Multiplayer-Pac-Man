@@ -101,6 +101,27 @@ bool GameLayer::TryApplyQueuedDirection(Entity* entity,
     return false;
 }
 
+void GameLayer::RenderNodes() const
+{
+    const auto& nodes = m_board.GetNodes();
+    for (const auto& [index, node] : nodes)
+    {
+        DrawCircleV(node->GetPosition(), 5, RED);
+
+        const Arc& rightArc = node->GetRightArc();
+        if (rightArc.GetEndNode() != nullptr)
+        {
+            DrawLineV(rightArc.GetStartNode()->GetPosition(), rightArc.GetEndNode()->GetPosition(), BLUE);
+        }
+
+        const Arc& downArc = node->GetDownArc();
+        if (downArc.GetEndNode() != nullptr)
+        {
+            DrawLineV(downArc.GetStartNode()->GetPosition(), downArc.GetEndNode()->GetPosition(), BLUE);
+        }
+    }
+}
+
 GameLayer::GameLayer() :
     m_board(),
     m_player(game::GameApplication::Get().GetProfile(),
@@ -261,9 +282,10 @@ void GameLayer::OnRender()
     m_player.GetPacman().Render();
     m_blinky.Render();
     RenderScores();
+    RenderNodes();
 }
 
-void GameLayer::RenderScores()
+void GameLayer::RenderScores() const
 {
     const int currentPoints = m_player.GetPoints();
     std::string_view boardName = m_board.GetName();

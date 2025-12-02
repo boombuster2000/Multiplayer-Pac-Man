@@ -25,7 +25,8 @@ class GameLayer : public engine::Layer
     void CollectPelletAtPosition(const Vector2Ex<float>& position);
     bool CanMoveInDirection(Entity* entity, const Vector2Ex<float>& position, const ui::Direction& direction) const;
     bool TryApplyQueuedDirection(Entity* entity, Vector2Ex<float>& currentPosition, ui::Direction& currentDirection);
-    void RenderScores();
+    void RenderScores() const;
+    void RenderNodes() const;
 
   public:
     GameLayer();
