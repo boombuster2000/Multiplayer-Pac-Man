@@ -1,5 +1,15 @@
 #include "game/components/ghost_blinky.h"
+#include "engine/core/vector2ex_hasher.h"
+#include "engine/ui/enums.h"
+#include "game/components/node_system.h"
 #include "game/game_application.h"
+#include <array>
+#include <cmath>
+#include <functional>
+#include <limits>
+#include <queue>
+#include <unordered_map>
+#include <vector>
 
 Blinky::Blinky(const Vector2Ex<float>& spawnPosition,
                const Vector2Ex<float>& speed,
@@ -13,23 +23,93 @@ Blinky::Blinky(const Vector2Ex<float>& spawnPosition,
 {
 }
 
-void Blinky::UpdateQueuedDirection(const Vector2Ex<float>& targetPosition)
+void Blinky::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& targetPosition)
 {
-    Vector2Ex<float> currentPosition = GetPositionAtAnchor();
-    Vector2Ex<float> directionToTarget = targetPosition - currentPosition;
+    using enum ui::Direction;
 
-    if (std::abs(directionToTarget.x) > std::abs(directionToTarget.y))
+    Node* startNode = board.GetClosestNode(GetPositionAtAnchor());
+    Node* endNode = board.GetClosestNode(targetPosition);
+
+    if (!startNode || !endNode || startNode == endNode)
     {
-        if (directionToTarget.x > 0)
-            SetQueuedDirection(ui::Direction::RIGHT);
-        else
-            SetQueuedDirection(ui::Direction::LEFT);
+        return; // No path to calculate or already there
     }
-    else
+
+    const auto& nodes = board.GetNodes();
+    std::unordered_map<Node*, float> distances;
+    std::unordered_map<Node*, Node*> previous_nodes;
+    for (Node* node : nodes)
     {
-        if (directionToTarget.y > 0)
-            SetQueuedDirection(ui::Direction::DOWN);
-        else
-            SetQueuedDirection(ui::Direction::UP);
+        distances[node] = std::numeric_limits<float>::infinity();
+        previous_nodes[node] = nullptr;
+    }
+
+    distances[startNode] = 0.0f;
+
+    auto compare = [](const std::pair<float, Node*>& a, const std::pair<float, Node*>& b) { return a.first > b.first; };
+
+    std::priority_queue<std::pair<float, Node*>, std::vector<std::pair<float, Node*>>, decltype(compare)> pq(compare);
+
+    pq.push({0.0f, startNode});
+
+    while (!pq.empty())
+    {
+        Node* u = pq.top().second;
+        pq.pop();
+
+        if (u == endNode)
+        {
+            break; // Found the shortest path to the target
+        }
+
+        const std::array<const Arc*, 4> arcs = {&u->GetUpArc(), &u->GetDownArc(), &u->GetLeftArc(), &u->GetRightArc()};
+        for (const Arc* arc : arcs)
+        {
+            Node* v = arc->GetEndNode();
+            if (v)
+            {
+                float weight = arc->GetLength();
+                if (distances.count(u) && distances[u] != std::numeric_limits<float>::infinity() &&
+                    distances[u] + weight < distances[v])
+                {
+                    distances[v] = distances[u] + weight;
+                    previous_nodes[v] = u;
+                    pq.push({distances[v], v});
+                }
+            }
+        }
+    }
+
+    // Reconstruct path to find the next move
+    Node* crawl = endNode;
+    if (previous_nodes.find(crawl) == previous_nodes.end() && crawl != startNode)
+    {
+        return; // No path found
+    }
+
+    while (previous_nodes[crawl] != nullptr && previous_nodes[crawl] != startNode)
+    {
+        crawl = previous_nodes[crawl];
+    }
+
+    if (crawl && previous_nodes[crawl] == startNode)
+    {
+        // Determine direction from startNode to nextNode
+        if (crawl == startNode->GetUpArc().GetEndNode())
+        {
+            SetQueuedDirection(UP);
+        }
+        else if (crawl == startNode->GetDownArc().GetEndNode())
+        {
+            SetQueuedDirection(DOWN);
+        }
+        else if (crawl == startNode->GetLeftArc().GetEndNode())
+        {
+            SetQueuedDirection(LEFT);
+        }
+        else if (crawl == startNode->GetRightArc().GetEndNode())
+        {
+            SetQueuedDirection(RIGHT);
+        }
     }
 }
