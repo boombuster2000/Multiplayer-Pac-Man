@@ -127,7 +127,7 @@ GameLayer::GameLayer() :
     m_player(game::GameApplication::Get().GetProfile(),
              Pacman(m_board.GetPlayerSpawnPoint(), m_board.GetTileDimensions(), 400)),
     m_blinky(m_board.GetSpeedyGhostSpawnPoint(),
-             Vector2Ex<float>(300, 300),
+             Vector2Ex<float>(350, 350),
              m_board.GetTileDimensions(),
              ui::Direction::RIGHT)
 {
@@ -138,7 +138,7 @@ GameLayer::GameLayer(std::string_view boardPath) :
     m_player(game::GameApplication::Get().GetProfile(),
              Pacman(m_board.GetPlayerSpawnPoint(), m_board.GetTileDimensions(), 400)),
     m_blinky(m_board.GetSpeedyGhostSpawnPoint(),
-             Vector2Ex<float>(300, 300),
+             Vector2Ex<float>(350, 350),
              m_board.GetTileDimensions(),
              ui::Direction::RIGHT)
 {
