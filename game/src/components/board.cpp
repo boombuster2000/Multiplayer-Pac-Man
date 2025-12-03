@@ -316,6 +316,24 @@ void Board::CreateNodes()
     }
 }
 
+void Board::CreateDistanceMap()
+{
+    const std::vector<Node*> nodes = GetNodes();
+    for (const auto& currentNode : nodes)
+    {
+        m_distanceMap[currentNode][currentNode->GetUpArc().GetEndNode()] = currentNode->GetUpArc().GetLength();
+        m_distanceMap[currentNode][currentNode->GetDownArc().GetEndNode()] = currentNode->GetDownArc().GetLength();
+        m_distanceMap[currentNode][currentNode->GetLeftArc().GetEndNode()] = currentNode->GetLeftArc().GetLength();
+        m_distanceMap[currentNode][currentNode->GetRightArc().GetEndNode()] = currentNode->GetRightArc().GetLength();
+
+        for (const auto& node : nodes)
+        {
+            if (!m_distanceMap[currentNode].count(node))
+                m_distanceMap[currentNode][node] = std::numeric_limits<float>::infinity();
+        }
+    }
+}
+
 bool Board::IsTileJunction(const Vector2Ex<size_t>& index) const
 {
     if (GetTile(index).GetType() != Tile::Type::PATH)
@@ -366,6 +384,8 @@ void Board::CreateNodesAndArcs()
 
     for (auto const& [index, node] : m_nodes)
         AddArcsToNode(node, index);
+
+    CreateDistanceMap();
 }
 
 Vector2Ex<float> Board::GetPlayerSpawnPoint() const

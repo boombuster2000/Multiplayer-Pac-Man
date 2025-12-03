@@ -24,11 +24,15 @@ class Board : public ui::Grid<Tile>
     HighscoreMap m_highScores;
     std::unordered_map<Vector2Ex<size_t>, Node*> m_nodes;
 
+    std::unordered_map<Node*, std::unordered_map<Node*, float>> m_distanceMap;
+    // std::unordered_map<Node*, std::unordered_map<Node*, Node*>> m_routeTable;
+
   private:
     void AddBoundaries();
 
     void AddArcsToNode(Node* node, const Vector2Ex<size_t>& index);
     void CreateNodes();
+    void CreateDistanceMap();
 
     bool IsTileJunction(const Vector2Ex<size_t>& index) const;
     bool HasLineOfSight(const Vector2Ex<float>& pos1, const Vector2Ex<float>& pos2) const;
