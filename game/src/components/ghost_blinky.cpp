@@ -54,28 +54,31 @@ void Blinky::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& t
 
     while (!pq.empty())
     {
-        Node* u = pq.top().second;
+        Node* currentNode = pq.top().second;
         pq.pop();
 
-        if (u == endNode)
+        if (currentNode == endNode)
         {
             break; // Found the shortest path to the target
         }
 
-        const std::array<const Arc*, 4> arcs = {&u->GetUpArc(), &u->GetDownArc(), &u->GetLeftArc(), &u->GetRightArc()};
+        const std::array<const Arc*, 4> arcs = {&currentNode->GetUpArc(),
+                                                &currentNode->GetDownArc(),
+                                                &currentNode->GetLeftArc(),
+                                                &currentNode->GetRightArc()};
         for (const Arc* arc : arcs)
         {
-            Node* v = arc->GetEndNode();
-            if (v)
+            Node* endNode = arc->GetEndNode();
+            if (!endNode)
+                continue;
+
+            float weight = arc->GetLength();
+            if (distances.count(currentNode) && distances[currentNode] != std::numeric_limits<float>::infinity() &&
+                distances[currentNode] + weight < distances[endNode])
             {
-                float weight = arc->GetLength();
-                if (distances.count(u) && distances[u] != std::numeric_limits<float>::infinity() &&
-                    distances[u] + weight < distances[v])
-                {
-                    distances[v] = distances[u] + weight;
-                    previous_nodes[v] = u;
-                    pq.push({distances[v], v});
-                }
+                distances[endNode] = distances[currentNode] + weight;
+                previous_nodes[endNode] = currentNode;
+                pq.push({distances[endNode], endNode});
             }
         }
     }
