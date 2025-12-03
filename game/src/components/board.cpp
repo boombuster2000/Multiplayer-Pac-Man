@@ -316,20 +316,33 @@ void Board::CreateNodes()
     }
 }
 
-void Board::CreateDistanceMap()
+void Board::CreateDistanceTable()
 {
     const std::vector<Node*> nodes = GetNodes();
     for (const auto& currentNode : nodes)
     {
-        m_distanceMap[currentNode][currentNode->GetUpArc().GetEndNode()] = currentNode->GetUpArc().GetLength();
-        m_distanceMap[currentNode][currentNode->GetDownArc().GetEndNode()] = currentNode->GetDownArc().GetLength();
-        m_distanceMap[currentNode][currentNode->GetLeftArc().GetEndNode()] = currentNode->GetLeftArc().GetLength();
-        m_distanceMap[currentNode][currentNode->GetRightArc().GetEndNode()] = currentNode->GetRightArc().GetLength();
+        m_distanceTable[currentNode][currentNode->GetUpArc().GetEndNode()] = currentNode->GetUpArc().GetLength();
+        m_distanceTable[currentNode][currentNode->GetDownArc().GetEndNode()] = currentNode->GetDownArc().GetLength();
+        m_distanceTable[currentNode][currentNode->GetLeftArc().GetEndNode()] = currentNode->GetLeftArc().GetLength();
+        m_distanceTable[currentNode][currentNode->GetRightArc().GetEndNode()] = currentNode->GetRightArc().GetLength();
 
         for (const auto& node : nodes)
         {
-            if (!m_distanceMap[currentNode].count(node))
-                m_distanceMap[currentNode][node] = std::numeric_limits<float>::infinity();
+            if (!m_distanceTable[currentNode].count(node))
+                m_distanceTable[currentNode][node] = std::numeric_limits<float>::infinity();
+        }
+    }
+}
+
+void Board::CreateRouteTable()
+{
+    std::vector<Node*> nodes = GetNodes();
+
+    for (const auto& currentNode : nodes)
+    {
+        for (const auto& node : nodes)
+        {
+            m_routeTable[currentNode][node] = node;
         }
     }
 }
@@ -385,7 +398,7 @@ void Board::CreateNodesAndArcs()
     for (auto const& [index, node] : m_nodes)
         AddArcsToNode(node, index);
 
-    CreateDistanceMap();
+    CreateDistanceTable();
 }
 
 Vector2Ex<float> Board::GetPlayerSpawnPoint() const
