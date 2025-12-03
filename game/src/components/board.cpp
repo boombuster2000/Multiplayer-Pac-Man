@@ -77,17 +77,12 @@ const std::string& Board::GetName() const
 
 const std::unordered_map<Vector2Ex<size_t>, Node*>& Board::GetNodeMap() const
 {
-    return m_nodes;
+    return m_nodeMap;
 }
 
 std::vector<Node*> Board::GetNodes() const
 {
-    std::vector<Node*> nodes(m_nodes.size());
-
-    for (const auto& [_, node] : m_nodes)
-        nodes.push_back(node);
-
-    return nodes;
+    return m_nodes;
 }
 
 bool Board::HasLineOfSight(const Vector2Ex<float>& pos1, const Vector2Ex<float>& pos2) const
@@ -127,7 +122,7 @@ Node* Board::GetClosestNode(const Vector2Ex<float> position) const
     Node* closestNode = nullptr;
     float smallestDistanceSq = std::numeric_limits<float>::max();
 
-    for (const auto& [_, node] : m_nodes)
+    for (const auto& node : m_nodes)
     {
         // Only consider nodes with a clear line of sight
         if (!HasLineOfSight(position, node->GetPosition()))
@@ -147,7 +142,7 @@ Node* Board::GetClosestNode(const Vector2Ex<float> position) const
     // This can prevent entities from getting stuck if they are in a bad spot.
     if (closestNode == nullptr)
     {
-        for (const auto& [_, node] : m_nodes)
+        for (const auto& node : m_nodes)
         {
             float distanceSq = (position - node->GetPosition()).GetLengthSqr();
             if (distanceSq < smallestDistanceSq)
@@ -274,7 +269,7 @@ void Board::AddArcsToNode(Node* node, const Vector2Ex<size_t>& index)
     Vector2Ex<size_t> rightIndex = GetIndexOfNextJunction(index, RIGHT);
     if (rightIndex != index)
     {
-        Node* rightNode = m_nodes.at(rightIndex);
+        Node* rightNode = m_nodeMap.at(rightIndex);
         node->SetRightArc({node, rightNode});
     }
 
@@ -282,7 +277,7 @@ void Board::AddArcsToNode(Node* node, const Vector2Ex<size_t>& index)
     Vector2Ex<size_t> leftIndex = GetIndexOfNextJunction(index, LEFT);
     if (leftIndex != index)
     {
-        Node* leftNode = m_nodes.at(leftIndex);
+        Node* leftNode = m_nodeMap.at(leftIndex);
         node->SetLeftArc({node, leftNode});
     }
 
@@ -290,7 +285,7 @@ void Board::AddArcsToNode(Node* node, const Vector2Ex<size_t>& index)
     Vector2Ex<size_t> downIndex = GetIndexOfNextJunction(index, DOWN);
     if (downIndex != index)
     {
-        Node* downNode = m_nodes.at(downIndex);
+        Node* downNode = m_nodeMap.at(downIndex);
         node->SetDownArc({node, downNode});
     }
 
@@ -298,7 +293,7 @@ void Board::AddArcsToNode(Node* node, const Vector2Ex<size_t>& index)
     Vector2Ex<size_t> upIndex = GetIndexOfNextJunction(index, UP);
     if (upIndex != index)
     {
-        Node* upNode = m_nodes.at(upIndex);
+        Node* upNode = m_nodeMap.at(upIndex);
         node->SetUpArc({node, upNode});
     }
 }
@@ -311,25 +306,43 @@ void Board::CreateNodes()
         {
             const Vector2Ex<size_t> index(x, y);
             if (IsTileJunction(index))
-                m_nodes[index] = new Node(GetPositionFromIndex(index), index);
+            {
+                m_nodeMap[index] = new Node(GetPositionFromIndex(index), index);
+                m_nodes.push_back(m_nodeMap[index]);
+            }
         }
     }
 }
 
 void Board::CreateDistanceTable()
 {
-    const std::vector<Node*> nodes = GetNodes();
-    for (const auto& currentNode : nodes)
-    {
-        m_distanceTable[currentNode][currentNode->GetUpArc().GetEndNode()] = currentNode->GetUpArc().GetLength();
-        m_distanceTable[currentNode][currentNode->GetDownArc().GetEndNode()] = currentNode->GetDownArc().GetLength();
-        m_distanceTable[currentNode][currentNode->GetLeftArc().GetEndNode()] = currentNode->GetLeftArc().GetLength();
-        m_distanceTable[currentNode][currentNode->GetRightArc().GetEndNode()] = currentNode->GetRightArc().GetLength();
-
-        for (const auto& node : nodes)
+    auto fillCell = [](std::unordered_map<Node*, float>& cell, const Arc& arc) {
+        if (arc.GetEndNode() != nullptr)
         {
-            if (!m_distanceTable[currentNode].count(node))
-                m_distanceTable[currentNode][node] = std::numeric_limits<float>::infinity();
+            cell[arc.GetEndNode()] = arc.GetLength();
+        }
+    };
+
+    for (Node* currentNode : m_nodes)
+    {
+        std::unordered_map<Node*, float>& row = m_distanceTable[currentNode];
+
+        // Fill arc neighbors
+        fillCell(row, currentNode->GetUpArc());
+        fillCell(row, currentNode->GetDownArc());
+        fillCell(row, currentNode->GetLeftArc());
+        fillCell(row, currentNode->GetRightArc());
+
+        // Distance to itself
+        row[currentNode] = 0.f;
+
+        // All other nodes = ∞ unless filled
+        for (Node* node : m_nodes)
+        {
+            if (!row.count(node))
+            {
+                row[node] = std::numeric_limits<float>::infinity();
+            }
         }
     }
 }
@@ -395,7 +408,7 @@ void Board::CreateNodesAndArcs()
 {
     CreateNodes();
 
-    for (auto const& [index, node] : m_nodes)
+    for (auto const& [index, node] : m_nodeMap)
         AddArcsToNode(node, index);
 
     CreateDistanceTable();
