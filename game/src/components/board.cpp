@@ -156,6 +156,11 @@ Node* Board::GetClosestNode(const Vector2Ex<float> position) const
     return closestNode;
 }
 
+const NodeRouteTable& Board::GetRouteTable() const
+{
+    return m_routeTable;
+}
+
 void Board::SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type)
 {
     Grid::GetTile(index).SetType(type);
@@ -207,29 +212,22 @@ HighscoreMap Board::GetHighscores() const
 void Board::SetHighscore(std::string_view profileName, int score)
 {
     if (auto it = m_highScores.find(profileName); it != m_highScores.end())
-    {
         // Profile exists, update if score is higher
         if (score > it->second)
-        {
             it->second = score;
-        }
-    }
-    else
-    {
-        // Profile doesn't exist, insert new score
-        m_highScores.emplace(profileName, score);
-    }
+
+        else
+            // Profile doesn't exist, insert new score
+            m_highScores.emplace(profileName, score);
 }
 
 Board Board::LoadFromFile(const std::string& filename)
 {
     std::ifstream file(filename);
     if (!file.is_open())
-    {
         throw std::filesystem::filesystem_error("Failed to open file",
                                                 std::filesystem::path(filename),
                                                 std::error_code{});
-    }
 
     json j;
     file >> j;
@@ -318,9 +316,7 @@ void Board::CreateDistanceTable()
 {
     auto fillCell = [](std::unordered_map<Node*, float>& cell, const Arc& arc) {
         if (arc.GetEndNode() != nullptr)
-        {
             cell[arc.GetEndNode()] = arc.GetLength();
-        }
     };
 
     for (Node* currentNode : m_nodes)
@@ -349,13 +345,34 @@ void Board::CreateDistanceTable()
 
 void Board::CreateRouteTable()
 {
-    std::vector<Node*> nodes = GetNodes();
-
-    for (const auto& currentNode : nodes)
+    for (const auto& currentNode : m_nodes)
     {
-        for (const auto& node : nodes)
+        for (const auto& node : m_nodes)
         {
             m_routeTable[currentNode][node] = node;
+        }
+    }
+}
+
+void Board::Floyds()
+{
+    // row and col are the same
+
+    for (const auto& [node, _] : m_distanceTable)
+    {
+        for (const auto& [yNode, row] : m_distanceTable)
+        {
+            for (const auto& [xNode, distance] : row)
+            {
+                float x = m_distanceTable[node][xNode];
+                float y = m_distanceTable[yNode][node];
+                float z = m_distanceTable[yNode][xNode];
+                if (x + y < z)
+                {
+                    m_distanceTable[yNode][xNode] = x + y;
+                    m_routeTable[yNode][xNode] = node;
+                }
+            }
         }
     }
 }
@@ -412,6 +429,8 @@ void Board::CreateNodesAndArcs()
         AddArcsToNode(node, index);
 
     CreateDistanceTable();
+    CreateRouteTable();
+    Floyds();
 }
 
 Vector2Ex<float> Board::GetPlayerSpawnPoint() const
