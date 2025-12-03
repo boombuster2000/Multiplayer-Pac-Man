@@ -31,12 +31,47 @@ void Blinky::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& t
     Node* endNode = board.GetClosestNode(targetPosition);
     const NodeRouteTable& routeTable = board.GetRouteTable();
 
-    if (!startNode || !endNode || startNode == endNode)
+    // 1. Handle null nodes: If start or end node is invalid, cannot calculate path.
+    if (!startNode || !endNode)
     {
-        return; // No path to calculate or already there
+        return;
     }
 
     Node* nextNode = nullptr;
+
+    // 2. Handle case where ghost and Pacman are closest to the same node.
+    // In this scenario, the ghost should try to follow Pacman along an arc.
+    if (startNode == endNode)
+    {
+        // When ghost and Pac-Man are closest to the same node, use a simple "greedy"
+        // strategy: move in the direction that closes the largest distance. This is
+        // more robust than checking arcs and prevents the ghost from getting stuck.
+        const Vector2Ex<float> moveVector = targetPosition - GetPositionAtAnchor();
+
+        if (std::abs(moveVector.x) > std::abs(moveVector.y))
+        {
+            // Prioritize horizontal movement
+            if (moveVector.x > 0)
+                SetQueuedDirection(RIGHT);
+            else
+                SetQueuedDirection(LEFT);
+        }
+        else
+        {
+            // Prioritize vertical movement
+            if (moveVector.y > 0)
+            {
+                SetQueuedDirection(DOWN); // Y is +ve downwards in screen coordinates
+            }
+            else
+            {
+                SetQueuedDirection(UP);
+            }
+        }
+        return;
+    }
+
+    // 3. Standard pathfinding: startNode and endNode are different.
     Node* hop = routeTable.at(startNode).at(endNode);
 
     // The route table gives an intermediate node 'hop' on the path from start to end.
@@ -59,7 +94,7 @@ void Blinky::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& t
         nextNode = hop;
     }
 
-    // Determine direction from startNode to nextNode
+    // 4. Determine direction based on nextNode.
     if (nextNode == startNode->GetUpArc().GetEndNode())
     {
         SetQueuedDirection(UP);
