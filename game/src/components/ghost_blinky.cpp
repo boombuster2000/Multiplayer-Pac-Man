@@ -36,7 +36,28 @@ void Blinky::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& t
         return; // No path to calculate or already there
     }
 
-    Node* nextNode = routeTable.at(startNode).at(endNode);
+    Node* nextNode = nullptr;
+    Node* hop = routeTable.at(startNode).at(endNode);
+
+    // The route table gives an intermediate node 'hop' on the path from start to end.
+    // To find the actual 'nextNode' (the first step from 'startNode'), we must
+    // trace the path back.
+    if (hop == endNode)
+    {
+        // The algorithm indicates a direct path, so 'endNode' should be a neighbor.
+        nextNode = endNode;
+    }
+    else
+    {
+        // The path is multi-step. We recursively look up the intermediate node
+        // until we find the one that is on the direct path from startNode.
+        // That node is our first hop.
+        while (routeTable.at(startNode).at(hop) != hop)
+        {
+            hop = routeTable.at(startNode).at(hop);
+        }
+        nextNode = hop;
+    }
 
     // Determine direction from startNode to nextNode
     if (nextNode == startNode->GetUpArc().GetEndNode())
@@ -55,71 +76,4 @@ void Blinky::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& t
     {
         SetQueuedDirection(RIGHT);
     }
-
-    // const auto& nodes = board.GetNodes();
-    // std::unordered_map<Node*, float> distances;
-    // std::unordered_map<Node*, Node*> previous_nodes;
-    // for (Node* node : nodes)
-    // {
-    //     distances[node] = std::numeric_limits<float>::infinity();
-    //     previous_nodes[node] = nullptr;
-    // }
-
-    // distances[startNode] = 0.0f;
-
-    // auto compare = [](const std::pair<float, Node*>& a, const std::pair<float, Node*>& b) { return a.first > b.first;
-    // };
-
-    // std::priority_queue<std::pair<float, Node*>, std::vector<std::pair<float, Node*>>, decltype(compare)>
-    // pq(compare);
-
-    // pq.push({0.0f, startNode});
-
-    // while (!pq.empty())
-    // {
-    //     Node* currentNode = pq.top().second;
-    //     pq.pop();
-
-    //     if (currentNode == endNode)
-    //     {
-    //         break; // Found the shortest path to the target
-    //     }
-
-    //     const std::array<const Arc*, 4> arcs = {&currentNode->GetUpArc(),
-    //                                             &currentNode->GetDownArc(),
-    //                                             &currentNode->GetLeftArc(),
-    //                                             &currentNode->GetRightArc()};
-    //     for (const Arc* arc : arcs)
-    //     {
-    //         Node* endNode = arc->GetEndNode();
-    //         if (!endNode)
-    //             continue;
-
-    //         float weight = arc->GetLength();
-    //         if (distances.count(currentNode) && distances[currentNode] != std::numeric_limits<float>::infinity() &&
-    //             distances[currentNode] + weight < distances[endNode])
-    //         {
-    //             distances[endNode] = distances[currentNode] + weight;
-    //             previous_nodes[endNode] = currentNode;
-    //             pq.push({distances[endNode], endNode});
-    //         }
-    //     }
-    // }
-
-    // Reconstruct path to find the next move
-    // Node* crawl = endNode;
-    // if (previous_nodes.find(crawl) == previous_nodes.end() && crawl != startNode)
-    // {
-    //     return; // No path found
-    // }
-
-    // while (previous_nodes[crawl] != nullptr && previous_nodes[crawl] != startNode)
-    // {
-    //     crawl = previous_nodes[crawl];
-    // }
-
-    // if (crawl && previous_nodes[crawl] == startNode)
-    // {
-
-    // }
 }
