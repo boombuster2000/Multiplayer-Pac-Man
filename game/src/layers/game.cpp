@@ -183,8 +183,9 @@ void GameLayer::HandleCollisions(Entity* entity, const float& deltaTime, const b
     Vector2Ex<float> currentPosition = entity->GetPositionAtAnchor();
     Direction currentDirection = entity->GetDirection();
 
-    // Collect pellet at starting position
-    CollectPelletAtPosition(currentPosition);
+    // Collect pellet at starting
+    if (collectPellets)
+        CollectPelletAtPosition(currentPosition);
 
     // Calculate desired movement
     const Vector2Ex<float> targetPosition = entity->GetNextPosition(currentDirection, deltaTime);
@@ -242,7 +243,9 @@ void GameLayer::HandleCollisions(Entity* entity, const float& deltaTime, const b
         }
 
         // position is valid, collect pellets and continue
-        CollectPelletAtPosition(intermediatePosition);
+        if (collectPellets)
+            CollectPelletAtPosition(intermediatePosition);
+
         lastValidPosition = intermediatePosition;
         currentPosition = intermediatePosition;
         remainingDistance -= stepSize;
