@@ -77,17 +77,12 @@ const std::string& Board::GetName() const
 
 const std::unordered_map<Vector2Ex<size_t>, Node*>& Board::GetNodeMap() const
 {
-    return m_nodes;
+    return m_nodeMap;
 }
 
 std::vector<Node*> Board::GetNodes() const
 {
-    std::vector<Node*> nodes(m_nodes.size());
-
-    for (const auto& [_, node] : m_nodes)
-        nodes.push_back(node);
-
-    return nodes;
+    return m_nodes;
 }
 
 bool Board::HasLineOfSight(const Vector2Ex<float>& pos1, const Vector2Ex<float>& pos2) const
@@ -127,7 +122,7 @@ Node* Board::GetClosestNode(const Vector2Ex<float> position) const
     Node* closestNode = nullptr;
     float smallestDistanceSq = std::numeric_limits<float>::max();
 
-    for (const auto& [_, node] : m_nodes)
+    for (const auto& node : m_nodes)
     {
         // Only consider nodes with a clear line of sight
         if (!HasLineOfSight(position, node->GetPosition()))
@@ -147,7 +142,7 @@ Node* Board::GetClosestNode(const Vector2Ex<float> position) const
     // This can prevent entities from getting stuck if they are in a bad spot.
     if (closestNode == nullptr)
     {
-        for (const auto& [_, node] : m_nodes)
+        for (const auto& node : m_nodes)
         {
             float distanceSq = (position - node->GetPosition()).GetLengthSqr();
             if (distanceSq < smallestDistanceSq)
@@ -159,6 +154,11 @@ Node* Board::GetClosestNode(const Vector2Ex<float> position) const
     }
 
     return closestNode;
+}
+
+const NodeRouteTable& Board::GetRouteTable() const
+{
+    return m_routeTable;
 }
 
 void Board::SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type)
@@ -212,29 +212,22 @@ HighscoreMap Board::GetHighscores() const
 void Board::SetHighscore(std::string_view profileName, int score)
 {
     if (auto it = m_highScores.find(profileName); it != m_highScores.end())
-    {
         // Profile exists, update if score is higher
         if (score > it->second)
-        {
             it->second = score;
-        }
-    }
-    else
-    {
-        // Profile doesn't exist, insert new score
-        m_highScores.emplace(profileName, score);
-    }
+
+        else
+            // Profile doesn't exist, insert new score
+            m_highScores.emplace(profileName, score);
 }
 
 Board Board::LoadFromFile(const std::string& filename)
 {
     std::ifstream file(filename);
     if (!file.is_open())
-    {
         throw std::filesystem::filesystem_error("Failed to open file",
                                                 std::filesystem::path(filename),
                                                 std::error_code{});
-    }
 
     json j;
     file >> j;
@@ -274,7 +267,7 @@ void Board::AddArcsToNode(Node* node, const Vector2Ex<size_t>& index)
     Vector2Ex<size_t> rightIndex = GetIndexOfNextJunction(index, RIGHT);
     if (rightIndex != index)
     {
-        Node* rightNode = m_nodes.at(rightIndex);
+        Node* rightNode = m_nodeMap.at(rightIndex);
         node->SetRightArc({node, rightNode});
     }
 
@@ -282,7 +275,7 @@ void Board::AddArcsToNode(Node* node, const Vector2Ex<size_t>& index)
     Vector2Ex<size_t> leftIndex = GetIndexOfNextJunction(index, LEFT);
     if (leftIndex != index)
     {
-        Node* leftNode = m_nodes.at(leftIndex);
+        Node* leftNode = m_nodeMap.at(leftIndex);
         node->SetLeftArc({node, leftNode});
     }
 
@@ -290,7 +283,7 @@ void Board::AddArcsToNode(Node* node, const Vector2Ex<size_t>& index)
     Vector2Ex<size_t> downIndex = GetIndexOfNextJunction(index, DOWN);
     if (downIndex != index)
     {
-        Node* downNode = m_nodes.at(downIndex);
+        Node* downNode = m_nodeMap.at(downIndex);
         node->SetDownArc({node, downNode});
     }
 
@@ -298,7 +291,7 @@ void Board::AddArcsToNode(Node* node, const Vector2Ex<size_t>& index)
     Vector2Ex<size_t> upIndex = GetIndexOfNextJunction(index, UP);
     if (upIndex != index)
     {
-        Node* upNode = m_nodes.at(upIndex);
+        Node* upNode = m_nodeMap.at(upIndex);
         node->SetUpArc({node, upNode});
     }
 }
@@ -311,7 +304,75 @@ void Board::CreateNodes()
         {
             const Vector2Ex<size_t> index(x, y);
             if (IsTileJunction(index))
-                m_nodes[index] = new Node(GetPositionFromIndex(index), index);
+            {
+                m_nodeMap[index] = new Node(GetPositionFromIndex(index), index);
+                m_nodes.push_back(m_nodeMap[index]);
+            }
+        }
+    }
+}
+
+void Board::CreateDistanceTable()
+{
+    auto fillCell = [](std::unordered_map<Node*, float>& cell, const Arc& arc) {
+        if (arc.GetEndNode() != nullptr)
+            cell[arc.GetEndNode()] = arc.GetLength();
+    };
+
+    for (Node* currentNode : m_nodes)
+    {
+        std::unordered_map<Node*, float>& row = m_distanceTable[currentNode];
+
+        // Fill arc neighbors
+        fillCell(row, currentNode->GetUpArc());
+        fillCell(row, currentNode->GetDownArc());
+        fillCell(row, currentNode->GetLeftArc());
+        fillCell(row, currentNode->GetRightArc());
+
+        // Distance to itself
+        row[currentNode] = 0.f;
+
+        // All other nodes = ∞ unless filled
+        for (Node* node : m_nodes)
+        {
+            if (!row.count(node))
+            {
+                row[node] = std::numeric_limits<float>::infinity();
+            }
+        }
+    }
+}
+
+void Board::CreateRouteTable()
+{
+    for (const auto& currentNode : m_nodes)
+    {
+        for (const auto& node : m_nodes)
+        {
+            m_routeTable[currentNode][node] = node;
+        }
+    }
+}
+
+void Board::Floyds()
+{
+    // row and col are the same
+
+    for (const auto& [node, _] : m_distanceTable)
+    {
+        for (const auto& [yNode, row] : m_distanceTable)
+        {
+            for (const auto& [xNode, distance] : row)
+            {
+                float x = m_distanceTable[node][xNode];
+                float y = m_distanceTable[yNode][node];
+                float z = m_distanceTable[yNode][xNode];
+                if (x + y < z)
+                {
+                    m_distanceTable[yNode][xNode] = x + y;
+                    m_routeTable[yNode][xNode] = node;
+                }
+            }
         }
     }
 }
@@ -364,8 +425,12 @@ void Board::CreateNodesAndArcs()
 {
     CreateNodes();
 
-    for (auto const& [index, node] : m_nodes)
+    for (auto const& [index, node] : m_nodeMap)
         AddArcsToNode(node, index);
+
+    CreateDistanceTable();
+    CreateRouteTable();
+    Floyds();
 }
 
 Vector2Ex<float> Board::GetPlayerSpawnPoint() const

@@ -29,90 +29,86 @@ void Blinky::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& t
 
     Node* startNode = board.GetClosestNode(GetPositionAtAnchor());
     Node* endNode = board.GetClosestNode(targetPosition);
+    const NodeRouteTable& routeTable = board.GetRouteTable();
 
-    if (!startNode || !endNode || startNode == endNode)
+    // 1. Handle null nodes: If start or end node is invalid, cannot calculate path.
+    if (!startNode || !endNode)
     {
-        return; // No path to calculate or already there
+        return;
     }
 
-    const auto& nodes = board.GetNodes();
-    std::unordered_map<Node*, float> distances;
-    std::unordered_map<Node*, Node*> previous_nodes;
-    for (Node* node : nodes)
+    Node* nextNode = nullptr;
+
+    // 2. Handle case where ghost and Pacman are closest to the same node.
+    // In this scenario, the ghost should try to follow Pacman along an arc.
+    if (startNode == endNode)
     {
-        distances[node] = std::numeric_limits<float>::infinity();
-        previous_nodes[node] = nullptr;
-    }
+        // When ghost and Pac-Man are closest to the same node, use a simple "greedy"
+        // strategy: move in the direction that closes the largest distance. This is
+        // more robust than checking arcs and prevents the ghost from getting stuck.
+        const Vector2Ex<float> moveVector = targetPosition - GetPositionAtAnchor();
 
-    distances[startNode] = 0.0f;
-
-    auto compare = [](const std::pair<float, Node*>& a, const std::pair<float, Node*>& b) { return a.first > b.first; };
-
-    std::priority_queue<std::pair<float, Node*>, std::vector<std::pair<float, Node*>>, decltype(compare)> pq(compare);
-
-    pq.push({0.0f, startNode});
-
-    while (!pq.empty())
-    {
-        Node* currentNode = pq.top().second;
-        pq.pop();
-
-        if (currentNode == endNode)
+        if (std::abs(moveVector.x) > std::abs(moveVector.y))
         {
-            break; // Found the shortest path to the target
+            // Prioritize horizontal movement
+            if (moveVector.x > 0)
+                SetQueuedDirection(RIGHT);
+            else
+                SetQueuedDirection(LEFT);
         }
-
-        const std::array<const Arc*, 4> arcs = {&currentNode->GetUpArc(),
-                                                &currentNode->GetDownArc(),
-                                                &currentNode->GetLeftArc(),
-                                                &currentNode->GetRightArc()};
-        for (const Arc* arc : arcs)
+        else
         {
-            Node* endNode = arc->GetEndNode();
-            if (!endNode)
-                continue;
-
-            float weight = arc->GetLength();
-            if (distances.count(currentNode) && distances[currentNode] != std::numeric_limits<float>::infinity() &&
-                distances[currentNode] + weight < distances[endNode])
+            // Prioritize vertical movement
+            if (moveVector.y > 0)
             {
-                distances[endNode] = distances[currentNode] + weight;
-                previous_nodes[endNode] = currentNode;
-                pq.push({distances[endNode], endNode});
+                SetQueuedDirection(DOWN); // Y is +ve downwards in screen coordinates
+            }
+            else
+            {
+                SetQueuedDirection(UP);
             }
         }
+        return;
     }
 
-    // Reconstruct path to find the next move
-    Node* crawl = endNode;
-    if (previous_nodes.find(crawl) == previous_nodes.end() && crawl != startNode)
+    // 3. Standard pathfinding: startNode and endNode are different.
+    Node* hop = routeTable.at(startNode).at(endNode);
+
+    // The route table gives an intermediate node 'hop' on the path from start to end.
+    // To find the actual 'nextNode' (the first step from 'startNode'), we must
+    // trace the path back.
+    if (hop == endNode)
     {
-        return; // No path found
+        // The algorithm indicates a direct path, so 'endNode' should be a neighbor.
+        nextNode = endNode;
+    }
+    else
+    {
+        // The path is multi-step. We recursively look up the intermediate node
+        // until we find the one that is on the direct path from startNode.
+        // That node is our first hop.
+        while (routeTable.at(startNode).at(hop) != hop)
+        {
+            hop = routeTable.at(startNode).at(hop);
+        }
+        nextNode = hop;
     }
 
-    while (previous_nodes[crawl] != nullptr && previous_nodes[crawl] != startNode)
+    // 4. Determine direction based on nextNode.
+    if (nextNode == startNode->GetUpArc().GetEndNode())
     {
-        crawl = previous_nodes[crawl];
+        SetQueuedDirection(UP);
     }
-
-    if (crawl && previous_nodes[crawl] == startNode)
+    else if (nextNode == startNode->GetDownArc().GetEndNode())
     {
-        // Determine direction from startNode to nextNode
-        if (crawl == startNode->GetUpArc().GetEndNode())
-        {
-            SetQueuedDirection(UP);
-        }
-        else if (crawl == startNode->GetDownArc().GetEndNode())
-        {
-            SetQueuedDirection(DOWN);
-        }
-        else if (crawl == startNode->GetLeftArc().GetEndNode())
-        {
-            SetQueuedDirection(LEFT);
-        }
-        else if (crawl == startNode->GetRightArc().GetEndNode())
-        {
-            SetQueuedDirection(RIGHT);
-        }
+        SetQueuedDirection(DOWN);
+    }
+    else if (nextNode == startNode->GetLeftArc().GetEndNode())
+    {
+        SetQueuedDirection(LEFT);
+    }
+    else if (nextNode == startNode->GetRightArc().GetEndNode())
+    {
+        SetQueuedDirection(RIGHT);
     }
 }

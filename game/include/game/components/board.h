@@ -12,6 +12,8 @@
 #include <unordered_map>
 
 using game::highscore_utils::HighscoreMap;
+using NodeDistanceTable = std::unordered_map<Node*, std::unordered_map<Node*, float>>;
+using NodeRouteTable = std::unordered_map<Node*, std::unordered_map<Node*, Node*>>;
 using nlohmann::json;
 
 class Board : public ui::Grid<Tile>
@@ -22,13 +24,20 @@ class Board : public ui::Grid<Tile>
   private:
     std::string m_name;
     HighscoreMap m_highScores;
-    std::unordered_map<Vector2Ex<size_t>, Node*> m_nodes;
+    std::unordered_map<Vector2Ex<size_t>, Node*> m_nodeMap;
+    std::vector<Node*> m_nodes;
+
+    NodeDistanceTable m_distanceTable;
+    NodeRouteTable m_routeTable;
 
   private:
     void AddBoundaries();
 
     void AddArcsToNode(Node* node, const Vector2Ex<size_t>& index);
     void CreateNodes();
+    void CreateDistanceTable();
+    void CreateRouteTable();
+    void Floyds();
 
     bool IsTileJunction(const Vector2Ex<size_t>& index) const;
     bool HasLineOfSight(const Vector2Ex<float>& pos1, const Vector2Ex<float>& pos2) const;
@@ -48,6 +57,8 @@ class Board : public ui::Grid<Tile>
     std::vector<Node*> GetNodes() const;
 
     Node* GetClosestNode(const Vector2Ex<float> position) const;
+
+    const NodeRouteTable& GetRouteTable() const;
 
     Vector2Ex<float> GetPlayerSpawnPoint() const;
 

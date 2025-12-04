@@ -49,7 +49,7 @@ int main()
     appSpec.name = "Pac-Man";
     appSpec.width = 1280;
     appSpec.height = 720;
-    appSpec.targetFPS = 120;
+    appSpec.targetFPS = 0;
     appSpec.programExitKey = KEY_NULL;
 
     game::GameApplication application(appSpec);
