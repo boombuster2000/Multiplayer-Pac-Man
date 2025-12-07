@@ -1,30 +1,113 @@
 #include "game/layers/player_join.h"
+
+#include "engine/ui/text_menu_option.h"
+#include "engine/ui/text_style.h"
 #include "game/components/client.h"
 #include "game/components/player.h"
+#include "game/file_paths.h"
 #include "game/game_application.h"
+#include "game/layers/create_profile.h"
 #include "game/layers/game.h"
+#include "game/serialization/profile_json.hpp"
+#include "game/utils/file_utils.h"
+#include "nlohmann/json.hpp"
 #include "raylib.h"
 #include <format>
+#include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
-void PlayerJoinLayer::AddJoiningPlayer(PlayerInput* controls)
+void PlayerJoinLayer::RebuildPlayerMenus()
 {
-    JoiningPlayer joiningPlayer;
-    if (!m_isFirstPlayerJoined) // Assigns the already loaded profile to controller device
+    const int joiningPlayersCount = m_joiningPlayers.size();
+    const int screenDivisions = GetScreenDivisions(joiningPlayersCount);
+
+    float fontSize = 30.f;
+    if (screenDivisions >= 4)
     {
-        joiningPlayer.profile = game::GameApplication::Get().GetProfile();
-        joiningPlayer.inputControls = controls;
-        joiningPlayer.state = ReadyState::READY;
-        m_isFirstPlayerJoined = true;
+        fontSize = 15.f;
     }
-    else // Need to split screen and allow player to select or create a profile.
+    else if (screenDivisions == 2)
     {
-        joiningPlayer.inputControls = controls;
-        joiningPlayer.state = ReadyState::SELECTING_PROFILE;
+        fontSize = 20.f;
+    }
+    const float spacing = fontSize * 1.2f;
+
+    ui::TextStyle unselectedStyle;
+    unselectedStyle.fontSize = fontSize;
+    unselectedStyle.color = LIGHTGRAY;
+
+    ui::TextStyle selectedStyle;
+    selectedStyle.fontSize = fontSize;
+    selectedStyle.color = GOLD;
+
+    std::set<std::string> takenUsernames;
+    for (const auto& p : m_joiningPlayers)
+    {
+        if (p.profile && !p.profile->GetUsername().empty())
+        {
+            takenUsernames.insert(std::string(p.profile->GetUsername()));
+        }
     }
 
-    m_joiningPlayers.push_back(joiningPlayer);
+    const auto profileJsons = game::file_utils::ReadJsonsFromDirectory(FilePaths::s_profilesDirectory);
+
+    for (auto& player : m_joiningPlayers)
+    {
+        if (player.state == ReadyState::SELECTING_PROFILE)
+        {
+            player.profileSelectionMenu.SetSpacing(spacing);
+            player.profileSelectionMenu.ClearOptions();
+
+            for (const auto& profileJson : profileJsons)
+            {
+                auto profile = std::make_shared<Profile>(profileJson.get<Profile>());
+
+                if (takenUsernames.find(std::string(profile->GetUsername())) == takenUsernames.end())
+                {
+                    auto option = std::make_unique<ui::TextMenuOption>(
+                        std::string(profile->GetUsername()), selectedStyle, unselectedStyle, false,
+                        [this, &player, profile]() {
+                            player.profile = profile;
+                            player.state = ReadyState::READY;
+                            RebuildPlayerMenus();
+                        });
+                    player.profileSelectionMenu.AddOption(std::move(option));
+                }
+            }
+
+            auto createOption = std::make_unique<ui::TextMenuOption>(
+                "Create New Profile", selectedStyle, unselectedStyle, false, [this, &player]() {
+                    static int newPlayerId = 1;
+                    std::string newUsername = "NewPlayer" + std::to_string(newPlayerId++);
+                    
+                    // A more robust solution would check for username uniqueness on disk too
+                    
+                    player.profile = std::make_shared<Profile>(newUsername);
+                    player.profile->Save();
+                    player.state = ReadyState::READY;
+                    RebuildPlayerMenus();
+                });
+            player.profileSelectionMenu.AddOption(std::move(createOption));
+        }
+    }
+}
+
+void PlayerJoinLayer::AddJoiningPlayer(PlayerInput* controls)
+{
+    m_joiningPlayers.emplace_back(controls);
+    auto& joiningPlayer = m_joiningPlayers.back();
+
+    if (!m_isFirstPlayerJoined)
+    {
+        joiningPlayer.profile = game::GameApplication::Get().GetProfile();
+        joiningPlayer.state = ReadyState::READY;
+        m_isFirstPlayerJoined = true;
+        return;
+    }
+
+    RebuildPlayerMenus();
 }
 
 int PlayerJoinLayer::GetScreenDivisions(const int playerCount) const
@@ -35,25 +118,52 @@ int PlayerJoinLayer::GetScreenDivisions(const int playerCount) const
     return playerCount;
 }
 
-PlayerJoinLayer::PlayerJoinLayer(std::string_view boardFilePath) :
-    m_boardPath(boardFilePath)
+PlayerJoinLayer::PlayerJoinLayer(std::string_view boardFilePath) : m_boardPath(boardFilePath)
 {
+    m_joiningPlayers.reserve(4);
 }
+
 
 void PlayerJoinLayer::OnUpdate(float ts)
 {
-
+    // Check for new players joining
     // KEYBOARD CONTROLS
     if (IsKeyPressed(KEY_W))
     {
-        PlayerInput* inputControls = new KeyboardPlayerInput(KEY_W, KEY_S, KEY_A, KEY_D);
-        AddJoiningPlayer(inputControls);
+        auto newInput = std::make_unique<KeyboardPlayerInput>(KEY_W, KEY_S, KEY_A, KEY_D, KEY_LEFT_SHIFT);
+        bool alreadyExists = false;
+        for (const auto& player : m_joiningPlayers)
+        {
+            if (player.inputControls && player.inputControls->IsEqual(newInput.get()))
+            {
+                alreadyExists = true;
+                break;
+            }
+        }
+
+        if (!alreadyExists)
+        {
+            AddJoiningPlayer(newInput.release());
+        }
     }
 
     if (IsKeyPressed(KEY_UP))
     {
-        PlayerInput* inputControls = new KeyboardPlayerInput(KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
-        AddJoiningPlayer(inputControls);
+        auto newInput = std::make_unique<KeyboardPlayerInput>(KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_RIGHT_SHIFT);
+        bool alreadyExists = false;
+        for (const auto& player : m_joiningPlayers)
+        {
+            if (player.inputControls && player.inputControls->IsEqual(newInput.get()))
+            {
+                alreadyExists = true;
+                break;
+            }
+        }
+
+        if (!alreadyExists)
+        {
+            AddJoiningPlayer(newInput.release());
+        }
     }
 
     // GAMEPAD CONTROLS
@@ -61,42 +171,73 @@ void PlayerJoinLayer::OnUpdate(float ts)
 
     for (int controllerID = 0; controllerID < numberOfControllers; controllerID++)
     {
-        // if (!IsGamepadAvailable(controllerID))
-        //     continue;
+        if (IsGamepadAvailable(controllerID) && IsGamepadButtonPressed(controllerID, GAMEPAD_BUTTON_MIDDLE_LEFT))
+        {
+            auto newInput = std::make_unique<GamepadPlayerInput>(controllerID,
+                                                                 GAMEPAD_BUTTON_LEFT_FACE_UP,
+                                                                 GAMEPAD_BUTTON_LEFT_FACE_DOWN,
+                                                                 GAMEPAD_BUTTON_LEFT_FACE_LEFT,
+                                                                 GAMEPAD_BUTTON_LEFT_FACE_RIGHT,
+                                                                 GAMEPAD_BUTTON_RIGHT_FACE_DOWN);
+            bool alreadyExists = false;
+            for (const auto& player : m_joiningPlayers)
+            {
+                if (player.inputControls && player.inputControls->IsEqual(newInput.get()))
+                {
+                    alreadyExists = true;
+                    break;
+                }
+            }
 
-        if (!IsGamepadButtonPressed(controllerID, GAMEPAD_BUTTON_MIDDLE_LEFT))
-            continue;
+            if (!alreadyExists)
+            {
+                AddJoiningPlayer(newInput.release());
+            }
+        }
+    }
 
-        PlayerInput* inputControls = new GamepadPlayerInput(controllerID,
-                                                            GAMEPAD_BUTTON_LEFT_FACE_UP,
-                                                            GAMEPAD_BUTTON_LEFT_FACE_DOWN,
-                                                            GAMEPAD_BUTTON_LEFT_FACE_LEFT,
-                                                            GAMEPAD_BUTTON_LEFT_FACE_RIGHT);
-        AddJoiningPlayer(inputControls);
+    // Update existing joining players
+    for (auto& player : m_joiningPlayers)
+    {
+        if (player.state == ReadyState::SELECTING_PROFILE)
+        {
+            if (player.inputControls->IsUpPressed())
+            {
+                player.profileSelectionMenu.SelectPrevious();
+            }
+            if (player.inputControls->IsDownPressed())
+            {
+                player.profileSelectionMenu.SelectNext();
+            }
+            if (player.inputControls->IsActionPressed())
+            {
+                player.profileSelectionMenu.ConfirmSelection();
+            }
+        }
     }
 
     // STARTING GAME
-
     if (IsKeyPressed(KEY_ENTER))
     {
         std::vector<Client> clients;
 
         for (auto& joiningPlayer : m_joiningPlayers)
         {
-            Client client = {
-                joiningPlayer.profile,
-                Player(),
-                joiningPlayer.pacman,
-                joiningPlayer.inputControls,
-            };
+            if (joiningPlayer.state != ReadyState::READY)
+                return; // Do not start if not all players are ready
+
+            Client client = {joiningPlayer.profile, Player(), joiningPlayer.pacman, joiningPlayer.inputControls};
 
             clients.push_back(client);
         }
 
-        if (m_boardPath == "built-in")
-            TransistionTo(std::make_unique<GameLayer>(clients));
-        else
-            TransistionTo(std::make_unique<GameLayer>(clients, m_boardPath));
+        if (!clients.empty())
+        {
+            if (m_boardPath == "built-in")
+                TransistionTo(std::make_unique<GameLayer>(clients));
+            else
+                TransistionTo(std::make_unique<GameLayer>(clients, m_boardPath));
+        }
     }
 }
 
@@ -144,7 +285,7 @@ void PlayerJoinLayer::OnRender()
 
         if (i < joiningPlayersCount)
         {
-            const auto& player = m_joiningPlayers[i];
+            auto& player = m_joiningPlayers[i];
             const int fontSize = 30;
             std::string line1, line2;
             Color color1 = RAYWHITE;
@@ -158,37 +299,32 @@ void PlayerJoinLayer::OnRender()
                 {
                     line2 = std::format("Profile: {}", player.profile->GetUsername());
                 }
+
+                {
+                    const int textWidth1 = MeasureText(line1.c_str(), fontSize);
+                    DrawText(line1.c_str(),
+                             rect.x + rect.width / 2 - textWidth1 / 2,
+                             rect.y + rect.height / 2 - fontSize,
+                             fontSize,
+                             color1);
+
+                    const int textWidth2 = MeasureText(line2.c_str(), fontSize - 10);
+                    DrawText(line2.c_str(),
+                             rect.x + rect.width / 2 - textWidth2 / 2,
+                             rect.y + rect.height / 2 + (fontSize - 10),
+                             fontSize - 10,
+                             color2);
+                }
                 break;
             case ReadyState::SELECTING_PROFILE:
-                line1 = "Player " + std::to_string(i + 1);
-                line2 = "SELECTING PROFILE";
+                player.profileSelectionMenu.SetPosition({rect.x + rect.width / 2, rect.y + rect.height / 2});
+                if (player.profileSelectionMenu.IsUIUpdateNeeded())
+                {
+                    player.profileSelectionMenu.UpdateOptionsAnchorPointPositions();
+                }
+                player.profileSelectionMenu.Render();
                 break;
             }
-
-            const int textWidth1 = MeasureText(line1.c_str(), fontSize);
-            DrawText(line1.c_str(),
-                     rect.x + rect.width / 2 - textWidth1 / 2,
-                     rect.y + rect.height / 2 - fontSize,
-                     fontSize,
-                     color1);
-
-            const int textWidth2 = MeasureText(line2.c_str(), fontSize - 10);
-            DrawText(line2.c_str(),
-                     rect.x + rect.width / 2 - textWidth2 / 2,
-                     rect.y + rect.height / 2 + (fontSize - 10),
-                     fontSize - 10,
-                     color2);
-        }
-        else
-        {
-            const char* text = "Waiting for player...";
-            const int fontSize = 20;
-            const int textWidth = MeasureText(text, fontSize);
-            DrawText(text,
-                     rect.x + rect.width / 2 - textWidth / 2,
-                     rect.y + rect.height / 2 - fontSize / 2,
-                     fontSize,
-                     DARKGRAY);
         }
     }
 }
