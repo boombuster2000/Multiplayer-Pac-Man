@@ -17,7 +17,7 @@ concept NumberLike = requires(T a, T b) {
     // Binary operators
     { a + b } -> std::convertible_to<T>;
     { a - b } -> std::convertible_to<T>;
-    { a* b } -> std::convertible_to<T>;
+    { a * b } -> std::convertible_to<T>;
     { a / b } -> std::convertible_to<T>;
     { a == b } -> std::convertible_to<bool>;
 
@@ -182,6 +182,15 @@ class Vector2Ex
     T GetLengthSqr() const
     {
         return x * x + y * y;
+    }
+
+    Vector2Ex<T> GetUnitVector() const
+    {
+        T len = GetLength();
+        if (len == static_cast<T>(0))
+            return {0, 0}; // avoid division by zero
+
+        return {x / len, y / len};
     }
 
     Vector2Ex<T> GetShiftedVector(const ui::Direction& directionOffset, const Vector2Ex<T>& offset) const
