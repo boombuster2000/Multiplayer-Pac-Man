@@ -91,6 +91,7 @@ void Blinky::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& t
         {
             hop = routeTable.at(startNode).at(hop);
         }
+
         nextNode = hop;
     }
 
