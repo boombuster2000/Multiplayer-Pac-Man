@@ -7,6 +7,7 @@
 #include <array>
 #include <format>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
 
@@ -22,7 +23,7 @@ bool GameLayer::IsPacmanTouchingPellet(const Pellet& pellet,
     return CheckCollisionRecs(pacmanRec, pelletRec);
 }
 
-bool GameLayer::TryCollectPellet(Player* player,
+bool GameLayer::TryCollectPellet(Player& player,
                                  const Vector2Ex<float>& pacmanPosition,
                                  const Vector2Ex<float>& pacmanDimensions,
                                  Pellet& pellet)
@@ -31,14 +32,14 @@ bool GameLayer::TryCollectPellet(Player* player,
         return false;
 
     int pointsGained = pellet.GetValue();
-    player->AddPoints(pointsGained);
+    player.AddPoints(pointsGained);
     UpdateHighscores();
     pellet.SetType(Pellet::Type::NONE);
 
     return pointsGained > 0;
 }
 
-bool GameLayer::TryCollectPellet(Player* player,
+bool GameLayer::TryCollectPellet(Player& player,
                                  const Vector2Ex<float>& pacmanPosition,
                                  const Vector2Ex<float>& pacmanDimensions,
                                  const Vector2Ex<float>& tilePosition)
@@ -304,8 +305,8 @@ void GameLayer::UpdateHighscores()
 
     for (auto& client : m_clients)
     {
-        Profile* profile = client.profile;
-        const int points = client.player->GetPoints();
+        std::shared_ptr<Profile> profile = client.profile;
+        const int points = client.player.GetPoints();
 
         client.profile->UpdateHighScore(boardName, points);
         m_board.SetHighscore(profile->GetUsername(), points);
@@ -348,7 +349,7 @@ void GameLayer::OnRender()
 
 void GameLayer::RenderScores() const
 {
-    const int currentPoints = m_clients[0].player->GetPoints();
+    const int currentPoints = m_clients[0].player.GetPoints();
     std::string_view boardName = m_board.GetName();
     const auto& highscores = game::GameApplication::Get().GetProfile()->GetPersonalHighscores();
 

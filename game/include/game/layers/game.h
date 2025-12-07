@@ -26,12 +26,12 @@ class GameLayer : public engine::Layer
                                 const Vector2Ex<float>& pacmanDimensions,
                                 const Vector2Ex<float>& pacmanPosition) const;
 
-    bool TryCollectPellet(Player* player,
+    bool TryCollectPellet(Player& player,
                           const Vector2Ex<float>& pacmanPosition,
                           const Vector2Ex<float>& pacmanDimensions,
                           Pellet& pellet);
 
-    bool TryCollectPellet(Player* player,
+    bool TryCollectPellet(Player& player,
                           const Vector2Ex<float>& pacmanPosition,
                           const Vector2Ex<float>& pacmanDimensions,
                           const Vector2Ex<float>& tilePosition);
