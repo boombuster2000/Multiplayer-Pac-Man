@@ -10,11 +10,10 @@
 #include <stdexcept>
 #include <string>
 
-bool GameLayer::IsPacmanTouchingPellet(const Vector2Ex<float>& pacmanDimensions,
+bool GameLayer::IsPacmanTouchingPellet(const Pellet& pellet,
+                                       const Vector2Ex<float>& pacmanDimensions,
                                        const Vector2Ex<float>& pacmanPosition) const
 {
-    const Tile& tile = m_board.GetTileFromPosition(pacmanPosition);
-    const Pellet& pellet = tile.GetPellet();
     const Vector2Ex<float> pelletPosition = pellet.GetPositionAtAnchor();
     const Vector2Ex<float> pelletDimensions = pellet.GetDimensions();
     const Rectangle pacmanRec = {pacmanPosition.x, pacmanPosition.y, pacmanDimensions.x, pacmanDimensions.y};
@@ -23,18 +22,60 @@ bool GameLayer::IsPacmanTouchingPellet(const Vector2Ex<float>& pacmanDimensions,
     return CheckCollisionRecs(pacmanRec, pelletRec);
 }
 
-void GameLayer::CollectPelletAtPosition(const Vector2Ex<float>& position)
+bool GameLayer::TryCollectPellet(Player* player,
+                                 const Vector2Ex<float>& pacmanPosition,
+                                 const Vector2Ex<float>& pacmanDimensions,
+                                 Pellet& pellet)
 {
-    if (IsPacmanTouchingPellet(m_player.GetPacman().GetDimensions(), position))
+    if (!IsPacmanTouchingPellet(pellet, pacmanDimensions, pacmanPosition))
+        return false;
+
+    int pointsGained = pellet.GetValue();
+    player->AddPoints(pointsGained);
+    UpdateHighscores();
+    pellet.SetType(Pellet::Type::NONE);
+
+    return pointsGained > 0;
+}
+
+bool GameLayer::TryCollectPellet(Player* player,
+                                 const Vector2Ex<float>& pacmanPosition,
+                                 const Vector2Ex<float>& pacmanDimensions,
+                                 const Vector2Ex<float>& tilePosition)
+{
+    Tile& tile = m_board.GetTileFromPosition(tilePosition);
+    Pellet& pellet = tile.GetPellet();
+
+    return TryCollectPellet(player, pacmanPosition, pacmanDimensions, pellet);
+}
+
+void GameLayer::ProcessPelletCollection(Client& client,
+                                        const Vector2Ex<float> posBefore,
+                                        const Vector2Ex<float> posAfter)
+{
+
+    const Vector2Ex<float>& pacmanPosition = client.pacman.GetPositionAtAnchor();
+    const Vector2Ex<float>& pacmanDimensions = client.pacman.GetDimensions();
+    TryCollectPellet(client.player, pacmanPosition, pacmanDimensions, posBefore);
+    TryCollectPellet(client.player, pacmanPosition, pacmanDimensions, posAfter);
+
+    // Pacman at most have moved across a tile boundary, and pellets on those have already been checked for collection
+    if ((posBefore - posAfter).GetLength() < 1)
+        return;
+
+    const Vector2Ex<size_t> posBeforeIndex = m_board.GetRelativeIndexFromPosition(posBefore);
+    const Vector2Ex<size_t> posAfterIndex = m_board.GetRelativeIndexFromPosition(posAfter);
+    const Vector2Ex<int> indexSteps = Vector2Ex<int>(posAfterIndex) - Vector2Ex<int>(posBeforeIndex);
+    const Vector2Ex<int> indexStep = indexSteps.GetUnitVector();
+
+    // I don't want to check tile at posBefore and posAfter as pacman may have passed the pellet at the centre of tile.
+    // They will be checked seperatley
+    for (int i = 1; i < indexStep.GetLength(); i++)
     {
-        Tile& tile = m_board.GetTileFromPosition(position);
+        Tile& tile = m_board.GetTile(posBeforeIndex + indexStep);
         Pellet& pellet = tile.GetPellet();
 
-        int pointsGained = pellet.GetValue();
-        m_player.AddPoints(pointsGained);
-        UpdateHighscores();
-
-        pellet.SetType(Pellet::Type::NONE);
+        TryCollectPellet(client.player, pacmanPosition, pacmanDimensions, pellet);
     }
 }
 
@@ -122,25 +163,26 @@ void GameLayer::RenderNodes() const
     }
 }
 
-GameLayer::GameLayer() :
+Blinky GameLayer::ConstructBlinky() const
+{
+    return Blinky(m_board.GetSpeedyGhostSpawnPoint(),
+                  Vector2Ex<float>(350, 350),
+                  m_board.GetTileDimensions(),
+                  ui::Direction::RIGHT);
+}
+
+GameLayer::GameLayer(const std::vector<Client>& clients) :
     m_board(),
-    m_player(game::GameApplication::Get().GetProfile(),
-             Pacman(m_board.GetPlayerSpawnPoint(), m_board.GetTileDimensions(), 400)),
-    m_blinky(m_board.GetSpeedyGhostSpawnPoint(),
-             Vector2Ex<float>(350, 350),
-             m_board.GetTileDimensions(),
-             ui::Direction::RIGHT)
+    m_blinky(ConstructBlinky()),
+    m_clients(clients)
 {
 }
 
-GameLayer::GameLayer(std::string_view boardPath) :
+GameLayer::GameLayer(const std::vector<Client>& clients, std::string_view boardPath) :
     m_board(boardPath),
-    m_player(game::GameApplication::Get().GetProfile(),
-             Pacman(m_board.GetPlayerSpawnPoint(), m_board.GetTileDimensions(), 400)),
-    m_blinky(m_board.GetSpeedyGhostSpawnPoint(),
-             Vector2Ex<float>(350, 350),
-             m_board.GetTileDimensions(),
-             ui::Direction::RIGHT)
+    m_blinky(ConstructBlinky()),
+    m_clients(clients)
+
 {
 }
 
@@ -154,17 +196,23 @@ void GameLayer::HandleKeyPresses()
     using enum ui::Direction;
     const auto& inputManager = game::GameApplication::GetInputManager();
 
-    if (inputManager.IsAction("move_up", engine::InputState::PRESSED))
-        m_player.GetPacman().SetQueuedDirection(UP);
+    for (auto& client : m_clients)
+    {
+        Pacman& pacman = client.pacman;
+        const PlayerInput* input = client.input;
 
-    if (inputManager.IsAction("move_down", engine::InputState::PRESSED))
-        m_player.GetPacman().SetQueuedDirection(DOWN);
+        if (input->IsUpPressed())
+            pacman.SetQueuedDirection(UP);
 
-    if (inputManager.IsAction("move_left", engine::InputState::PRESSED))
-        m_player.GetPacman().SetQueuedDirection(LEFT);
+        if (input->IsDownPressed())
+            pacman.SetQueuedDirection(DOWN);
 
-    if (inputManager.IsAction("move_right", engine::InputState::PRESSED))
-        m_player.GetPacman().SetQueuedDirection(RIGHT);
+        if (input->IsLeftPressed())
+            pacman.SetQueuedDirection(LEFT);
+
+        if (input->IsRightPressed())
+            pacman.SetQueuedDirection(RIGHT);
+    }
 
     if (IsKeyPressed(KEY_F1))
         m_board.SaveToFile();
@@ -176,33 +224,30 @@ void GameLayer::HandleKeyPresses()
     }
 }
 
-void GameLayer::HandleCollisions(Entity* entity, const float& deltaTime, const bool collectPellets)
+void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
 {
+    // TODO: Refactor to run less iteractions
     using namespace ui;
 
     Vector2Ex<float> currentPosition = entity->GetPositionAtAnchor();
     Direction currentDirection = entity->GetDirection();
 
-    // Collect pellet at starting
-    if (collectPellets)
-        CollectPelletAtPosition(currentPosition);
+    // // Collect pellet at starting
+    // if (entity->GetEntityType() == EntityType::PACMAN)
+    //     ProcessPelletCollection(currentPosition);
 
     // Calculate desired movement
     const Vector2Ex<float> targetPosition = entity->GetNextPosition(currentDirection, deltaTime);
     const Vector2Ex<float> movementDelta = targetPosition - currentPosition;
 
     // Number of intermediate steps to check
-    float totalDistance = (currentDirection == Direction::UP || currentDirection == Direction::DOWN)
-                              ? std::abs(movementDelta.y)
-                              : std::abs(movementDelta.x);
+    float totalDistance = movementDelta.y + movementDelta.x; // One of these will always be 0.
 
     // Try to apply queued direction at start if stationary or at current position
     float remainingDistance = totalDistance;
     if (TryApplyQueuedDirection(entity, currentPosition, currentDirection))
-    {
         // Direction changed, update current direction for the pacman
         currentDirection = entity->GetDirection();
-    }
 
     if (totalDistance <= 0)
     {
@@ -216,6 +261,7 @@ void GameLayer::HandleCollisions(Entity* entity, const float& deltaTime, const b
     while (remainingDistance > 0)
     {
         // The incremental step size (1 or less for the last step)
+        // if remainingDistnace is less that 1, remainingDistance will be used as the step so loop will run once
         float stepSize = std::min(remainingDistance, 1.0f);
 
         // Calculate the intermediate position using current direction
@@ -225,8 +271,8 @@ void GameLayer::HandleCollisions(Entity* entity, const float& deltaTime, const b
         // Try to apply queued direction at this position
         if (TryApplyQueuedDirection(entity, intermediatePosition, currentDirection))
         {
-            if (collectPellets)
-                CollectPelletAtPosition(intermediatePosition);
+            // if (entity->GetEntityType() == EntityType::PACMAN)
+            //     ProcessPelletCollection(intermediatePosition);
 
             // Direction changed, update position and direction, then continue in new direction
             lastValidPosition = intermediatePosition;
@@ -237,14 +283,12 @@ void GameLayer::HandleCollisions(Entity* entity, const float& deltaTime, const b
 
         // Check collision
         if (!CanMoveInDirection(entity, intermediatePosition, currentDirection))
-        {
             // Hit a wall, stop at last valid position
             break;
-        }
 
-        // position is valid, collect pellets and continue
-        if (collectPellets)
-            CollectPelletAtPosition(intermediatePosition);
+        // // position is valid, collect pellets and continue
+        // if (entity->GetEntityType() == EntityType::PACMAN)
+        //     ProcessPelletCollection(intermediatePosition);
 
         lastValidPosition = intermediatePosition;
         currentPosition = intermediatePosition;
@@ -258,8 +302,14 @@ void GameLayer::UpdateHighscores()
 {
     std::string_view boardName = m_board.GetName();
 
-    game::GameApplication::Get().GetProfile()->UpdateHighScore(boardName, m_player.GetPoints());
-    m_board.SetHighscore(game::GameApplication::Get().GetProfile()->GetUsername(), m_player.GetPoints());
+    for (auto& client : m_clients)
+    {
+        Profile* profile = client.profile;
+        const int points = client.player->GetPoints();
+
+        client.profile->UpdateHighScore(boardName, points);
+        m_board.SetHighscore(profile->GetUsername(), points);
+    }
 }
 
 void GameLayer::OnUpdate(float ts)
@@ -273,16 +323,24 @@ void GameLayer::OnUpdate(float ts)
     }
 
     HandleKeyPresses();
-    HandleCollisions(&m_player.GetPacman(), ts, true);
 
-    m_blinky.UpdateQueuedDirection(m_board, m_player.GetPacman().GetPositionAtAnchor());
-    HandleCollisions(&m_blinky, ts, false);
+    for (auto& client : m_clients)
+    {
+        ProcessMovementSteps(&client.pacman, ts);
+        ProcessPelletCollection(client, client.pacman.GetLastPosition(), client.pacman.GetPositionAtAnchor());
+    }
+
+    m_blinky.UpdateQueuedDirection(m_board, m_clients[0].pacman.GetPositionAtAnchor());
+    ProcessMovementSteps(&m_blinky, ts);
 }
 
 void GameLayer::OnRender()
 {
     m_board.Render();
-    m_player.GetPacman().Render();
+
+    for (auto& client : m_clients)
+        client.pacman.Render();
+
     m_blinky.Render();
     RenderScores();
     RenderNodes();
@@ -290,7 +348,7 @@ void GameLayer::OnRender()
 
 void GameLayer::RenderScores() const
 {
-    const int currentPoints = m_player.GetPoints();
+    const int currentPoints = m_clients[0].player->GetPoints();
     std::string_view boardName = m_board.GetName();
     const auto& highscores = game::GameApplication::Get().GetProfile()->GetPersonalHighscores();
 
