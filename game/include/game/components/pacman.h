@@ -21,5 +21,7 @@ class Pacman : public Entity
     void SetQueuedDirection(const ui::Direction& direction) final;
     void ApplyQueuedDirection() final;
 
+    Vector2Ex<float> GetLastPosition() const;
+
     bool IsStationary() const;
 };

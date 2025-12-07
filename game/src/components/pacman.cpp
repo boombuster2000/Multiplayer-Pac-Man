@@ -48,6 +48,11 @@ void Pacman::ApplyQueuedDirection()
     SetRotation(ConvertDirectionToRotation(GetDirection()));
 }
 
+Vector2Ex<float> Pacman::GetLastPosition() const
+{
+    return m_lastPosition;
+}
+
 bool Pacman::IsStationary() const
 {
     return GetWorldOrigin() == m_lastPosition;
