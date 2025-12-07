@@ -46,6 +46,12 @@ void Menu::ClearOptions()
     m_isUIupdateNeeded = true;
 }
 
+void Menu::SetSpacing(float spacing)
+{
+    m_spacing = spacing;
+    m_isUIupdateNeeded = true;
+}
+
 void Menu::SelectNext()
 {
     if (m_options.empty())
