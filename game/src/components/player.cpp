@@ -1,14 +1,4 @@
 #include "game/components/player.h"
-#include "game/components/profile.h"
-
-Player::Player(std::shared_ptr<Profile> profile, Pacman pacman) : m_profile(profile), m_pacman(pacman)
-{
-}
-
-void Player::SetProfile(std::shared_ptr<Profile> profile)
-{
-    m_profile = profile;
-}
 
 int Player::GetPoints() const
 {
@@ -18,14 +8,4 @@ int Player::GetPoints() const
 void Player::AddPoints(const int pointsToAdd)
 {
     m_points += pointsToAdd;
-}
-
-Pacman& Player::GetPacman()
-{
-    return m_pacman;
-}
-
-const Pacman& Player::GetPacman() const
-{
-    return m_pacman;
 }
