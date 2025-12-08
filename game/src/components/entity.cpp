@@ -5,7 +5,8 @@ Entity::Entity(const EntityType entityType,
                const Vector2Ex<float>& speed,
                const Vector2Ex<float>& dimensions,
                const ui::Direction& direction,
-               const std::shared_ptr<Texture2D>& texture) :
+               const std::shared_ptr<Texture2D>& texture,
+               const Color& color) :
     RenderableObject(spawnPosition),
     m_entityType(entityType),
     m_spawnPosition(spawnPosition),
@@ -13,7 +14,8 @@ Entity::Entity(const EntityType entityType,
     m_dimensions(dimensions),
     m_direction(direction),
     m_queuedDirection(direction),
-    m_texture(texture)
+    m_texture(texture),
+    m_color(color)
 {
 }
 
@@ -50,6 +52,15 @@ float Entity::GetRotation() const
 void Entity::SetRotation(const float& rotation)
 {
     m_rotation = rotation;
+}
+
+Color Entity::GetColor() const
+{
+    return m_color;
+}
+void Entity::SetColor(const Color& color)
+{
+    m_color = color;
 }
 
 ui::Direction Entity::GetDirection() const
@@ -179,5 +190,5 @@ void Entity::Render(Vector2Ex<float> offset) const
     // Center of rotation (pivot)
     Vector2 originPosition = {(textureWidth * scaleX) / 2.0f, (textureHeight * scaleY) / 2.0f};
 
-    DrawTexturePro(*m_texture, sourceRect, destRect, originPosition, m_rotation, WHITE);
+    DrawTexturePro(*m_texture, sourceRect, destRect, originPosition, m_rotation, m_color);
 }
