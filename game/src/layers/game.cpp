@@ -164,6 +164,18 @@ void GameLayer::RenderNodes() const
     }
 }
 
+void GameLayer::SetPacmansSpawnPositions()
+{
+    int player = 1;
+    for (auto& client : m_clients)
+    {
+        const Vector2Ex<float> position = m_board.GetPlayerSpawnPoint(player);
+        client.pacman.SetSpawnPosition(position);
+        client.pacman.SetPosition(position);
+        player++;
+    }
+}
+
 Blinky GameLayer::ConstructBlinky() const
 {
     return Blinky(m_board.GetSpeedyGhostSpawnPoint(),
@@ -177,6 +189,7 @@ GameLayer::GameLayer(const std::vector<Client>& clients) :
     m_blinky(ConstructBlinky()),
     m_clients(clients)
 {
+    SetPacmansSpawnPositions();
 }
 
 GameLayer::GameLayer(const std::vector<Client>& clients, std::string_view boardPath) :
@@ -185,6 +198,7 @@ GameLayer::GameLayer(const std::vector<Client>& clients, std::string_view boardP
     m_clients(clients)
 
 {
+    SetPacmansSpawnPositions();
 }
 
 GameLayer::~GameLayer()
@@ -241,8 +255,8 @@ void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
     const Vector2Ex<float> targetPosition = entity->GetNextPosition(currentDirection, deltaTime);
     const Vector2Ex<float> movementDelta = targetPosition - currentPosition;
 
-    // Number of intermediate steps to check
-    float totalDistance = movementDelta.y + movementDelta.x; // One of these will always be 0.
+    // Total distance to move this frame
+    float totalDistance = movementDelta.GetLength();
 
     // Try to apply queued direction at start if stationary or at current position
     float remainingDistance = totalDistance;

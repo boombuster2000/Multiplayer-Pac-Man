@@ -43,6 +43,8 @@ class GameLayer : public engine::Layer
     void RenderScores() const;
     void RenderNodes() const;
 
+    void SetPacmansSpawnPositions();
+
     Blinky ConstructBlinky() const;
 
   public:
