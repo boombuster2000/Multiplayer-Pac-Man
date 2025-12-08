@@ -78,24 +78,6 @@ void PlayerJoinLayer::RebuildPlayerMenus()
                     player.profileSelectionMenu.AddOption(std::move(option));
                 }
             }
-
-            auto createOption = std::make_unique<ui::TextMenuOption>(
-                "Create New Profile",
-                selectedStyle,
-                unselectedStyle,
-                false,
-                [this, &player]() {
-                    static int newPlayerId = 1;
-                    std::string newUsername = "NewPlayer" + std::to_string(newPlayerId++);
-
-                    // A more robust solution would check for username uniqueness on disk too
-
-                    player.profile = std::make_shared<Profile>(newUsername);
-                    player.profile->Save();
-                    player.state = ReadyState::READY;
-                    RebuildPlayerMenus();
-                });
-            player.profileSelectionMenu.AddOption(std::move(createOption));
         }
     }
 }
