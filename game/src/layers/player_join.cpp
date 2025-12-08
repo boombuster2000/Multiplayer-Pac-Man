@@ -8,6 +8,7 @@
 #include "game/game_application.h"
 #include "game/layers/create_profile.h"
 #include "game/layers/game.h"
+#include "game/layers/main_menu.h"
 #include "game/serialization/profile_json.hpp"
 #include "game/utils/file_utils.h"
 #include "nlohmann/json.hpp"
@@ -32,7 +33,12 @@ void PlayerJoinLayer::RebuildPlayerMenus()
     {
         fontSize = 20.f;
     }
-    const float spacing = fontSize * 1.2f;
+    
+    float spacing = fontSize * 1.2f;
+    if (screenDivisions >= 4)
+    {
+        spacing = fontSize;
+    }
 
     ui::TextStyle unselectedStyle;
     unselectedStyle.fontSize = fontSize;
@@ -118,7 +124,8 @@ void PlayerJoinLayer::OnUpdate(float ts)
     // KEYBOARD CONTROLS
     if (IsKeyPressed(KEY_W))
     {
-        auto newInput = std::make_unique<KeyboardPlayerInput>(KEY_W, KEY_S, KEY_A, KEY_D, KEY_LEFT_SHIFT);
+        auto newInput =
+            std::make_unique<KeyboardPlayerInput>(KEY_W, KEY_S, KEY_A, KEY_D, KEY_LEFT_SHIFT, KEY_LEFT_CONTROL);
         bool alreadyExists = false;
         for (const auto& player : m_joiningPlayers)
         {
@@ -137,7 +144,12 @@ void PlayerJoinLayer::OnUpdate(float ts)
 
     if (IsKeyPressed(KEY_UP))
     {
-        auto newInput = std::make_unique<KeyboardPlayerInput>(KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_RIGHT_SHIFT);
+        auto newInput = std::make_unique<KeyboardPlayerInput>(KEY_UP,
+                                                              KEY_DOWN,
+                                                              KEY_LEFT,
+                                                              KEY_RIGHT,
+                                                              KEY_RIGHT_SHIFT,
+                                                              KEY_RIGHT_CONTROL);
         bool alreadyExists = false;
         for (const auto& player : m_joiningPlayers)
         {
@@ -166,7 +178,8 @@ void PlayerJoinLayer::OnUpdate(float ts)
                                                                  GAMEPAD_BUTTON_LEFT_FACE_DOWN,
                                                                  GAMEPAD_BUTTON_LEFT_FACE_LEFT,
                                                                  GAMEPAD_BUTTON_LEFT_FACE_RIGHT,
-                                                                 GAMEPAD_BUTTON_RIGHT_FACE_DOWN);
+                                                                 GAMEPAD_BUTTON_RIGHT_FACE_DOWN,
+                                                                 GAMEPAD_BUTTON_RIGHT_FACE_RIGHT);
             bool alreadyExists = false;
             for (const auto& player : m_joiningPlayers)
             {
@@ -185,8 +198,10 @@ void PlayerJoinLayer::OnUpdate(float ts)
     }
 
     // Update existing joining players
-    for (auto& player : m_joiningPlayers)
+    for (size_t i = 0; i < m_joiningPlayers.size(); ++i)
     {
+        auto& player = m_joiningPlayers[i];
+
         if (player.state == ReadyState::SELECTING_PROFILE)
         {
             if (player.inputControls->IsUpPressed())
@@ -200,6 +215,28 @@ void PlayerJoinLayer::OnUpdate(float ts)
             if (player.inputControls->IsActionPressed())
             {
                 player.profileSelectionMenu.ConfirmSelection();
+            }
+        }
+
+        if (player.inputControls->IsBackPressed())
+        {
+            if (i == 0) // Player 1
+            {
+                TransistionTo(std::make_unique<MainMenuLayer>());
+                return; // Exit to avoid using invalidated 'this'
+            }
+
+            if (player.state == ReadyState::READY)
+            {
+                player.profile = nullptr;
+                player.state = ReadyState::SELECTING_PROFILE;
+                RebuildPlayerMenus();
+            }
+            else if (player.state == ReadyState::SELECTING_PROFILE)
+            {
+                m_joiningPlayers.erase(m_joiningPlayers.begin() + i);
+                RebuildPlayerMenus();
+                --i; // Decrement i to account for the removed element
             }
         }
     }
@@ -342,6 +379,50 @@ void PlayerJoinLayer::OnRender()
                              rect.y + rect.height / 2 + (fontSize - 10),
                              fontSize - 10,
                              color2);
+
+                    const int backFontSize = 15;
+                    const int y_spacing = backFontSize + 5;
+                    int y_start_offset = 10;
+
+                    if (screenDivisions == 4)
+                    {
+                        const char* back_text = "";
+                        if (i == 0)
+                        {
+                            back_text = "CTRL/B to return to menu";
+                        }
+                        else
+                        {
+                            back_text = "CTRL/B to change profile";
+                        }
+                        const int text_width = MeasureText(back_text, backFontSize);
+                        DrawText(back_text, rect.x + rect.width / 2 - text_width / 2,
+                                 rect.y + rect.height - backFontSize - y_start_offset, backFontSize, LIGHTGRAY);
+                    }
+                    else
+                    {
+                        const char* kb_part1 = "CTRL";
+                        const char* kb_part2 = (i == 0) ? " to return to menu (Keyboard)" : " to change profile (Keyboard)";
+                        const char* gp_part1 = "B";
+                        const char* gp_part2 = (i == 0) ? " to return to menu (Gamepad)" : " to change profile (Gamepad)";
+
+                        const int kb_part1_width = MeasureText(kb_part1, backFontSize);
+                        const int kb_total_width = kb_part1_width + MeasureText(kb_part2, backFontSize);
+                        const int gp_part1_width = MeasureText(gp_part1, backFontSize);
+                        const int gp_total_width = gp_part1_width + MeasureText(gp_part2, backFontSize);
+
+                        float kb_current_X = rect.x + rect.width / 2 - kb_total_width / 2;
+                        float gp_current_X = rect.x + rect.width / 2 - gp_total_width / 2;
+                        const int y = rect.y + rect.height - y_spacing * 2 - y_start_offset;
+
+                        DrawText(kb_part1, kb_current_X, y, backFontSize, ORANGE);
+                        kb_current_X += kb_part1_width;
+                        DrawText(kb_part2, kb_current_X, y, backFontSize, LIGHTGRAY);
+
+                        DrawText(gp_part1, gp_current_X, y + y_spacing, backFontSize, ORANGE);
+                        gp_current_X += gp_part1_width;
+                        DrawText(gp_part2, gp_current_X, y + y_spacing, backFontSize, LIGHTGRAY);
+                    }
                 }
                 break;
             case ReadyState::SELECTING_PROFILE:
@@ -353,31 +434,55 @@ void PlayerJoinLayer::OnRender()
                 player.profileSelectionMenu.Render();
 
                 {
-                    const int selectFontSize = 20;
-                    const char* part1 = "SHIFT";
-                    const char* part2 = " to select (Keyboard) / ";
-                    const char* part3 = "A";
-                    const char* part4 = " to select (Gamepad)";
+                    const int selectFontSize = 15;
+                    const char* sel_kb_part1 = "SHIFT";
+                    const char* sel_kb_part2 = " to select (Keyboard)";
+                    const char* sel_gp_part1 = "A";
+                    const char* sel_gp_part2 = " to select (Gamepad)";
 
-                    const int part1Width = MeasureText(part1, selectFontSize);
-                    const int part2Width = MeasureText(part2, selectFontSize);
-                    const int part3Width = MeasureText(part3, selectFontSize);
-                    const int part4Width = MeasureText(part4, selectFontSize);
-                    const int totalWidth = part1Width + part2Width + part3Width + part4Width;
+                    const int sel_kb_part1_width = MeasureText(sel_kb_part1, selectFontSize);
+                    const int sel_kb_total_width = sel_kb_part1_width + MeasureText(sel_kb_part2, selectFontSize);
+                    const int sel_gp_part1_width = MeasureText(sel_gp_part1, selectFontSize);
+                    const int sel_gp_total_width = sel_gp_part1_width + MeasureText(sel_gp_part2, selectFontSize);
 
-                    float currentX = rect.x + rect.width / 2 - totalWidth / 2;
-                    const int y = rect.y + rect.height - selectFontSize - 10;
+                    float sel_kb_current_X = rect.x + rect.width / 2 - sel_kb_total_width / 2;
+                    float sel_gp_current_X = rect.x + rect.width / 2 - sel_gp_total_width / 2;
+                    const int y_spacing = selectFontSize + 5;
+                    const int y = rect.y + rect.height - y_spacing * 4 - 10;
 
-                    DrawText(part1, currentX, y, selectFontSize, ORANGE); // Highlight SHIFT
-                    currentX += part1Width;
+                    DrawText(sel_kb_part1, sel_kb_current_X, y, selectFontSize, ORANGE);
+                    sel_kb_current_X += sel_kb_part1_width;
+                    DrawText(sel_kb_part2, sel_kb_current_X, y, selectFontSize, LIGHTGRAY);
 
-                    DrawText(part2, currentX, y, selectFontSize, LIGHTGRAY);
-                    currentX += part2Width;
+                    DrawText(sel_gp_part1, sel_gp_current_X, y + y_spacing, selectFontSize, ORANGE);
+                    sel_gp_current_X += sel_gp_part1_width;
+                    DrawText(sel_gp_part2, sel_gp_current_X, y + y_spacing, selectFontSize, LIGHTGRAY);
 
-                    DrawText(part3, currentX, y, selectFontSize, ORANGE); // Highlight A
-                    currentX += part3Width;
+                    const int backFontSize = 15;
+                    const char* backPart1 = "CTRL";
+                    const char* backPart2 = " to leave (Keyboard)";
+                    const char* backPart3 = "B";
+                    const char* backPart4 = " to leave (Gamepad)";
 
-                    DrawText(part4, currentX, y, selectFontSize, LIGHTGRAY);
+                    const int backPart1Width = MeasureText(backPart1, backFontSize);
+                    const int backPart2Width = MeasureText(backPart2, backFontSize);
+                    const int backPart3Width = MeasureText(backPart3, backFontSize);
+                    const int backPart4Width = MeasureText(backPart4, backFontSize);
+                    const int backTotalWidth = backPart1Width + backPart2Width;
+                    const int backTotalWidth2 = backPart3Width + backPart4Width;
+
+                    float backCurrentX = rect.x + rect.width / 2 - backTotalWidth / 2;
+                    float backCurrentX2 = rect.x + rect.width / 2 - backTotalWidth2 / 2;
+                    const int back_y_spacing = backFontSize + 5;
+                    const int backY = y + y_spacing * 2;
+
+                    DrawText(backPart1, backCurrentX, backY, backFontSize, ORANGE);
+                    backCurrentX += backPart1Width;
+                    DrawText(backPart2, backCurrentX, backY, backFontSize, LIGHTGRAY);
+
+                    DrawText(backPart3, backCurrentX2, backY + back_y_spacing, backFontSize, ORANGE);
+                    backCurrentX2 += backPart3Width;
+                    DrawText(backPart4, backCurrentX2, backY + back_y_spacing, backFontSize, LIGHTGRAY);
                 }
                 break;
             }
@@ -414,7 +519,7 @@ void PlayerJoinLayer::OnRender()
             const int totalWidth = part1Width + part2Width + part3Width + part4Width + part5Width;
 
             const int x = GetScreenWidth() / 2 - totalWidth / 2;
-            const int y = GetScreenHeight() - startFontSize - 50;
+            const int y = GetScreenHeight() - startFontSize - 100;
 
             // Draw a black background behind the text
             DrawRectangle(x - 10, y - 5, totalWidth + 20, startFontSize + 10, WHITE);

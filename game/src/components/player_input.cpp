@@ -1,11 +1,13 @@
 #include "game/components/player_input.h"
 
-KeyboardPlayerInput::KeyboardPlayerInput(KeyboardKey up, KeyboardKey down, KeyboardKey left, KeyboardKey right, KeyboardKey action) :
+KeyboardPlayerInput::KeyboardPlayerInput(KeyboardKey up, KeyboardKey down, KeyboardKey left, KeyboardKey right,
+                                       KeyboardKey action, KeyboardKey back) :
     m_up(up),
     m_down(down),
     m_left(left),
     m_right(right),
-    m_action(action)
+    m_action(action),
+    m_back(back)
 {
 }
 
@@ -34,12 +36,18 @@ bool KeyboardPlayerInput::IsActionPressed() const
     return IsKeyPressed(m_action);
 }
 
+bool KeyboardPlayerInput::IsBackPressed() const
+{
+    return IsKeyPressed(m_back);
+}
+
 bool KeyboardPlayerInput::IsEqual(const PlayerInput* other) const
 {
     if (const auto* otherKeyboard = dynamic_cast<const KeyboardPlayerInput*>(other))
     {
         return m_up == otherKeyboard->m_up && m_down == otherKeyboard->m_down && m_left == otherKeyboard->m_left &&
-               m_right == otherKeyboard->m_right && m_action == otherKeyboard->m_action;
+               m_right == otherKeyboard->m_right && m_action == otherKeyboard->m_action &&
+               m_back == otherKeyboard->m_back;
     }
     return false;
 }
@@ -49,13 +57,15 @@ GamepadPlayerInput::GamepadPlayerInput(int controllerID,
                                        GamepadButton down,
                                        GamepadButton left,
                                        GamepadButton right,
-                                       GamepadButton action) :
+                                       GamepadButton action,
+                                       GamepadButton back) :
     m_controllerID(controllerID),
     m_up(up),
     m_down(down),
     m_left(left),
     m_right(right),
-    m_action(action)
+    m_action(action),
+    m_back(back)
 {
 }
 
@@ -82,6 +92,11 @@ bool GamepadPlayerInput::IsRightPressed() const
 bool GamepadPlayerInput::IsActionPressed() const
 {
     return IsGamepadButtonPressed(m_controllerID, m_action);
+}
+
+bool GamepadPlayerInput::IsBackPressed() const
+{
+    return IsGamepadButtonPressed(m_controllerID, m_back);
 }
 
 bool GamepadPlayerInput::IsEqual(const PlayerInput* other) const
