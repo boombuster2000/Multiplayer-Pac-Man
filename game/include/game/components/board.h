@@ -60,7 +60,7 @@ class Board : public ui::Grid<Tile>
 
     const NodeRouteTable& GetRouteTable() const;
 
-    Vector2Ex<float> GetPlayerSpawnPoint() const;
+    Vector2Ex<float> GetPlayerSpawnPoint(const int player) const;
 
     Vector2Ex<float> GetSpeedyGhostSpawnPoint() const;
 

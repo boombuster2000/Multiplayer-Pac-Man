@@ -433,9 +433,19 @@ void Board::CreateNodesAndArcs()
     Floyds();
 }
 
-Vector2Ex<float> Board::GetPlayerSpawnPoint() const
+Vector2Ex<float> Board::GetPlayerSpawnPoint(const int player) const
 {
-    return GetPositionFromIndex({1, 1});
+    switch (player)
+    {
+    case 2:
+        return GetPositionFromIndex({1, 2});
+    case 3:
+        return GetPositionFromIndex({1, 3});
+    case 4:
+        return GetPositionFromIndex({1, 4});
+    default:
+        return GetPositionFromIndex({1, 1});
+    }
 }
 
 Vector2Ex<float> Board::GetSpeedyGhostSpawnPoint() const
