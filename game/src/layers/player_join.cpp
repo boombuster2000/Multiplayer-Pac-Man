@@ -36,11 +36,11 @@ void PlayerJoinLayer::RebuildPlayerMenus()
 
     ui::TextStyle unselectedStyle;
     unselectedStyle.fontSize = fontSize;
-    unselectedStyle.color = LIGHTGRAY;
+    unselectedStyle.color = DARKGRAY;
 
     ui::TextStyle selectedStyle;
     selectedStyle.fontSize = fontSize;
-    selectedStyle.color = GOLD;
+    selectedStyle.color = ORANGE;
 
     std::set<std::string> takenUsernames;
     for (const auto& p : m_joiningPlayers)
@@ -66,24 +66,30 @@ void PlayerJoinLayer::RebuildPlayerMenus()
 
                 if (takenUsernames.find(std::string(profile->GetUsername())) == takenUsernames.end())
                 {
-                    auto option = std::make_unique<ui::TextMenuOption>(
-                        std::string(profile->GetUsername()), selectedStyle, unselectedStyle, false,
-                        [this, &player, profile]() {
-                            player.profile = profile;
-                            player.state = ReadyState::READY;
-                            RebuildPlayerMenus();
-                        });
+                    auto option = std::make_unique<ui::TextMenuOption>(std::string(profile->GetUsername()),
+                                                                       selectedStyle,
+                                                                       unselectedStyle,
+                                                                       false,
+                                                                       [this, &player, profile]() {
+                                                                           player.profile = profile;
+                                                                           player.state = ReadyState::READY;
+                                                                           RebuildPlayerMenus();
+                                                                       });
                     player.profileSelectionMenu.AddOption(std::move(option));
                 }
             }
 
             auto createOption = std::make_unique<ui::TextMenuOption>(
-                "Create New Profile", selectedStyle, unselectedStyle, false, [this, &player]() {
+                "Create New Profile",
+                selectedStyle,
+                unselectedStyle,
+                false,
+                [this, &player]() {
                     static int newPlayerId = 1;
                     std::string newUsername = "NewPlayer" + std::to_string(newPlayerId++);
-                    
+
                     // A more robust solution would check for username uniqueness on disk too
-                    
+
                     player.profile = std::make_shared<Profile>(newUsername);
                     player.profile->Save();
                     player.state = ReadyState::READY;
@@ -118,11 +124,11 @@ int PlayerJoinLayer::GetScreenDivisions(const int playerCount) const
     return playerCount;
 }
 
-PlayerJoinLayer::PlayerJoinLayer(std::string_view boardFilePath) : m_boardPath(boardFilePath)
+PlayerJoinLayer::PlayerJoinLayer(std::string_view boardFilePath) :
+    m_boardPath(boardFilePath)
 {
     m_joiningPlayers.reserve(4);
 }
-
 
 void PlayerJoinLayer::OnUpdate(float ts)
 {
@@ -248,10 +254,37 @@ void PlayerJoinLayer::OnRender()
     if (joiningPlayersCount == 0)
     {
         ClearBackground(BLACK);
-        const char* text = "PRESS A BUTTON ON KEYBOARD OR CONTROLLER TO JOIN";
         const int fontSize = 30;
-        const int textWidth = MeasureText(text, fontSize);
-        DrawText(text, GetScreenWidth() / 2 - textWidth / 2, GetScreenHeight() / 2 - fontSize / 2, fontSize, LIGHTGRAY);
+
+        // Define parts and colors
+        const char* part1 = "PRESS THE ";
+        const char* part2 = "UP/W";
+        const char* part3 = " BUTTON ON KEYBOARD OR ";
+        const char* part4 = "SELECT";
+        const char* part5 = " ON CONTROLLER TO JOIN";
+
+        // Calculate total width to center the entire message
+        const int totalWidth = MeasureText(part1, fontSize) + MeasureText(part2, fontSize) +
+                               MeasureText(part3, fontSize) + MeasureText(part4, fontSize) +
+                               MeasureText(part5, fontSize);
+
+        float currentX = GetScreenWidth() / 2 - totalWidth / 2;
+        float y = GetScreenHeight() / 2 - fontSize / 2;
+
+        DrawText(part1, currentX, y, fontSize, LIGHTGRAY);
+        currentX += MeasureText(part1, fontSize);
+
+        DrawText(part2, currentX, y, fontSize, ORANGE); // Highlight UP/W
+        currentX += MeasureText(part2, fontSize);
+
+        DrawText(part3, currentX, y, fontSize, LIGHTGRAY);
+        currentX += MeasureText(part3, fontSize);
+
+        DrawText(part4, currentX, y, fontSize, ORANGE); // Highlight SELECT
+        currentX += MeasureText(part4, fontSize);
+
+        DrawText(part5, currentX, y, fontSize, LIGHTGRAY);
+
         return;
     }
 
@@ -288,8 +321,8 @@ void PlayerJoinLayer::OnRender()
             auto& player = m_joiningPlayers[i];
             const int fontSize = 30;
             std::string line1, line2;
-            Color color1 = RAYWHITE;
-            Color color2 = LIGHTGRAY;
+            Color color1 = ORANGE;
+            Color color2 = DARKGRAY;
 
             switch (player.state)
             {

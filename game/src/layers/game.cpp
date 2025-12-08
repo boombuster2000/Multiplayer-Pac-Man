@@ -452,7 +452,7 @@ void GameLayer::RenderScores() const
 
         // Display Highscore in gold/yellow
         const std::string highscoreStr = std::format("Highscore: {}", highscore);
-        DrawText(highscoreStr.c_str(), 10, yOffset, lineHeight, GOLD); // Using GOLD for highscore
-        yOffset += lineHeight + playerSpacing;                         // Add extra spacing for the next player
+        DrawText(highscoreStr.c_str(), 10, yOffset, lineHeight, ORANGE); // Using ORANGE for highscore
+        yOffset += lineHeight + playerSpacing;                           // Add extra spacing for the next player
     }
 }
