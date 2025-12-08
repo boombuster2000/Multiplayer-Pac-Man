@@ -421,20 +421,38 @@ void GameLayer::OnRender()
 
 void GameLayer::RenderScores() const
 {
-    const int currentPoints = m_clients[0].player.GetPoints();
     std::string_view boardName = m_board.GetName();
-    const auto& highscores = game::GameApplication::Get().GetProfile()->GetPersonalHighscores();
+    int yOffset = 10;
+    const int lineHeight = 20;
+    const int lineSpacing = 5;    // Spacing between lines for the same player's info
+    const int playerSpacing = 20; // Extra spacing between different players
 
-    int highscore = 0;
-    auto it = highscores.find(boardName);
-    if (it != highscores.end())
+    for (const auto& client : m_clients)
     {
-        highscore = it->second;
+        std::string_view username = client.profile->GetUsername();
+        const int currentPoints = client.player.GetPoints();
+        const auto& personalHighscores = client.profile->GetPersonalHighscores();
+
+        int highscore = 0;
+        auto it = personalHighscores.find(boardName);
+        if (it != personalHighscores.end())
+        {
+            highscore = it->second;
+        }
+
+        // Display Username in a distinct color
+        const std::string usernameText = std::format("Username: {}", username);
+        DrawText(usernameText.c_str(), 10, yOffset, lineHeight, DARKBLUE); // Using DARKBLUE for username
+        yOffset += lineHeight + lineSpacing;
+
+        // Display Current Score in green
+        const std::string currentPointsStr = std::format("Score: {}", currentPoints);
+        DrawText(currentPointsStr.c_str(), 10, yOffset, lineHeight, GREEN); // Using GREEN for current score
+        yOffset += lineHeight + lineSpacing;
+
+        // Display Highscore in gold/yellow
+        const std::string highscoreStr = std::format("Highscore: {}", highscore);
+        DrawText(highscoreStr.c_str(), 10, yOffset, lineHeight, GOLD); // Using GOLD for highscore
+        yOffset += lineHeight + playerSpacing;                         // Add extra spacing for the next player
     }
-
-    const std::string currentPointsStr = std::format("Score: {}", currentPoints);
-    const std::string highscoreStr = std::format("Highscore: {}", highscore);
-
-    DrawText(highscoreStr.c_str(), 10, 10, 20, BLACK);
-    DrawText(currentPointsStr.c_str(), 10, 40, 20, BLACK);
 }
