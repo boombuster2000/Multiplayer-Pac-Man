@@ -59,6 +59,7 @@ class Board : public ui::Grid<Tile>
     Node* GetClosestNode(const Vector2Ex<float> position) const;
 
     const NodeRouteTable& GetRouteTable() const;
+    const NodeDistanceTable& GetDistanceTable() const;
 
     Vector2Ex<float> GetPlayerSpawnPoint(const int player) const;
 

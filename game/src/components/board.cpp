@@ -161,6 +161,10 @@ const NodeRouteTable& Board::GetRouteTable() const
     return m_routeTable;
 }
 
+const NodeDistanceTable& Board::GetDistanceTable() const
+{
+    return m_distanceTable;
+}
 void Board::SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type)
 {
     Grid::GetTile(index).SetType(type);
