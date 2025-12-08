@@ -7,6 +7,7 @@
 #include <array>
 #include <format>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -174,6 +175,62 @@ void GameLayer::SetPacmansSpawnPositions()
         client.pacman.SetPosition(position);
         player++;
     }
+}
+
+Pacman& GameLayer::GetClosestPacmanWithNodes(const Vector2Ex<float>& referencePoint) const
+{
+    if (m_clients.empty())
+    {
+        throw std::runtime_error("GetClosestPacmanWithNodes called with no clients");
+    }
+
+    const NodeDistanceTable& distanceTable = m_board.GetDistanceTable();
+    Node* referenceNode = m_board.GetClosestNode(referencePoint);
+
+    const Pacman* closestPacman = nullptr;
+    float minDistance = std::numeric_limits<float>::max();
+
+    for (const auto& client : m_clients)
+    {
+        const Pacman& currentPacman = client.pacman;
+        Node* pacmanNode = m_board.GetClosestNode(currentPacman.GetPositionAtAnchor());
+
+        // Check if a route exists between the nodes
+        auto refIt = distanceTable.find(referenceNode);
+        if (refIt != distanceTable.end())
+        {
+            auto pacmanIt = refIt->second.find(pacmanNode);
+            if (pacmanIt != refIt->second.end())
+            {
+                // Distance between nodes from the pre-calculated table
+                float nodeDistance = pacmanIt->second;
+
+                // Distance from reference point to its closest node
+                float distToRefNode = (referencePoint - referenceNode->GetPosition()).GetLength();
+
+                // Distance from pacman to its closest node
+                float distFromPacmanNode =
+                    (currentPacman.GetPositionAtAnchor() - pacmanNode->GetPosition()).GetLength();
+
+                float totalDistance = distToRefNode + nodeDistance + distFromPacmanNode;
+
+                if (totalDistance < minDistance)
+                {
+                    minDistance = totalDistance;
+                    closestPacman = &currentPacman;
+                }
+            }
+        }
+    }
+
+    if (closestPacman == nullptr)
+    {
+        // This can happen if no path is found to any pacman.
+        // Fallback to the first pacman as a default.
+        return const_cast<Pacman&>(m_clients[0].pacman);
+    }
+
+    return const_cast<Pacman&>(*closestPacman);
 }
 
 Blinky GameLayer::ConstructBlinky() const
@@ -345,7 +402,8 @@ void GameLayer::OnUpdate(float ts)
         ProcessPelletCollection(client, client.pacman.GetLastPosition(), client.pacman.GetPositionAtAnchor());
     }
 
-    m_blinky.UpdateQueuedDirection(m_board, m_clients[0].pacman.GetPositionAtAnchor());
+    Pacman& closestPacman = GetClosestPacmanWithNodes(m_blinky.GetPositionAtAnchor());
+    m_blinky.UpdateQueuedDirection(m_board, closestPacman.GetPositionAtAnchor());
     ProcessMovementSteps(&m_blinky, ts);
 }
 

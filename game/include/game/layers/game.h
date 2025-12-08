@@ -45,6 +45,8 @@ class GameLayer : public engine::Layer
 
     void SetPacmansSpawnPositions();
 
+    Pacman& GetClosestPacmanWithNodes(const Vector2Ex<float>& referencePoint) const;
+
     Blinky ConstructBlinky() const;
 
   public:
