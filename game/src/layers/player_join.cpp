@@ -223,7 +223,20 @@ void PlayerJoinLayer::OnUpdate(float ts)
     }
 
     // STARTING GAME
-    if (IsKeyPressed(KEY_ENTER))
+    bool startGame = IsKeyPressed(KEY_ENTER);
+    if (!startGame)
+    {
+        for (int controllerID = 0; controllerID < 4; controllerID++)
+        {
+            if (IsGamepadAvailable(controllerID) && IsGamepadButtonPressed(controllerID, GAMEPAD_BUTTON_MIDDLE_RIGHT))
+            {
+                startGame = true;
+                break;
+            }
+        }
+    }
+
+    if (startGame)
     {
         std::vector<Client> clients;
 
@@ -358,17 +371,82 @@ void PlayerJoinLayer::OnRender()
                 player.profileSelectionMenu.Render();
 
                 {
-                    const char* selectText = "SHIFT to select (Keyboard) / A to select (Gamepad)";
                     const int selectFontSize = 20;
-                    const int selectTextWidth = MeasureText(selectText, selectFontSize);
-                    DrawText(selectText,
-                             rect.x + rect.width / 2 - selectTextWidth / 2,
-                             rect.y + rect.height - selectFontSize - 10, // Position it near the bottom of the rect
-                             selectFontSize,
-                             LIGHTGRAY);
+                    const char* part1 = "SHIFT";
+                    const char* part2 = " to select (Keyboard) / ";
+                    const char* part3 = "A";
+                    const char* part4 = " to select (Gamepad)";
+
+                    const int part1Width = MeasureText(part1, selectFontSize);
+                    const int part2Width = MeasureText(part2, selectFontSize);
+                    const int part3Width = MeasureText(part3, selectFontSize);
+                    const int part4Width = MeasureText(part4, selectFontSize);
+                    const int totalWidth = part1Width + part2Width + part3Width + part4Width;
+
+                    float currentX = rect.x + rect.width / 2 - totalWidth / 2;
+                    const int y = rect.y + rect.height - selectFontSize - 10;
+
+                    DrawText(part1, currentX, y, selectFontSize, ORANGE); // Highlight SHIFT
+                    currentX += part1Width;
+
+                    DrawText(part2, currentX, y, selectFontSize, LIGHTGRAY);
+                    currentX += part2Width;
+
+                    DrawText(part3, currentX, y, selectFontSize, ORANGE); // Highlight A
+                    currentX += part3Width;
+
+                    DrawText(part4, currentX, y, selectFontSize, LIGHTGRAY);
                 }
                 break;
             }
+        }
+    }
+
+    // Check if all players are ready and display "PRESS ENTER / START TO START"
+    if (joiningPlayersCount > 0)
+    {
+        bool allPlayersReady = true;
+        for (const auto& player : m_joiningPlayers)
+        {
+            if (player.state != ReadyState::READY)
+            {
+                allPlayersReady = false;
+                break;
+            }
+        }
+
+        if (allPlayersReady)
+        {
+            const int startFontSize = 40;
+            const char* part1 = "PRESS ";
+            const char* part2 = "ENTER";
+            const char* part3 = " / ";
+            const char* part4 = "START";
+            const char* part5 = " TO START";
+
+            const int part1Width = MeasureText(part1, startFontSize);
+            const int part2Width = MeasureText(part2, startFontSize);
+            const int part3Width = MeasureText(part3, startFontSize);
+            const int part4Width = MeasureText(part4, startFontSize);
+            const int part5Width = MeasureText(part5, startFontSize);
+            const int totalWidth = part1Width + part2Width + part3Width + part4Width + part5Width;
+
+            const int x = GetScreenWidth() / 2 - totalWidth / 2;
+            const int y = GetScreenHeight() - startFontSize - 50;
+
+            // Draw a black background behind the text
+            DrawRectangle(x - 10, y - 5, totalWidth + 20, startFontSize + 10, WHITE);
+
+            float currentX = x;
+            DrawText(part1, currentX, y, startFontSize, DARKGRAY);
+            currentX += part1Width;
+            DrawText(part2, currentX, y, startFontSize, ORANGE);
+            currentX += part2Width;
+            DrawText(part3, currentX, y, startFontSize, DARKGRAY);
+            currentX += part3Width;
+            DrawText(part4, currentX, y, startFontSize, ORANGE);
+            currentX += part4Width;
+            DrawText(part5, currentX, y, startFontSize, DARKGRAY);
         }
     }
 }
