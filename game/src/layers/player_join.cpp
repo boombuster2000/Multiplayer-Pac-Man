@@ -356,6 +356,17 @@ void PlayerJoinLayer::OnRender()
                     player.profileSelectionMenu.UpdateOptionsAnchorPointPositions();
                 }
                 player.profileSelectionMenu.Render();
+
+                {
+                    const char* selectText = "SHIFT to select (Keyboard) / A to select (Gamepad)";
+                    const int selectFontSize = 20;
+                    const int selectTextWidth = MeasureText(selectText, selectFontSize);
+                    DrawText(selectText,
+                             rect.x + rect.width / 2 - selectTextWidth / 2,
+                             rect.y + rect.height - selectFontSize - 10, // Position it near the bottom of the rect
+                             selectFontSize,
+                             LIGHTGRAY);
+                }
                 break;
             }
         }
