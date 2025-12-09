@@ -63,7 +63,7 @@ class Board : public ui::Grid<Tile>
 
     Vector2Ex<float> GetPlayerSpawnPoint(const int player) const;
 
-    Vector2Ex<float> GetSpeedyGhostSpawnPoint() const;
+    Vector2Ex<float> GetBlinkyGhostSpawnPoint() const;
 
     void SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type);
 

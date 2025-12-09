@@ -452,7 +452,7 @@ Vector2Ex<float> Board::GetPlayerSpawnPoint(const int player) const
     }
 }
 
-Vector2Ex<float> Board::GetSpeedyGhostSpawnPoint() const
+Vector2Ex<float> Board::GetBlinkyGhostSpawnPoint() const
 {
     return GetPositionFromIndex({5, 8});
 }
