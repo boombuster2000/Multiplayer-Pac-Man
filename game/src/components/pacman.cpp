@@ -58,3 +58,51 @@ bool Pacman::IsStationary() const
 {
     return GetWorldOrigin() == m_lastPosition;
 }
+
+int Pacman::GetLives() const
+{
+    return m_lives;
+}
+
+void Pacman::SetLives(const int lives)
+{
+    m_lives = lives;
+}
+
+void Pacman::RemoveLife(const int livesToRemove)
+{
+    m_lives -= livesToRemove;
+}
+
+void Pacman::AddLife(const int livesToAdd)
+{
+    m_lives += livesToAdd;
+}
+
+bool Pacman::IsDead() const
+{
+    return m_isDead;
+}
+
+void Pacman::SetDead(const bool isDead)
+{
+    m_isDead = isDead;
+}
+
+float Pacman::GetRespawnTimer() const
+{
+    return m_respawnTimer;
+}
+
+void Pacman::SetRespawnTimer(const float time)
+{
+    m_respawnTimer = time;
+}
+
+void Pacman::UpdateRespawnTimer(const float dt)
+{
+    if (m_respawnTimer <= 0)
+        return;
+
+    m_respawnTimer -= dt;
+}
