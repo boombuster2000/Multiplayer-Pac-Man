@@ -1,13 +1,15 @@
+#pragma once
 #include "board.h"
 #include "engine/core/vector2ex.h"
 #include "engine/ui/enums.h"
 #include "entity.h"
 #include "game/components/pacman.h"
 
-
 class Ghost : public Entity
 {
-  private:
+  protected:
+    void UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& targetPosition);
+
   public:
     Ghost(const Vector2Ex<float>& spawnPosition,
           const Vector2Ex<float>& speed,
@@ -17,5 +19,7 @@ class Ghost : public Entity
 
     virtual ~Ghost() = default;
 
-    virtual void UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& targetPosition) = 0;
+    virtual void Update(const Board& board,
+                        const Vector2Ex<float>& pacmanPosition,
+                        const ui::Direction pacmanDirection) = 0;
 };
