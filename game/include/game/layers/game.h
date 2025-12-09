@@ -13,6 +13,8 @@
 #include "game/components/pacman.h"
 #include "game/components/player_input.h"
 
+#include <array>
+
 class GameLayer : public engine::Layer
 {
   private:
@@ -24,7 +26,7 @@ class GameLayer : public engine::Layer
     Pinky m_pinky;
     Inky m_inky;
     Clyde m_clyde;
-    std::vector<Ghost*> m_ghosts;
+    std::array<Ghost*, 4> m_ghosts;
 
     bool m_isPinkyReleased = false;
     bool m_isInkyReleased = false;
