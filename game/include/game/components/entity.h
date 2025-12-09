@@ -21,6 +21,7 @@ class Entity : public ui::RenderableObject
     ui::Direction m_queuedDirection;
     std::shared_ptr<Texture2D> m_texture;
     float m_rotation = 0.0f;
+    Color m_color;
 
   private:
     Entity() = default;
@@ -31,7 +32,8 @@ class Entity : public ui::RenderableObject
            const Vector2Ex<float>& speed,
            const Vector2Ex<float>& dimensions,
            const ui::Direction& direction,
-           const std::shared_ptr<Texture2D>& texture);
+           const std::shared_ptr<Texture2D>& texture,
+           const Color& color = WHITE);
 
     EntityType GetEntityType() const;
 
@@ -43,6 +45,9 @@ class Entity : public ui::RenderableObject
 
     float GetRotation() const;
     void SetRotation(const float& rotation);
+
+    Color GetColor() const;
+    void SetColor(const Color& color);
 
     ui::Direction GetDirection() const;
     void SetDirection(const ui::Direction& direction);
