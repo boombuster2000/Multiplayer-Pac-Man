@@ -4,9 +4,21 @@ Ghost::Ghost(const Vector2Ex<float>& spawnPosition,
              const Vector2Ex<float>& speed,
              const Vector2Ex<float>& dimensions,
              const ui::Direction& direction,
-             const std::shared_ptr<Texture2D>& texture) :
-    Entity(EntityType::GHOST, spawnPosition, speed, dimensions, direction, texture)
+             const std::shared_ptr<Texture2D>& texture,
+             const State state) :
+    Entity(EntityType::GHOST, spawnPosition, speed, dimensions, direction, texture),
+    m_state(state)
 {
+}
+
+Ghost::State Ghost::GetState() const
+{
+    return m_state;
+}
+
+void Ghost::SetState(const State state)
+{
+    m_state = state;
 }
 
 void Ghost::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& targetPosition)
