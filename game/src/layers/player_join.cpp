@@ -33,7 +33,7 @@ void PlayerJoinLayer::RebuildPlayerMenus()
     {
         fontSize = 20.f;
     }
-    
+
     float spacing = fontSize * 1.2f;
     if (screenDivisions >= 4)
     {
@@ -99,6 +99,17 @@ void PlayerJoinLayer::AddJoiningPlayer(PlayerInput* controls)
         joiningPlayer.state = ReadyState::READY;
         m_isFirstPlayerJoined = true;
         return;
+    }
+
+    switch (m_joiningPlayers.size())
+    {
+    case 2:
+        joiningPlayer.pacman.SetColor(Color(67, 255, 65, 255));
+        break;
+    case 3:
+        joiningPlayer.pacman.SetColor(Color(255, 65, 235, 255));
+    case 4:
+        joiningPlayer.pacman.SetColor(Color(110, 123, 145, 255));
     }
 
     RebuildPlayerMenus();
@@ -396,15 +407,20 @@ void PlayerJoinLayer::OnRender()
                             back_text = "CTRL/B to change profile";
                         }
                         const int text_width = MeasureText(back_text, backFontSize);
-                        DrawText(back_text, rect.x + rect.width / 2 - text_width / 2,
-                                 rect.y + rect.height - backFontSize - y_start_offset, backFontSize, LIGHTGRAY);
+                        DrawText(back_text,
+                                 rect.x + rect.width / 2 - text_width / 2,
+                                 rect.y + rect.height - backFontSize - y_start_offset,
+                                 backFontSize,
+                                 LIGHTGRAY);
                     }
                     else
                     {
                         const char* kb_part1 = "CTRL";
-                        const char* kb_part2 = (i == 0) ? " to return to menu (Keyboard)" : " to change profile (Keyboard)";
+                        const char* kb_part2 =
+                            (i == 0) ? " to return to menu (Keyboard)" : " to change profile (Keyboard)";
                         const char* gp_part1 = "B";
-                        const char* gp_part2 = (i == 0) ? " to return to menu (Gamepad)" : " to change profile (Gamepad)";
+                        const char* gp_part2 =
+                            (i == 0) ? " to return to menu (Gamepad)" : " to change profile (Gamepad)";
 
                         const int kb_part1_width = MeasureText(kb_part1, backFontSize);
                         const int kb_total_width = kb_part1_width + MeasureText(kb_part2, backFontSize);
