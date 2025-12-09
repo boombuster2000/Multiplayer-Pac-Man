@@ -271,7 +271,8 @@ GameLayer::GameLayer(const std::vector<Client>& clients) :
     m_pinky(ConstructPinky()),
     m_inky(ConstructInky()),
     m_clyde(ConstructClyde()),
-    m_clients(clients)
+    m_clients(clients),
+    m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde}
 {
     SetPacmansSpawnPositions();
 }
@@ -282,7 +283,8 @@ GameLayer::GameLayer(const std::vector<Client>& clients, std::string_view boardP
     m_pinky(ConstructPinky()),
     m_inky(ConstructInky()),
     m_clyde(ConstructClyde()),
-    m_clients(clients)
+    m_clients(clients),
+    m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde}
 
 {
     SetPacmansSpawnPositions();
@@ -433,17 +435,11 @@ void GameLayer::OnUpdate(float ts)
         ProcessPelletCollection(client, client.pacman.GetLastPosition(), client.pacman.GetPositionAtAnchor());
     }
 
-    const Pacman& closestPacmanToBlinky = GetClosestPacmanWithNodes(m_blinky.GetPositionAtAnchor());
-    m_blinky.Update(m_board, closestPacmanToBlinky.GetPositionAtAnchor(), closestPacmanToBlinky.GetDirection());
-
-    const Pacman& closestPacmanToPinky = GetClosestPacmanWithNodes(m_pinky.GetPositionAtAnchor());
-    m_pinky.Update(m_board, closestPacmanToPinky.GetPositionAtAnchor(), closestPacmanToPinky.GetDirection());
-
-    const Pacman& closestPacmanToInky = GetClosestPacmanWithNodes(m_inky.GetPositionAtAnchor());
-    m_inky.Update(m_board, closestPacmanToInky.GetPositionAtAnchor(), closestPacmanToInky.GetDirection());
-
-    const Pacman& closestPacmanToClyde = GetClosestPacmanWithNodes(m_clyde.GetPositionAtAnchor());
-    m_clyde.Update(m_board, closestPacmanToClyde.GetPositionAtAnchor(), closestPacmanToClyde.GetDirection());
+    for (auto& ghost : m_ghosts)
+    {
+        const Pacman& closestPacman = GetClosestPacmanWithNodes(ghost->GetPositionAtAnchor());
+        ghost->Update(m_board, closestPacman.GetPositionAtAnchor(), closestPacman.GetDirection());
+    }
 
     ProcessMovementSteps(&m_blinky, ts);
 
@@ -467,13 +463,12 @@ void GameLayer::OnRender()
 {
     m_board.Render();
 
-    for (auto& client : m_clients)
+    for (const auto& client : m_clients)
         client.pacman.Render();
 
-    m_blinky.Render();
-    m_pinky.Render();
-    m_inky.Render();
-    m_clyde.Render();
+    for (const auto& ghost : m_ghosts)
+        ghost->Render();
+
     RenderScores();
     // RenderNodes();
 }

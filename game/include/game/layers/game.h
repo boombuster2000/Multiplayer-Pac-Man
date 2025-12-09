@@ -24,6 +24,7 @@ class GameLayer : public engine::Layer
     Pinky m_pinky;
     Inky m_inky;
     Clyde m_clyde;
+    std::vector<Ghost*> m_ghosts;
 
     bool m_isPinkyReleased = false;
     bool m_isInkyReleased = false;
@@ -53,7 +54,6 @@ class GameLayer : public engine::Layer
     bool TryApplyQueuedDirection(Entity* entity, Vector2Ex<float>& currentPosition, ui::Direction& currentDirection);
     void RenderScores() const;
     void RenderNodes() const;
-
     void SetPacmansSpawnPositions();
 
     Pacman& GetClosestPacmanWithNodes(const Vector2Ex<float>& referencePoint) const;
