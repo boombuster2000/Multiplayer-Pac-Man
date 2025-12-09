@@ -4,7 +4,6 @@
 
 class Blinky : public Ghost
 {
-  private:
   public:
     Blinky(const Vector2Ex<float>& spawnPosition,
            const Vector2Ex<float>& speed,

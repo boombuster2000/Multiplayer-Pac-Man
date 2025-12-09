@@ -4,7 +4,6 @@
 
 class Pinky : public Ghost
 {
-  private:
   public:
     Pinky(const Vector2Ex<float>& spawnPosition,
           const Vector2Ex<float>& speed,

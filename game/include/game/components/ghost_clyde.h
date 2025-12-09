@@ -4,7 +4,6 @@
 
 class Clyde : public Ghost
 {
-  private:
   public:
     Clyde(const Vector2Ex<float>& spawnPosition,
           const Vector2Ex<float>& speed,
