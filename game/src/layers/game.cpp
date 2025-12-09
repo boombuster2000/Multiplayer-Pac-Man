@@ -416,7 +416,7 @@ void GameLayer::OnRender()
 
     m_blinky.Render();
     RenderScores();
-    RenderNodes();
+    // RenderNodes();
 }
 
 void GameLayer::RenderScores() const
@@ -430,6 +430,7 @@ void GameLayer::RenderScores() const
     for (const auto& client : m_clients)
     {
         std::string_view username = client.profile->GetUsername();
+        const Color playerColor = client.pacman.GetColor();
         const int currentPoints = client.player.GetPoints();
         const auto& personalHighscores = client.profile->GetPersonalHighscores();
 
@@ -442,17 +443,17 @@ void GameLayer::RenderScores() const
 
         // Display Username in a distinct color
         const std::string usernameText = std::format("Username: {}", username);
-        DrawText(usernameText.c_str(), 10, yOffset, lineHeight, DARKBLUE); // Using DARKBLUE for username
+        DrawText(usernameText.c_str(), 10, yOffset, lineHeight, playerColor); // Using DARKBLUE for username
         yOffset += lineHeight + lineSpacing;
 
         // Display Current Score in green
         const std::string currentPointsStr = std::format("Score: {}", currentPoints);
-        DrawText(currentPointsStr.c_str(), 10, yOffset, lineHeight, GREEN); // Using GREEN for current score
+        DrawText(currentPointsStr.c_str(), 10, yOffset, lineHeight, playerColor); // Using GREEN for current score
         yOffset += lineHeight + lineSpacing;
 
         // Display Highscore in gold/yellow
         const std::string highscoreStr = std::format("Highscore: {}", highscore);
-        DrawText(highscoreStr.c_str(), 10, yOffset, lineHeight, ORANGE); // Using ORANGE for highscore
-        yOffset += lineHeight + playerSpacing;                           // Add extra spacing for the next player
+        DrawText(highscoreStr.c_str(), 10, yOffset, lineHeight, playerColor); // Using ORANGE for highscore
+        yOffset += lineHeight + playerSpacing;                                // Add extra spacing for the next player
     }
 }
