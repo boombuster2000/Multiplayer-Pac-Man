@@ -177,11 +177,11 @@ void GameLayer::SetPacmansSpawnPositions()
     }
 }
 
-Pacman& GameLayer::GetClosestPacmanWithNodes(const Vector2Ex<float>& referencePoint) const
+Pacman& GameLayer::GetClosestAlivePacmanWithNodes(const Vector2Ex<float>& referencePoint) const
 {
     if (m_clients.empty())
     {
-        throw std::runtime_error("GetClosestPacmanWithNodes called with no clients");
+        throw std::runtime_error("GetClosestAlivePacmanWithNodes called with no clients");
     }
 
     const NodeDistanceTable& distanceTable = m_board.GetDistanceTable();
@@ -193,6 +193,10 @@ Pacman& GameLayer::GetClosestPacmanWithNodes(const Vector2Ex<float>& referencePo
     for (const auto& client : m_clients)
     {
         const Pacman& currentPacman = client.pacman;
+
+        if (currentPacman.IsDead())
+            continue;
+
         Node* pacmanNode = m_board.GetClosestNode(currentPacman.GetPositionAtAnchor());
 
         // Check if a route exists between the nodes
@@ -239,7 +243,7 @@ Blinky GameLayer::ConstructBlinky() const
                   Vector2Ex<float>(350, 350),
                   m_board.GetTileDimensions(),
                   ui::Direction::RIGHT,
-                  true);
+                  Ghost::State::CHASE);
 }
 
 Pinky GameLayer::ConstructPinky() const
@@ -342,22 +346,18 @@ bool GameLayer::IsPacmanTouchingGhost(const Pacman& pacman, const Ghost& ghost) 
     return CheckCollisionRecs(pacmanRec, ghostRec);
 }
 
-void GameLayer::HandlePacmanDeath(Client& client, Ghost& ghost)
+void GameLayer::HandlePacmanDeath(Pacman& pacman, Ghost& ghost)
 {
-    client.player.RemoveLife();
-    client.player.SetDead(true);
-    client.player.SetRespawnTimer(3.0f); // Pac-man is "dead" for 3 seconds.
+    pacman.RemoveLife();
+    pacman.SetDead(true);
+    pacman.SetRespawnTimer(3.0f); // Pac-man is "dead" for 3 seconds.
 
-    if (client.player.GetLives() <= 0)
-    {
-        m_isGameOver = true;
-    }
-    else
+    if (pacman.GetLives() > 0)
     {
         // Respawn Pacman
-        client.pacman.SetPosition(client.pacman.GetSpawnPosition());
-        client.pacman.SetDirection(ui::Direction::RIGHT); // Stop movement
-        client.pacman.SetQueuedDirection(ui::Direction::RIGHT);
+        pacman.SetPosition(pacman.GetSpawnPosition());
+        pacman.SetDirection(ui::Direction::RIGHT); // Stop movement
+        pacman.SetQueuedDirection(ui::Direction::RIGHT);
     }
 }
 
@@ -365,30 +365,42 @@ void GameLayer::ProcessGhostCollisions()
 {
     for (auto& client : m_clients)
     {
-        if (client.player.IsDead()) // Already dead, no need to check collisions
+        if (client.pacman.IsDead()) // Already dead, no need to check collisions
             continue;
 
         for (auto& ghost : m_ghosts)
         {
             if (IsPacmanTouchingGhost(client.pacman, *ghost))
             {
-                HandlePacmanDeath(client, *ghost);
+                HandlePacmanDeath(client.pacman, *ghost);
                 break; // One collision is enough to kill pacman, move to next client
             }
         }
     }
 }
 
-int GameLayer::GetAlivePacmanCount() const
+int GameLayer::GetCurrentAlivePacmanCount() const
 {
     int aliveCount = 0;
     for (const auto& client : m_clients)
     {
-        if (!client.player.IsDead())
+        if (!client.pacman.IsDead())
             aliveCount++;
     }
 
     return aliveCount;
+}
+
+int GameLayer::GetPacmanWithLivesCount() const
+{
+    int pacmanWithLivesCount = 0;
+    for (const auto& client : m_clients)
+    {
+        if (client.pacman.GetLives() > 0)
+            pacmanWithLivesCount++;
+    }
+
+    return pacmanWithLivesCount;
 }
 
 void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
@@ -488,13 +500,15 @@ void GameLayer::OnUpdate(float ts)
         return;
     }
 
+    m_isGameOver = GetPacmanWithLivesCount() <= 0;
+
     for (auto& client : m_clients)
     {
-        if (client.player.IsDead())
+        if (client.pacman.IsDead())
         {
-            client.player.UpdateRespawnTimer(ts);
-            if (client.player.GetRespawnTimer() <= 0.f)
-                client.player.SetDead(false);
+            client.pacman.UpdateRespawnTimer(ts);
+            if (client.pacman.GetRespawnTimer() <= 0.f && client.pacman.GetLives() > 0)
+                client.pacman.SetDead(false);
         }
         else // Only process movement and pellet collection for alive Pacmans
         {
@@ -505,30 +519,35 @@ void GameLayer::OnUpdate(float ts)
 
     ProcessGhostCollisions(); // Check for collisions after Pac-Mans have moved
 
-    int alivePacmanCount = GetAlivePacmanCount();
+    int alivePacmanCount = GetCurrentAlivePacmanCount();
 
     for (auto& ghost : m_ghosts)
     {
-        if (!ghost->IsReleased())
-            continue;
-
-        // Ghosts only update their queued direction and move if there's at least one alive Pacman
-        if (alivePacmanCount > 0)
+        if (ghost->GetState() == Ghost::State::CHASE)
         {
-            const Pacman& closestPacman = GetClosestPacmanWithNodes(ghost->GetPositionAtAnchor());
-            ghost->Update(m_board, closestPacman.GetPositionAtAnchor(), closestPacman.GetDirection());
+            // Ghosts only update their queued directio in and move if there's at least one alive Pacman
+            if (alivePacmanCount > 0)
+            {
+                const Pacman& closestPacman = GetClosestAlivePacmanWithNodes(ghost->GetPositionAtAnchor());
+                ghost->Update(m_board, closestPacman.GetPositionAtAnchor(), closestPacman.GetDirection());
+            }
         }
+        else
+        {
+            continue;
+        }
+
         ProcessMovementSteps(ghost, ts);
     }
 
     if (m_timePassedSinceStart >= 5)
-        m_pinky.SetReleased(true);
+        m_pinky.SetState(Ghost::State::CHASE);
 
     if (m_timePassedSinceStart >= 10)
-        m_inky.SetReleased(true);
+        m_inky.SetState(Ghost::State::CHASE);
 
     if (m_timePassedSinceStart >= 15)
-        m_clyde.SetReleased(true);
+        m_clyde.SetState(Ghost::State::CHASE);
 }
 
 void GameLayer::OnRender()

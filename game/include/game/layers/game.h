@@ -55,7 +55,7 @@ class GameLayer : public engine::Layer
     void RenderNodes() const;
     void SetPacmansSpawnPositions();
 
-    Pacman& GetClosestPacmanWithNodes(const Vector2Ex<float>& referencePoint) const;
+    Pacman& GetClosestAlivePacmanWithNodes(const Vector2Ex<float>& referencePoint) const;
 
     Blinky ConstructBlinky() const;
     Pinky ConstructPinky() const;
@@ -64,8 +64,9 @@ class GameLayer : public engine::Layer
 
     bool IsPacmanTouchingGhost(const Pacman& pacman, const Ghost& ghost) const;
     void ProcessGhostCollisions();
-    void HandlePacmanDeath(Client& client, Ghost& ghost);
-    int GetAlivePacmanCount() const;
+    void HandlePacmanDeath(Pacman& pacman, Ghost& ghost);
+    int GetCurrentAlivePacmanCount() const;
+    int GetPacmanWithLivesCount() const;
 
   public:
     explicit GameLayer(const std::vector<Client>& players);
