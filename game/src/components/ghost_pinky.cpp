@@ -14,14 +14,12 @@
 Pinky::Pinky(const Vector2Ex<float>& spawnPosition,
              const Vector2Ex<float>& speed,
              const Vector2Ex<float>& dimensions,
-             const ui::Direction& direction,
-             const bool isReleased) :
+             const ui::Direction& direction) :
     Ghost(spawnPosition,
           speed,
           dimensions,
           direction,
-          game::GameApplication::Get().GetTexturesManager().GetTexture("pinky"),
-          isReleased)
+          game::GameApplication::Get().GetTexturesManager().GetTexture("pinky"))
 {
 }
 

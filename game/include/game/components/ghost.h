@@ -7,9 +7,6 @@
 
 class Ghost : public Entity
 {
-  private:
-    bool m_isReleased = false;
-
   protected:
     void UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& targetPosition);
 
@@ -18,13 +15,9 @@ class Ghost : public Entity
           const Vector2Ex<float>& speed,
           const Vector2Ex<float>& dimensions,
           const ui::Direction& direction,
-          const std::shared_ptr<Texture2D>& texture,
-          const bool isReleased = false);
+          const std::shared_ptr<Texture2D>& texture);
 
     virtual ~Ghost() = default;
-
-    void SetReleased(const bool isReleased);
-    bool IsReleased() const;
 
     virtual void Update(const Board& board,
                         const Vector2Ex<float>& pacmanPosition,
