@@ -454,5 +454,20 @@ Vector2Ex<float> Board::GetPlayerSpawnPoint(const int player) const
 
 Vector2Ex<float> Board::GetBlinkyGhostSpawnPoint() const
 {
+    return GetPositionFromIndex({8, 8});
+}
+
+Vector2Ex<float> Board::GetPinkyGhostSpawnPoint() const
+{
+    return GetPositionFromIndex({7, 8});
+}
+
+Vector2Ex<float> Board::GetInkyGhostSpawnPoint() const
+{
+    return GetPositionFromIndex({6, 8});
+}
+
+Vector2Ex<float> Board::GetClydeGhostSpawnPoint() const
+{
     return GetPositionFromIndex({5, 8});
 }

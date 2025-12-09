@@ -243,7 +243,7 @@ Blinky GameLayer::ConstructBlinky() const
 
 Pinky GameLayer::ConstructPinky() const
 {
-    return Pinky(m_board.GetBlinkyGhostSpawnPoint(),
+    return Pinky(m_board.GetPinkyGhostSpawnPoint(),
                  Vector2Ex<float>(350, 350),
                  m_board.GetTileDimensions(),
                  ui::Direction::RIGHT);
@@ -251,7 +251,7 @@ Pinky GameLayer::ConstructPinky() const
 
 Inky GameLayer::ConstructInky() const
 {
-    return Inky(m_board.GetBlinkyGhostSpawnPoint(),
+    return Inky(m_board.GetInkyGhostSpawnPoint(),
                 Vector2Ex<float>(350, 350),
                 m_board.GetTileDimensions(),
                 ui::Direction::RIGHT);
@@ -259,7 +259,7 @@ Inky GameLayer::ConstructInky() const
 
 Clyde GameLayer::ConstructClyde() const
 {
-    return Clyde(m_board.GetBlinkyGhostSpawnPoint(),
+    return Clyde(m_board.GetClydeGhostSpawnPoint(),
                  Vector2Ex<float>(350, 350),
                  m_board.GetTileDimensions(),
                  ui::Direction::RIGHT);
