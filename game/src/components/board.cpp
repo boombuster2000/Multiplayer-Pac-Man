@@ -442,11 +442,11 @@ Vector2Ex<float> Board::GetPlayerSpawnPoint(const int player) const
     switch (player)
     {
     case 2:
-        return GetPositionFromIndex({1, 2});
+        return GetPositionFromIndex({12, 12});
     case 3:
-        return GetPositionFromIndex({1, 3});
+        return GetPositionFromIndex({3, 10});
     case 4:
-        return GetPositionFromIndex({1, 4});
+        return GetPositionFromIndex({10, 3});
     default:
         return GetPositionFromIndex({1, 1});
     }
