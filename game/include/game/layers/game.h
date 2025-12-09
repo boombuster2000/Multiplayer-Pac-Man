@@ -7,6 +7,9 @@
 #include "game/components/client.h"
 #include "game/components/entity.h"
 #include "game/components/ghost_blinky.h"
+#include "game/components/ghost_clyde.h"
+#include "game/components/ghost_inky.h"
+#include "game/components/ghost_pinky.h"
 #include "game/components/pacman.h"
 #include "game/components/player_input.h"
 
@@ -18,8 +21,16 @@ class GameLayer : public engine::Layer
     std::vector<Client> m_clients;
     ui::Direction m_queuedDirection;
     Blinky m_blinky;
+    Pinky m_pinky;
+    Inky m_inky;
+    Clyde m_clyde;
+
+    bool m_isPinkyReleased = false;
+    bool m_isInkyReleased = false;
+    bool m_isClydeReleased = false;
 
     float m_timePassedSinceLastSave = 0.0f;
+    float m_timePassedSinceStart = 0.0f;
 
   private:
     bool IsPacmanTouchingPellet(const Pellet& pellet,
@@ -48,6 +59,9 @@ class GameLayer : public engine::Layer
     Pacman& GetClosestPacmanWithNodes(const Vector2Ex<float>& referencePoint) const;
 
     Blinky ConstructBlinky() const;
+    Pinky ConstructPinky() const;
+    Inky ConstructInky() const;
+    Clyde ConstructClyde() const;
 
   public:
     explicit GameLayer(const std::vector<Client>& players);

@@ -235,15 +235,42 @@ Pacman& GameLayer::GetClosestPacmanWithNodes(const Vector2Ex<float>& referencePo
 
 Blinky GameLayer::ConstructBlinky() const
 {
-    return Blinky(m_board.GetSpeedyGhostSpawnPoint(),
+    return Blinky(m_board.GetBlinkyGhostSpawnPoint(),
                   Vector2Ex<float>(350, 350),
                   m_board.GetTileDimensions(),
                   ui::Direction::RIGHT);
 }
 
+Pinky GameLayer::ConstructPinky() const
+{
+    return Pinky(m_board.GetBlinkyGhostSpawnPoint(),
+                 Vector2Ex<float>(350, 350),
+                 m_board.GetTileDimensions(),
+                 ui::Direction::RIGHT);
+}
+
+Inky GameLayer::ConstructInky() const
+{
+    return Inky(m_board.GetBlinkyGhostSpawnPoint(),
+                Vector2Ex<float>(350, 350),
+                m_board.GetTileDimensions(),
+                ui::Direction::RIGHT);
+}
+
+Clyde GameLayer::ConstructClyde() const
+{
+    return Clyde(m_board.GetBlinkyGhostSpawnPoint(),
+                 Vector2Ex<float>(350, 350),
+                 m_board.GetTileDimensions(),
+                 ui::Direction::RIGHT);
+}
+
 GameLayer::GameLayer(const std::vector<Client>& clients) :
     m_board(),
     m_blinky(ConstructBlinky()),
+    m_pinky(ConstructPinky()),
+    m_inky(ConstructInky()),
+    m_clyde(ConstructClyde()),
     m_clients(clients)
 {
     SetPacmansSpawnPositions();
@@ -252,6 +279,9 @@ GameLayer::GameLayer(const std::vector<Client>& clients) :
 GameLayer::GameLayer(const std::vector<Client>& clients, std::string_view boardPath) :
     m_board(boardPath),
     m_blinky(ConstructBlinky()),
+    m_pinky(ConstructPinky()),
+    m_inky(ConstructInky()),
+    m_clyde(ConstructClyde()),
     m_clients(clients)
 
 {
@@ -387,6 +417,7 @@ void GameLayer::UpdateHighscores()
 void GameLayer::OnUpdate(float ts)
 {
     m_timePassedSinceLastSave += ts;
+    m_timePassedSinceStart += ts;
 
     if (m_timePassedSinceLastSave >= 10.0f)
     {
@@ -402,9 +433,34 @@ void GameLayer::OnUpdate(float ts)
         ProcessPelletCollection(client, client.pacman.GetLastPosition(), client.pacman.GetPositionAtAnchor());
     }
 
-    Pacman& closestPacman = GetClosestPacmanWithNodes(m_blinky.GetPositionAtAnchor());
-    m_blinky.UpdateQueuedDirection(m_board, closestPacman.GetPositionAtAnchor());
+    const Pacman& closestPacmanToBlinky = GetClosestPacmanWithNodes(m_blinky.GetPositionAtAnchor());
+    m_blinky.Update(m_board, closestPacmanToBlinky.GetPositionAtAnchor(), closestPacmanToBlinky.GetDirection());
+
+    const Pacman& closestPacmanToPinky = GetClosestPacmanWithNodes(m_pinky.GetPositionAtAnchor());
+    m_pinky.Update(m_board, closestPacmanToPinky.GetPositionAtAnchor(), closestPacmanToPinky.GetDirection());
+
+    const Pacman& closestPacmanToInky = GetClosestPacmanWithNodes(m_inky.GetPositionAtAnchor());
+    m_inky.Update(m_board, closestPacmanToInky.GetPositionAtAnchor(), closestPacmanToInky.GetDirection());
+
+    const Pacman& closestPacmanToClyde = GetClosestPacmanWithNodes(m_clyde.GetPositionAtAnchor());
+    m_clyde.Update(m_board, closestPacmanToClyde.GetPositionAtAnchor(), closestPacmanToClyde.GetDirection());
+
     ProcessMovementSteps(&m_blinky, ts);
+
+    if (m_isPinkyReleased)
+        ProcessMovementSteps(&m_pinky, ts);
+    else if (m_timePassedSinceStart >= 5)
+        m_isPinkyReleased = true;
+
+    if (m_isInkyReleased)
+        ProcessMovementSteps(&m_inky, ts);
+    else if (m_timePassedSinceStart >= 10)
+        m_isInkyReleased = true;
+
+    if (m_isClydeReleased)
+        ProcessMovementSteps(&m_clyde, ts);
+    else if (m_timePassedSinceStart >= 15)
+        m_isClydeReleased = true;
 }
 
 void GameLayer::OnRender()
@@ -415,6 +471,9 @@ void GameLayer::OnRender()
         client.pacman.Render();
 
     m_blinky.Render();
+    m_pinky.Render();
+    m_inky.Render();
+    m_clyde.Render();
     RenderScores();
     // RenderNodes();
 }
