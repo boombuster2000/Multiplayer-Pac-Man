@@ -15,7 +15,10 @@ class Pacman : public Entity
     float ConvertDirectionToRotation(const ui::Direction& direction) const;
 
   public:
-    Pacman(Vector2Ex<float> spawnPosition, Vector2Ex<float> dimensions, float speed);
+    Pacman(Vector2Ex<float> spawnPosition,
+           Vector2Ex<float> dimensions,
+           float speed,
+           Color color = Color(255, 239, 0, 255));
 
     void SetPosition(const Vector2Ex<float> position) final;
     void SetQueuedDirection(const ui::Direction& direction) final;

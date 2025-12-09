@@ -19,13 +19,14 @@ float Pacman::ConvertDirectionToRotation(const ui::Direction& direction) const
     }
 }
 
-Pacman::Pacman(Vector2Ex<float> spawnPosition, Vector2Ex<float> dimensions, float speed) :
+Pacman::Pacman(Vector2Ex<float> spawnPosition, Vector2Ex<float> dimensions, float speed, Color color) :
     Entity(EntityType::PACMAN,
            spawnPosition,
            Vector2Ex<float>(speed, speed),
            dimensions,
            ui::Direction::LEFT,
-           game::GameApplication::Get().GetTexturesManager().GetTexture("pac-man"))
+           game::GameApplication::Get().GetTexturesManager().GetTexture("pac-man"),
+           color)
 {
 }
 
