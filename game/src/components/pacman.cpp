@@ -24,7 +24,7 @@ Pacman::Pacman(Vector2Ex<float> spawnPosition, Vector2Ex<float> dimensions, floa
            spawnPosition,
            Vector2Ex<float>(speed, speed),
            dimensions,
-           ui::Direction::LEFT,
+           ui::Direction::RIGHT,
            game::GameApplication::Get().GetTexturesManager().GetTexture("pac-man"),
            color)
 {
