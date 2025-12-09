@@ -4,9 +4,21 @@ Ghost::Ghost(const Vector2Ex<float>& spawnPosition,
              const Vector2Ex<float>& speed,
              const Vector2Ex<float>& dimensions,
              const ui::Direction& direction,
-             const std::shared_ptr<Texture2D>& texture) :
-    Entity(EntityType::GHOST, spawnPosition, speed, dimensions, direction, texture)
+             const std::shared_ptr<Texture2D>& texture,
+             const bool isReleased) :
+    Entity(EntityType::GHOST, spawnPosition, speed, dimensions, direction, texture),
+    m_isReleased(isReleased)
 {
+}
+
+void Ghost::SetReleased(const bool isReleased)
+{
+    m_isReleased = isReleased;
+}
+
+bool Ghost::IsReleased() const
+{
+    return m_isReleased;
 }
 
 void Ghost::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& targetPosition)

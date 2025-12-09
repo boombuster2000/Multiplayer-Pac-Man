@@ -14,12 +14,14 @@
 Blinky::Blinky(const Vector2Ex<float>& spawnPosition,
                const Vector2Ex<float>& speed,
                const Vector2Ex<float>& dimensions,
-               const ui::Direction& direction) :
+               const ui::Direction& direction,
+               const bool isReleased) :
     Ghost(spawnPosition,
           speed,
           dimensions,
           direction,
-          game::GameApplication::Get().GetTexturesManager().GetTexture("blinky"))
+          game::GameApplication::Get().GetTexturesManager().GetTexture("blinky"),
+          isReleased)
 {
 }
 
