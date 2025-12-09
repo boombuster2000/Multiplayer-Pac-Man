@@ -28,12 +28,9 @@ class GameLayer : public engine::Layer
     Clyde m_clyde;
     std::array<Ghost*, 4> m_ghosts;
 
-    bool m_isPinkyReleased = false;
-    bool m_isInkyReleased = false;
-    bool m_isClydeReleased = false;
-
     float m_timePassedSinceLastSave = 0.0f;
     float m_timePassedSinceStart = 0.0f;
+    bool m_isGameOver = false;
 
   private:
     bool IsPacmanTouchingPellet(const Pellet& pellet,
@@ -64,6 +61,11 @@ class GameLayer : public engine::Layer
     Pinky ConstructPinky() const;
     Inky ConstructInky() const;
     Clyde ConstructClyde() const;
+
+    bool IsPacmanTouchingGhost(const Pacman& pacman, const Ghost& ghost) const;
+    void ProcessGhostCollisions();
+    void HandlePacmanDeath(Client& client, Ghost& ghost);
+    int GetAlivePacmanCount() const;
 
   public:
     explicit GameLayer(const std::vector<Client>& players);

@@ -238,7 +238,8 @@ Blinky GameLayer::ConstructBlinky() const
     return Blinky(m_board.GetBlinkyGhostSpawnPoint(),
                   Vector2Ex<float>(350, 350),
                   m_board.GetTileDimensions(),
-                  ui::Direction::RIGHT);
+                  ui::Direction::RIGHT,
+                  true);
 }
 
 Pinky GameLayer::ConstructPinky() const
@@ -328,6 +329,68 @@ void GameLayer::HandleKeyPresses()
     }
 }
 
+bool GameLayer::IsPacmanTouchingGhost(const Pacman& pacman, const Ghost& ghost) const
+{
+    const Vector2Ex<float> pacmanPosition = pacman.GetPositionAtAnchor();
+    const Vector2Ex<float> pacmanDimensions = pacman.GetDimensions();
+    const Vector2Ex<float> ghostPosition = ghost.GetPositionAtAnchor();
+    const Vector2Ex<float> ghostDimensions = ghost.GetDimensions();
+
+    const Rectangle pacmanRec = {pacmanPosition.x, pacmanPosition.y, pacmanDimensions.x, pacmanDimensions.y};
+    const Rectangle ghostRec = {ghostPosition.x, ghostPosition.y, ghostDimensions.x, ghostDimensions.y};
+
+    return CheckCollisionRecs(pacmanRec, ghostRec);
+}
+
+void GameLayer::HandlePacmanDeath(Client& client, Ghost& ghost)
+{
+    client.player.RemoveLife();
+    client.player.SetDead(true);
+    client.player.SetRespawnTimer(3.0f); // Pac-man is "dead" for 3 seconds.
+
+    if (client.player.GetLives() <= 0)
+    {
+        m_isGameOver = true;
+    }
+    else
+    {
+        // Respawn Pacman
+        client.pacman.SetPosition(client.pacman.GetSpawnPosition());
+        client.pacman.SetDirection(ui::Direction::RIGHT); // Stop movement
+        client.pacman.SetQueuedDirection(ui::Direction::RIGHT);
+    }
+}
+
+void GameLayer::ProcessGhostCollisions()
+{
+    for (auto& client : m_clients)
+    {
+        if (client.player.IsDead()) // Already dead, no need to check collisions
+            continue;
+
+        for (auto& ghost : m_ghosts)
+        {
+            if (IsPacmanTouchingGhost(client.pacman, *ghost))
+            {
+                HandlePacmanDeath(client, *ghost);
+                break; // One collision is enough to kill pacman, move to next client
+            }
+        }
+    }
+}
+
+int GameLayer::GetAlivePacmanCount() const
+{
+    int aliveCount = 0;
+    for (const auto& client : m_clients)
+    {
+        if (!client.player.IsDead())
+            aliveCount++;
+    }
+
+    return aliveCount;
+}
+
 void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
 {
     // TODO: Refactor to run less iteractions
@@ -335,10 +398,6 @@ void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
 
     Vector2Ex<float> currentPosition = entity->GetPositionAtAnchor();
     Direction currentDirection = entity->GetDirection();
-
-    // // Collect pellet at starting
-    // if (entity->GetEntityType() == EntityType::PACMAN)
-    //     ProcessPelletCollection(currentPosition);
 
     // Calculate desired movement
     const Vector2Ex<float> targetPosition = entity->GetNextPosition(currentDirection, deltaTime);
@@ -375,9 +434,6 @@ void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
         // Try to apply queued direction at this position
         if (TryApplyQueuedDirection(entity, intermediatePosition, currentDirection))
         {
-            // if (entity->GetEntityType() == EntityType::PACMAN)
-            //     ProcessPelletCollection(intermediatePosition);
-
             // Direction changed, update position and direction, then continue in new direction
             lastValidPosition = intermediatePosition;
             currentPosition = intermediatePosition;
@@ -389,10 +445,6 @@ void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
         if (!CanMoveInDirection(entity, intermediatePosition, currentDirection))
             // Hit a wall, stop at last valid position
             break;
-
-        // // position is valid, collect pellets and continue
-        // if (entity->GetEntityType() == EntityType::PACMAN)
-        //     ProcessPelletCollection(intermediatePosition);
 
         lastValidPosition = intermediatePosition;
         currentPosition = intermediatePosition;
@@ -418,6 +470,7 @@ void GameLayer::UpdateHighscores()
 
 void GameLayer::OnUpdate(float ts)
 {
+
     m_timePassedSinceLastSave += ts;
     m_timePassedSinceStart += ts;
 
@@ -429,34 +482,53 @@ void GameLayer::OnUpdate(float ts)
 
     HandleKeyPresses();
 
+    if (m_isGameOver)
+    {
+        // TODO: Render "Game Over" screen or transition to a game over state.
+        return;
+    }
+
     for (auto& client : m_clients)
     {
-        ProcessMovementSteps(&client.pacman, ts);
-        ProcessPelletCollection(client, client.pacman.GetLastPosition(), client.pacman.GetPositionAtAnchor());
+        if (client.player.IsDead())
+        {
+            client.player.UpdateRespawnTimer(ts);
+            if (client.player.GetRespawnTimer() <= 0.f)
+                client.player.SetDead(false);
+        }
+        else // Only process movement and pellet collection for alive Pacmans
+        {
+            ProcessMovementSteps(&client.pacman, ts);
+            ProcessPelletCollection(client, client.pacman.GetLastPosition(), client.pacman.GetPositionAtAnchor());
+        }
     }
+
+    ProcessGhostCollisions(); // Check for collisions after Pac-Mans have moved
+
+    int alivePacmanCount = GetAlivePacmanCount();
 
     for (auto& ghost : m_ghosts)
     {
-        const Pacman& closestPacman = GetClosestPacmanWithNodes(ghost->GetPositionAtAnchor());
-        ghost->Update(m_board, closestPacman.GetPositionAtAnchor(), closestPacman.GetDirection());
+        if (!ghost->IsReleased())
+            continue;
+
+        // Ghosts only update their queued direction and move if there's at least one alive Pacman
+        if (alivePacmanCount > 0)
+        {
+            const Pacman& closestPacman = GetClosestPacmanWithNodes(ghost->GetPositionAtAnchor());
+            ghost->Update(m_board, closestPacman.GetPositionAtAnchor(), closestPacman.GetDirection());
+        }
+        ProcessMovementSteps(ghost, ts);
     }
 
-    ProcessMovementSteps(&m_blinky, ts);
+    if (m_timePassedSinceStart >= 5)
+        m_pinky.SetReleased(true);
 
-    if (m_isPinkyReleased)
-        ProcessMovementSteps(&m_pinky, ts);
-    else if (m_timePassedSinceStart >= 5)
-        m_isPinkyReleased = true;
+    if (m_timePassedSinceStart >= 10)
+        m_inky.SetReleased(true);
 
-    if (m_isInkyReleased)
-        ProcessMovementSteps(&m_inky, ts);
-    else if (m_timePassedSinceStart >= 10)
-        m_isInkyReleased = true;
-
-    if (m_isClydeReleased)
-        ProcessMovementSteps(&m_clyde, ts);
-    else if (m_timePassedSinceStart >= 15)
-        m_isClydeReleased = true;
+    if (m_timePassedSinceStart >= 15)
+        m_clyde.SetReleased(true);
 }
 
 void GameLayer::OnRender()
