@@ -11,6 +11,9 @@ void LoadAllTextures()
     texturesManager.AddTexture("path", FilePaths::s_texturesDirectory / "path.png");
     texturesManager.AddTexture("pac-man", FilePaths::s_texturesDirectory / "pac-man.png");
     texturesManager.AddTexture("blinky", FilePaths::s_texturesDirectory / "blinky.png");
+    texturesManager.AddTexture("pinky", FilePaths::s_texturesDirectory / "pinky.png");
+    texturesManager.AddTexture("inky", FilePaths::s_texturesDirectory / "inky.png");
+    texturesManager.AddTexture("clyde", FilePaths::s_texturesDirectory / "clyde.png");
 }
 
 void LoadKeyBinds()
