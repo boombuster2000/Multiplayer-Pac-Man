@@ -15,11 +15,17 @@ Clyde::Clyde(const Vector2Ex<float>& spawnPosition,
              const Vector2Ex<float>& speed,
              const Vector2Ex<float>& dimensions,
              const ui::Direction& direction,
+             const Type ghostType,
+             const Vector2Ex<float>& guardPosition,
+             const float releaseTime,
              const State state) :
     Ghost(spawnPosition,
           speed,
           dimensions,
           direction,
+          Ghost::Type::CLYDE,
+          guardPosition,
+          releaseTime,
           game::GameApplication::Get().GetTexturesManager().GetTexture("clyde"),
           state)
 {

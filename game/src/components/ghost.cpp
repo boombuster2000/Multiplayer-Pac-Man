@@ -1,13 +1,21 @@
 #include "game/components/ghost.h"
+#include "game/components/board.h"
+#include "game/components/node_system.h"
 
 Ghost::Ghost(const Vector2Ex<float>& spawnPosition,
              const Vector2Ex<float>& speed,
              const Vector2Ex<float>& dimensions,
              const ui::Direction& direction,
+             const Type ghostType,
+             const Vector2Ex<float>& guardPosition,
+             const float releaseTime,
              const std::shared_ptr<Texture2D>& texture,
              const State state) :
     Entity(EntityType::GHOST, spawnPosition, speed, dimensions, direction, texture),
-    m_state(state)
+    m_state(state),
+    m_ghostType(ghostType),
+    m_guardPosition(guardPosition),
+    m_releaseTime(releaseTime)
 {
 }
 
@@ -19,6 +27,21 @@ Ghost::State Ghost::GetState() const
 void Ghost::SetState(const State state)
 {
     m_state = state;
+}
+
+Ghost::Type Ghost::GetType() const
+{
+    return m_ghostType;
+}
+
+float Ghost::GetReleaseTime() const
+{
+    return m_releaseTime;
+}
+
+void Ghost::SetReleaseTime(const float releaseTime)
+{
+    m_releaseTime = releaseTime;
 }
 
 void Ghost::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& targetPosition)

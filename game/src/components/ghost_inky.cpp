@@ -15,11 +15,17 @@ Inky::Inky(const Vector2Ex<float>& spawnPosition,
            const Vector2Ex<float>& speed,
            const Vector2Ex<float>& dimensions,
            const ui::Direction& direction,
+           const Type ghostType,
+           const Vector2Ex<float>& guardPosition,
+           const float releaseTime,
            const State state) :
     Ghost(spawnPosition,
           speed,
           dimensions,
           direction,
+          Ghost::Type::INKY,
+          guardPosition,
+          releaseTime,
           game::GameApplication::Get().GetTexturesManager().GetTexture("inky"),
           state)
 {
@@ -27,6 +33,5 @@ Inky::Inky(const Vector2Ex<float>& spawnPosition,
 
 void Inky::Update(const Board& board, const Vector2Ex<float>& pacmanPosition, const ui::Direction pacmanDirection)
 {
-
     UpdateQueuedDirection(board, pacmanPosition);
 }
