@@ -237,60 +237,26 @@ Pacman& GameLayer::GetClosestAlivePacmanWithNodes(const Vector2Ex<float>& refere
     return const_cast<Pacman&>(*closestPacman);
 }
 
-Blinky GameLayer::ConstructBlinky() const
-{
-    return Blinky(m_board.GetBlinkyGhostSpawnPoint(),
-                  Vector2Ex<float>(350, 350),
-                  m_board.GetTileDimensions(),
-                  ui::Direction::RIGHT,
-                  Ghost::State::CHASE);
-}
-
-Pinky GameLayer::ConstructPinky() const
-{
-    return Pinky(m_board.GetPinkyGhostSpawnPoint(),
-                 Vector2Ex<float>(350, 350),
-                 m_board.GetTileDimensions(),
-                 ui::Direction::RIGHT);
-}
-
-Inky GameLayer::ConstructInky() const
-{
-    return Inky(m_board.GetInkyGhostSpawnPoint(),
-                Vector2Ex<float>(350, 350),
-                m_board.GetTileDimensions(),
-                ui::Direction::RIGHT);
-}
-
-Clyde GameLayer::ConstructClyde() const
-{
-    return Clyde(m_board.GetClydeGhostSpawnPoint(),
-                 Vector2Ex<float>(350, 350),
-                 m_board.GetTileDimensions(),
-                 ui::Direction::RIGHT);
-}
-
 GameLayer::GameLayer(const std::vector<Client>& clients) :
     m_board(),
-    m_blinky(ConstructBlinky()),
-    m_pinky(ConstructPinky()),
-    m_inky(ConstructInky()),
-    m_clyde(ConstructClyde()),
+    m_blinky(m_board.GetBlinky()),
+    m_pinky(m_board.GetPinky()),
+    m_inky(m_board.GetInky()),
+    m_clyde(m_board.GetClyde()),
     m_clients(clients),
     m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde}
 {
     SetPacmansSpawnPositions();
 }
 
-GameLayer::GameLayer(const std::vector<Client>& clients, std::string_view boardPath) :
-    m_board(boardPath),
-    m_blinky(ConstructBlinky()),
-    m_pinky(ConstructPinky()),
-    m_inky(ConstructInky()),
-    m_clyde(ConstructClyde()),
+GameLayer::GameLayer(const std::vector<Client>& clients, Board board) :
+    m_board(std::move(board)),
+    m_blinky(m_board.GetBlinky()),
+    m_pinky(m_board.GetPinky()),
+    m_inky(m_board.GetInky()),
+    m_clyde(m_board.GetClyde()),
     m_clients(clients),
     m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde}
-
 {
     SetPacmansSpawnPositions();
 }
@@ -502,6 +468,7 @@ void GameLayer::OnUpdate(float ts)
 
     m_isGameOver = GetPacmanWithLivesCount() <= 0;
 
+    // Process pacmans
     for (auto& client : m_clients)
     {
         if (client.pacman.IsDead())
@@ -521,6 +488,7 @@ void GameLayer::OnUpdate(float ts)
 
     int alivePacmanCount = GetCurrentAlivePacmanCount();
 
+    // Process Ghosts
     for (auto& ghost : m_ghosts)
     {
         if (ghost->GetState() == Ghost::State::CHASE)
@@ -534,20 +502,14 @@ void GameLayer::OnUpdate(float ts)
         }
         else
         {
+            if (ghost->GetReleaseTime() <= m_timePassedSinceStart)
+                ghost->SetState(Ghost::State::CHASE);
+
             continue;
         }
 
         ProcessMovementSteps(ghost, ts);
     }
-
-    if (m_timePassedSinceStart >= 5)
-        m_pinky.SetState(Ghost::State::CHASE);
-
-    if (m_timePassedSinceStart >= 10)
-        m_inky.SetState(Ghost::State::CHASE);
-
-    if (m_timePassedSinceStart >= 15)
-        m_clyde.SetState(Ghost::State::CHASE);
 }
 
 void GameLayer::OnRender()
