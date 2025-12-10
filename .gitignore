@@ -6,3 +6,4 @@
 .vs
 .env
 .cmake_cache
+.idea
