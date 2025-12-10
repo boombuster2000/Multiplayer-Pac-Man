@@ -170,6 +170,51 @@ void Board::SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type)
     Grid::GetTile(index).SetType(type);
 }
 
+Blinky Board::GetBlinky()
+{
+    return Blinky(GetGhostSpawnPoint(Ghost::Type::BLINKY),
+                  Vector2Ex<float>(350, 350),
+                  GetTileDimensions(),
+                  ui::Direction::RIGHT,
+                  Ghost::Type::BLINKY,
+                  GetPositionFromIndex({1, 1}),
+                  0,
+                  Ghost::State::CHASE);
+}
+
+Pinky Board::GetPinky()
+{
+    return Pinky(GetGhostSpawnPoint(Ghost::Type::PINKY),
+                 Vector2Ex<float>(350, 350),
+                 GetTileDimensions(),
+                 ui::Direction::RIGHT,
+                 Ghost::Type::PINKY,
+                 GetPositionFromIndex({2, 1}),
+                 5);
+}
+
+Inky Board::GetInky()
+{
+    return Inky(GetGhostSpawnPoint(Ghost::Type::INKY),
+                Vector2Ex<float>(350, 350),
+                GetTileDimensions(),
+                ui::Direction::RIGHT,
+                Ghost::Type::INKY,
+                GetPositionFromIndex({3, 1}),
+                10);
+}
+
+Clyde Board::GetClyde()
+{
+    return Clyde(GetGhostSpawnPoint(Ghost::Type::CLYDE),
+                 Vector2Ex<float>(350, 350),
+                 GetTileDimensions(),
+                 ui::Direction::RIGHT,
+                 Ghost::Type::CLYDE,
+                 GetPositionFromIndex({4, 1}),
+                 15);
+}
+
 void Board::SaveToFile() const
 {
     json j = *this;
@@ -455,22 +500,20 @@ Vector2Ex<float> Board::GetPlayerSpawnPoint(const int player) const
     }
 }
 
-Vector2Ex<float> Board::GetBlinkyGhostSpawnPoint() const
+Vector2Ex<float> Board::GetGhostSpawnPoint(const Ghost::Type ghostType) const
 {
+    using enum Ghost::Type;
+    switch (ghostType)
+    {
+    case BLINKY:
+        return GetPositionFromIndex({8, 8});
+    case PINKY:
+        return GetPositionFromIndex({7, 8});
+    case INKY:
+        return GetPositionFromIndex({6, 8});
+    case CLYDE:
+        return GetPositionFromIndex({5, 8});
+    }
+
     return GetPositionFromIndex({8, 8});
-}
-
-Vector2Ex<float> Board::GetPinkyGhostSpawnPoint() const
-{
-    return GetPositionFromIndex({7, 8});
-}
-
-Vector2Ex<float> Board::GetInkyGhostSpawnPoint() const
-{
-    return GetPositionFromIndex({6, 8});
-}
-
-Vector2Ex<float> Board::GetClydeGhostSpawnPoint() const
-{
-    return GetPositionFromIndex({5, 8});
 }

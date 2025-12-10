@@ -2,9 +2,15 @@
 #include "engine/core/vector2ex.h"
 #include "engine/core/vector2ex_hasher.h"
 #include "engine/ui/grid.h"
+#include "game/components/ghost.h"
+#include "game/components/ghost_blinky.h"
+#include "game/components/ghost_clyde.h"
+#include "game/components/ghost_inky.h"
+#include "game/components/ghost_pinky.h"
 #include "game/components/tile.h"
 #include "game/utils/highscore_utils.h"
 #include "node_system.h"
+#include <array>
 #include <filesystem>
 #include <nlohmann/json.hpp>
 #include <string>
@@ -62,13 +68,17 @@ class Board : public ui::Grid<Tile>
     const NodeDistanceTable& GetDistanceTable() const;
 
     Vector2Ex<float> GetPlayerSpawnPoint(const int player) const;
-
-    Vector2Ex<float> GetBlinkyGhostSpawnPoint() const;
-    Vector2Ex<float> GetPinkyGhostSpawnPoint() const;
-    Vector2Ex<float> GetInkyGhostSpawnPoint() const;
-    Vector2Ex<float> GetClydeGhostSpawnPoint() const;
+    Vector2Ex<float> GetGhostSpawnPoint(const Ghost::Type ghostType) const;
 
     void SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type);
+
+    Blinky GetBlinky();
+
+    Pinky GetPinky();
+
+    Inky GetInky();
+
+    Clyde GetClyde();
 
     void SaveToFile() const;
 
