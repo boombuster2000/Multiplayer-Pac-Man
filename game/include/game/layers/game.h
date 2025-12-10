@@ -70,7 +70,7 @@ class GameLayer : public engine::Layer
 
   public:
     explicit GameLayer(const std::vector<Client>& players);
-    GameLayer(const std::vector<Client>& players, std::string_view boardPath);
+    GameLayer(const std::vector<Client>& players, const Board board);
     ~GameLayer() final;
 
     void HandleKeyPresses();

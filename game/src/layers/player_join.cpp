@@ -123,8 +123,8 @@ int PlayerJoinLayer::GetScreenDivisions(const int playerCount) const
     return playerCount;
 }
 
-PlayerJoinLayer::PlayerJoinLayer(std::string_view boardFilePath) :
-    m_boardPath(boardFilePath)
+PlayerJoinLayer::PlayerJoinLayer(const Board board) :
+    m_board(board)
 {
     m_joiningPlayers.reserve(4);
 }
@@ -137,6 +137,7 @@ void PlayerJoinLayer::OnUpdate(float ts)
     {
         auto newInput =
             std::make_unique<KeyboardPlayerInput>(KEY_W, KEY_S, KEY_A, KEY_D, KEY_LEFT_SHIFT, KEY_LEFT_CONTROL);
+
         bool alreadyExists = false;
         for (const auto& player : m_joiningPlayers)
         {
@@ -281,12 +282,7 @@ void PlayerJoinLayer::OnUpdate(float ts)
         }
 
         if (!clients.empty())
-        {
-            if (m_boardPath == "built-in")
-                TransistionTo(std::make_unique<GameLayer>(clients));
-            else
-                TransistionTo(std::make_unique<GameLayer>(clients, m_boardPath));
-        }
+            TransistionTo(std::make_unique<GameLayer>(clients, std::move(m_board)));
     }
 }
 

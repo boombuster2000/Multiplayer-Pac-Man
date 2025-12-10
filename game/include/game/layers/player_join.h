@@ -1,6 +1,7 @@
 #include "engine/core/layer.h"
-#include "engine/ui/menu.h"
 #include "engine/ui/enums.h"
+#include "engine/ui/menu.h"
+#include "game/components/board.h"
 #include "game/components/client.h"
 #include "game/components/pacman.h"
 #include "game/components/player_input.h"
@@ -41,12 +42,12 @@ class PlayerJoinLayer : public engine::Layer
     };
 
   private:
-    std::string_view m_boardPath;
+    Board m_board;
     std::vector<JoiningPlayer> m_joiningPlayers{};
     bool m_isFirstPlayerJoined = false;
 
   public:
-    explicit PlayerJoinLayer(std::string_view boardFilePath);
+    explicit PlayerJoinLayer(const Board board);
 
     void OnUpdate(float ts) final;
 
