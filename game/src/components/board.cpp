@@ -1,5 +1,4 @@
 #include "game/components/board.h"
-#include "engine/serialization/json_converters.hpp"
 #include "game/components/pellet.h"
 #include "game/file_paths.h"
 #include "game/serialization/json_converters.hpp"
@@ -25,7 +24,7 @@ void Board::AddBoundaries()
     }
 }
 
-void Board::AddArcsToNode(Node* node, const Vector2Ex<size_t>& index)
+void Board::AddArcsToNode(Node* node, const Vector2Ex<size_t>& index) const
 {
     using enum ui::Direction;
 
@@ -101,7 +100,7 @@ void Board::CreateDistanceTable()
         // All other nodes = ∞ unless filled
         for (Node* node : m_nodes)
         {
-            if (!row.count(node))
+            if (!row.contains(node))
             {
                 row[node] = std::numeric_limits<float>::infinity();
             }
@@ -124,11 +123,11 @@ void Board::Floyds()
 {
     // row and col are the same
 
-    for (const auto& [node, _] : m_distanceTable)
+    for (const auto& node : m_distanceTable | std::views::keys)
     {
         for (const auto& [yNode, row] : m_distanceTable)
         {
-            for (const auto& [xNode, distance] : row)
+            for (const auto& xNode : row | std::views::keys)
             {
                 float x = m_distanceTable[node][xNode];
                 float y = m_distanceTable[yNode][node];
@@ -168,26 +167,24 @@ bool Board::IsTileJunction(const Vector2Ex<size_t>& index) const
 }
 bool Board::HasLineOfSight(const Vector2Ex<float>& pos1, const Vector2Ex<float>& pos2) const
 {
-    Vector2Ex<float> line = pos2 - pos1;
-    float length = line.GetLength();
+    const Vector2Ex<float> line = pos2 - pos1;
+    const float length = line.GetLength();
 
     if (length == 0.0f)
         return true;
 
-    Vector2Ex<float> direction = line / length;
+    const Vector2Ex<float> direction = line / length;
 
     // Walk along the line in small steps (e.g., 1 pixel at a time)
     for (float i = 0.0f; i < length; i += 1.0f)
     {
         Vector2Ex<float> currentPoint = pos1 + direction * i;
-        const Tile& tile = GetTileFromPosition(currentPoint);
-        if (tile.GetType() == Tile::Type::WALL)
+        if (const Tile& tile = GetTileFromPosition(currentPoint); tile.GetType() == Tile::Type::WALL)
             return false;
     }
 
     // Check the final point as well to be safe
-    const Tile& endTile = GetTileFromPosition(pos2);
-    if (endTile.GetType() == Tile::Type::WALL)
+    if (const Tile& endTile = GetTileFromPosition(pos2); endTile.GetType() == Tile::Type::WALL)
         return false;
 
     return true;
@@ -401,7 +398,7 @@ void Board::SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type)
     Grid::GetTile(index).SetType(type);
 }
 
-Blinky Board::GetBlinky()
+Blinky Board::GetBlinky() const
 {
     return Blinky(GetGhostSpawnPoint(Ghost::Type::BLINKY),
                   Vector2Ex<float>(350, 350),
@@ -413,7 +410,7 @@ Blinky Board::GetBlinky()
                   Ghost::State::CHASE);
 }
 
-Pinky Board::GetPinky()
+Pinky Board::GetPinky() const
 {
     return Pinky(GetGhostSpawnPoint(Ghost::Type::PINKY),
                  Vector2Ex<float>(350, 350),
@@ -424,7 +421,7 @@ Pinky Board::GetPinky()
                  5);
 }
 
-Inky Board::GetInky()
+Inky Board::GetInky() const
 {
     return Inky(GetGhostSpawnPoint(Ghost::Type::INKY),
                 Vector2Ex<float>(350, 350),
@@ -435,7 +432,7 @@ Inky Board::GetInky()
                 10);
 }
 
-Clyde Board::GetClyde()
+Clyde Board::GetClyde() const
 {
     return Clyde(GetGhostSpawnPoint(Ghost::Type::CLYDE),
                  Vector2Ex<float>(350, 350),
@@ -470,12 +467,15 @@ void Board::SetHighscore(std::string_view profileName, int score)
 {
     if (auto it = m_highScores.find(profileName); it != m_highScores.end())
         // Profile exists, update if score is higher
-        if (score > it->second)
-            it->second = score;
-
-        else
+        if (score <= it->second)
+        {
             // Profile doesn't exist, insert new score
             m_highScores.emplace(profileName, score);
+        }
+        else
+        {
+            it->second = score;
+        }
 }
 
 void Board::SaveHighscoresToFile() const

@@ -38,7 +38,7 @@ class Board : public ui::Grid<Tile>
   private:
     void AddBoundaries();
 
-    void AddArcsToNode(Node* node, const Vector2Ex<size_t>& index);
+    void AddArcsToNode(Node* node, const Vector2Ex<size_t>& index) const;
     void CreateNodes();
     void CreateDistanceTable();
     void CreateRouteTable();
@@ -71,13 +71,13 @@ class Board : public ui::Grid<Tile>
 
     void SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type);
 
-    Blinky GetBlinky();
+    Blinky GetBlinky() const;
 
-    Pinky GetPinky();
+    Pinky GetPinky() const;
 
-    Inky GetInky();
+    Inky GetInky() const;
 
-    Clyde GetClyde();
+    Clyde GetClyde() const;
 
     void SaveToFile() const;
 
