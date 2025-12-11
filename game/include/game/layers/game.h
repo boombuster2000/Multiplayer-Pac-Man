@@ -36,9 +36,9 @@ class GameLayer : public engine::Layer
     bool m_isGameOver = false;
 
   private:
-    bool IsPacmanTouchingPellet(const Pellet& pellet,
+    static bool IsPacmanTouchingPellet(const Pellet& pellet,
                                 const Vector2Ex<float>& pacmanDimensions,
-                                const Vector2Ex<float>& pacmanPosition) const;
+                                const Vector2Ex<float>& pacmanPosition);
 
     bool TryCollectPellet(Player& player,
                           const Vector2Ex<float>& pacmanPosition,
@@ -74,7 +74,7 @@ class GameLayer : public engine::Layer
   public:
     explicit GameLayer(const std::vector<Client>& clients);
     GameLayer(const std::vector<Client>& clients, const Board board);
-    ~GameLayer() final;
+    ~GameLayer() override;
 
     void HandleKeyPresses();
     void ProcessMovementSteps(Entity* entity, const float& deltaTime);

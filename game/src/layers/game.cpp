@@ -14,7 +14,7 @@
 
 bool GameLayer::IsPacmanTouchingPellet(const Pellet& pellet,
                                        const Vector2Ex<float>& pacmanDimensions,
-                                       const Vector2Ex<float>& pacmanPosition) const
+                                       const Vector2Ex<float>& pacmanPosition)
 {
     const Vector2Ex<float> pelletPosition = pellet.GetPositionAtAnchor();
     const Vector2Ex<float> pelletDimensions = pellet.GetDimensions();
@@ -166,15 +166,13 @@ void GameLayer::RenderLives() const
     float yOffset = 10;
     constexpr float xOffset = 30;
 
-    constexpr float ySpacing = 10;
-
-    constexpr float radius = 17;
-
     Vector2Ex<float> startPosition = m_board.GetPositionAtAnchor(TOP_RIGHT);
     startPosition.x += xOffset;
 
     for (const auto& client : m_clients)
     {
+        constexpr float radius = 17;
+        constexpr float ySpacing = 10;
         const Color pacmanColor = client.pacman.GetColor();
         std::shared_ptr<Texture2D> texture = client.pacman.GetTexture();
         const int lives = client.pacman.GetLives();
@@ -191,9 +189,7 @@ void GameLayer::RenderLives() const
             position.x += radius + xSpacing;
         }
 
-
         yOffset += radius + ySpacing;
-
     }
 }
 
@@ -346,13 +342,13 @@ void GameLayer::HandlePacmanDeath(Pacman& pacman, Ghost& ghost)
     pacman.SetDead(true);
     pacman.SetRespawnTimer(3.0f); // Pac-man is "dead" for 3 seconds.
 
+    // Making pacman slightly transparent
+    Color newColor = pacman.GetColor();
+    newColor.a = 128;
+    pacman.SetColor(newColor);
+
     if (pacman.GetLives() > 0)
-    {
-        // Respawn Pacman
         pacman.SetPosition(pacman.GetSpawnPosition());
-        pacman.SetDirection(ui::Direction::RIGHT); // Stop movement
-        pacman.SetQueuedDirection(ui::Direction::RIGHT);
-    }
 }
 
 void GameLayer::ProcessGhostCollisions()
@@ -506,14 +502,27 @@ void GameLayer::OnUpdate(float ts)
         if (client.pacman.IsDead())
         {
             client.pacman.UpdateRespawnTimer(ts);
+
+            // Pacman comes to life again
             if (client.pacman.GetRespawnTimer() <= 0.f && client.pacman.GetLives() > 0)
+            {
                 client.pacman.SetDead(false);
+
+                // Making solid color again.
+                Color color = client.pacman.GetColor();
+                color.a = 255;
+                client.pacman.SetColor(color);
+            }
+
         }
-        else // Only process movement and pellet collection for alive Pacmans
-        {
+
+        // If permanently dead they can't move
+        if (client.pacman.GetLives() > 0)
             ProcessMovementSteps(&client.pacman, ts);
+
+        if (!client.pacman.IsDead())
             ProcessPelletCollection(client, client.pacman.GetLastPosition(), client.pacman.GetPositionAtAnchor());
-        }
+
     }
 
     ProcessGhostCollisions(); // Check for collisions after Pac-Mans have moved
