@@ -29,7 +29,7 @@ class RenderableObject
                               bool visible = true);
     virtual ~RenderableObject() = default;
 
-    /// @return Returns the position of the orgin in the object (not in the 2d space).
+    /// @return Returns the position of the origin in the object (not in the 2d space).
     virtual Vector2Ex<float> GetObjectOrigin() const;
 
     /// @return Returns the position of the origin in the 2d space.
