@@ -48,13 +48,21 @@ void Pellet::SetTypePoints(const TypePointValues& newValues)
 
 Vector2Ex<float> Pellet::GetDimensions() const
 {
-    return Vector2Ex<float>(radius, radius);
+    return {radius, radius};
 }
 
 void Pellet::Render(Vector2Ex<float> offset) const
 {
-    if (m_type == Type::NONE)
-        return;
+    switch (m_type)
+    {
+        case Type::NORMAL:
+            DrawCircleV(GetWorldOrigin(), radius, WHITE);
+            break;
+        case Type::SUPER:
+            DrawCircleV(GetWorldOrigin(), radius + 2, WHITE);
+            break;
+        case Type::NONE:
+            break;
+        }
 
-    DrawCircleV(GetWorldOrigin(), radius, WHITE);
 }

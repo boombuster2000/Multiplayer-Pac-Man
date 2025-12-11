@@ -234,48 +234,74 @@ Board::Board() :
          Vector2Ex<float>(50, 50)),
     m_name("test-file")
 {
-    using enum Tile::Type;
-    AddBoundaries();
+    {
+        using enum Tile::Type;
+        AddBoundaries();
 
-    // Row 2 - top horizontal walls
-    for (size_t x : {2, 4, 5, 7, 8, 9, 10, 11})
-        SetTileType({x, 2}, WALL);
+        // Row 2 - top horizontal walls
+        for (size_t x : {2, 4, 5, 7, 8, 9, 10, 11})
+            SetTileType({x, 2}, WALL);
 
-    // Row 3 - vertical pillars
-    for (size_t x : {2, 11})
-        SetTileType({x, 3}, WALL);
+        // Row 3 - vertical pillars
+        for (size_t x : {2, 11})
+            SetTileType({x, 3}, WALL);
 
-    // Row 4 - inner walls with gaps
-    for (size_t x : {2, 4, 5, 6, 7, 8, 9, 11})
-        SetTileType({x, 4}, WALL);
+        // Row 4 - inner walls with gaps
+        for (size_t x : {2, 4, 5, 6, 7, 8, 9, 11})
+            SetTileType({x, 4}, WALL);
 
-    // Row 5 - ghost house top
-    for (size_t x : {0, 2, 11})
-        SetTileType({x, 5}, WALL);
+        // Row 5 - ghost house top
+        for (size_t x : {0, 2, 11})
+            SetTileType({x, 5}, WALL);
 
-    // Row 6 - ghost house sides
-    for (size_t x : {0, 4, 5, 6, 7, 9})
-        SetTileType({x, 6}, WALL);
+        // Row 6 - ghost house sides
+        for (size_t x : {0, 4, 5, 6, 7, 9})
+            SetTileType({x, 6}, WALL);
 
-    // Row 7 - ghost house sides
-    for (size_t x : {0, 2, 4, 5, 6, 7, 9, 11})
-        SetTileType({x, 7}, WALL);
+        // Row 7 - ghost house sides
+        for (size_t x : {0, 2, 4, 5, 6, 7, 9, 11})
+            SetTileType({x, 7}, WALL);
 
-    // Row 8 - ghost house bottom
-    for (size_t x : {0, 2, 4, 9, 11})
-        SetTileType({x, 8}, WALL);
+        // Row 8 - ghost house bottom
+        for (size_t x : {0, 2, 4, 9, 11})
+            SetTileType({x, 8}, WALL);
 
-    // Row 9 - inner walls with gaps
-    for (size_t x : {2, 4, 5, 6, 7, 8, 9, 11})
-        SetTileType({x, 9}, WALL);
+        // Row 9 - inner walls with gaps
+        for (size_t x : {2, 4, 5, 6, 7, 8, 9, 11})
+            SetTileType({x, 9}, WALL);
 
-    // Row 10 - vertical pillars
-    for (size_t x : {2, 11})
-        SetTileType({x, 10}, WALL);
+        // Row 10 - vertical pillars
+        for (size_t x : {2, 11})
+            SetTileType({x, 10}, WALL);
 
-    // Row 11 - bottom horizontal walls
-    for (size_t x : {2, 3, 4, 5, 7, 8, 9, 11})
-        SetTileType({x, 11}, WALL);
+        // Row 11 - bottom horizontal walls
+        for (size_t x : {2, 3, 4, 5, 7, 8, 9, 11})
+            SetTileType({x, 11}, WALL);
+    }
+
+    // Set super pellets
+    {
+        using enum Pellet::Type;
+        constexpr std::array<Vector2Ex<size_t>, 10> superPelletsCoords{
+            Vector2Ex<size_t>{1, 1},
+            Vector2Ex<size_t>{1, 12},
+            Vector2Ex<size_t>{12, 1},
+            Vector2Ex<size_t>{12, 12},
+            Vector2Ex<size_t>{6, 2},
+            Vector2Ex<size_t>{2, 3},
+            Vector2Ex<size_t>{2, 6},
+            Vector2Ex<size_t>{6, 11},
+            Vector2Ex<size_t>{11, 6},
+            Vector2Ex<size_t>{11, 10}
+        };
+
+        for (const auto& coord : superPelletsCoords)
+        {
+            Tile& tile = GetTile(coord);
+            Pellet& pellet = tile.GetPellet();
+            pellet.SetType(SUPER);
+        }
+    }
 
     CreateNodesAndArcs();
 }
