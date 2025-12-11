@@ -32,7 +32,7 @@ bool GameLayer::TryCollectPellet(Player& player,
     if (!IsPacmanTouchingPellet(pellet, pacmanDimensions, pacmanPosition))
         return false;
 
-    int pointsGained = pellet.GetValue();
+    const int pointsGained = pellet.GetValue();
     player.AddPoints(pointsGained);
     UpdateHighscores();
     pellet.SetType(Pellet::Type::NONE);
@@ -81,7 +81,7 @@ void GameLayer::ProcessPelletCollection(Client& client,
     }
 }
 
-bool GameLayer::CanMoveInDirection(Entity* entity,
+bool GameLayer::CanMoveInDirection(const Entity* entity,
                                    const Vector2Ex<float>& position,
                                    const ui::Direction& direction) const
 {
@@ -114,8 +114,7 @@ bool GameLayer::CanMoveInDirection(Entity* entity,
 
     for (auto& corner : cornersToCheck)
     {
-        const Tile& tile = m_board.GetTileFromPosition(corner);
-        if (tile.GetType() == Tile::Type::WALL)
+        if (const Tile& tile = m_board.GetTileFromPosition(corner); tile.GetType() == Tile::Type::WALL)
             return false;
     }
 
@@ -123,18 +122,18 @@ bool GameLayer::CanMoveInDirection(Entity* entity,
 }
 
 bool GameLayer::TryApplyQueuedDirection(Entity* entity,
-                                        Vector2Ex<float>& currentPosition,
-                                        ui::Direction& currentDirection)
+                                        const Vector2Ex<float>& currentPosition,
+                                        ui::Direction& currentDirection) const
 {
-    ui::Direction queuedDir = entity->GetQueuedDirection();
+    const ui::Direction queuedDir = entity->GetQueuedDirection();
 
     if (queuedDir == currentDirection)
         return false;
 
     const Vector2Ex<float> queuedVec = Vector2Ex<float>::GetDirectionVector(queuedDir);
-    const Vector2Ex<float> peekPosition = currentPosition + queuedVec;
 
-    if (CanMoveInDirection(entity, peekPosition, queuedDir))
+    if (const Vector2Ex<float> peekPosition = currentPosition + queuedVec;
+        CanMoveInDirection(entity, peekPosition, queuedDir))
     {
         entity->ApplyQueuedDirection();
         currentDirection = queuedDir;
@@ -146,19 +145,16 @@ bool GameLayer::TryApplyQueuedDirection(Entity* entity,
 
 void GameLayer::RenderNodes() const
 {
-    const auto& nodes = m_board.GetNodeMap();
-    for (const auto& [index, node] : nodes)
+    for (const auto& nodes = m_board.GetNodeMap(); const auto& node : nodes | std::views::values)
     {
         DrawCircleV(node->GetPosition(), 5, RED);
 
-        const Arc& rightArc = node->GetRightArc();
-        if (rightArc.GetEndNode() != nullptr)
+        if (const Arc& rightArc = node->GetRightArc(); rightArc.GetEndNode() != nullptr)
         {
             DrawLineV(rightArc.GetStartNode()->GetPosition(), rightArc.GetEndNode()->GetPosition(), BLUE);
         }
 
-        const Arc& downArc = node->GetDownArc();
-        if (downArc.GetEndNode() != nullptr)
+        if (const Arc& downArc = node->GetDownArc(); downArc.GetEndNode() != nullptr)
         {
             DrawLineV(downArc.GetStartNode()->GetPosition(), downArc.GetEndNode()->GetPosition(), BLUE);
         }
@@ -200,25 +196,22 @@ Pacman& GameLayer::GetClosestAlivePacmanWithNodes(const Vector2Ex<float>& refere
         Node* pacmanNode = m_board.GetClosestNode(currentPacman.GetPositionAtAnchor());
 
         // Check if a route exists between the nodes
-        auto refIt = distanceTable.find(referenceNode);
-        if (refIt != distanceTable.end())
+        if (auto refIt = distanceTable.find(referenceNode); refIt != distanceTable.end())
         {
-            auto pacmanIt = refIt->second.find(pacmanNode);
-            if (pacmanIt != refIt->second.end())
+            if (auto pacmanIt = refIt->second.find(pacmanNode); pacmanIt != refIt->second.end())
             {
                 // Distance between nodes from the pre-calculated table
-                float nodeDistance = pacmanIt->second;
+                const float nodeDistance = pacmanIt->second;
 
                 // Distance from reference point to its closest node
-                float distToRefNode = (referencePoint - referenceNode->GetPosition()).GetLength();
+                const float distToRefNode = (referencePoint - referenceNode->GetPosition()).GetLength();
 
                 // Distance from pacman to its closest node
-                float distFromPacmanNode =
+                const float distFromPacmanNode =
                     (currentPacman.GetPositionAtAnchor() - pacmanNode->GetPosition()).GetLength();
 
-                float totalDistance = distToRefNode + nodeDistance + distFromPacmanNode;
-
-                if (totalDistance < minDistance)
+                if (const float totalDistance = distToRefNode + nodeDistance + distFromPacmanNode;
+                    totalDistance < minDistance)
                 {
                     minDistance = totalDistance;
                     closestPacman = &currentPacman;
@@ -239,11 +232,11 @@ Pacman& GameLayer::GetClosestAlivePacmanWithNodes(const Vector2Ex<float>& refere
 
 GameLayer::GameLayer(const std::vector<Client>& clients) :
     m_board(),
+    m_clients(clients),
     m_blinky(m_board.GetBlinky()),
     m_pinky(m_board.GetPinky()),
     m_inky(m_board.GetInky()),
     m_clyde(m_board.GetClyde()),
-    m_clients(clients),
     m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde}
 {
     SetPacmansSpawnPositions();
@@ -251,11 +244,11 @@ GameLayer::GameLayer(const std::vector<Client>& clients) :
 
 GameLayer::GameLayer(const std::vector<Client>& clients, Board board) :
     m_board(std::move(board)),
+    m_clients(clients),
     m_blinky(m_board.GetBlinky()),
     m_pinky(m_board.GetPinky()),
     m_inky(m_board.GetInky()),
     m_clyde(m_board.GetClyde()),
-    m_clients(clients),
     m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde}
 {
     SetPacmansSpawnPositions();
@@ -334,7 +327,7 @@ void GameLayer::ProcessGhostCollisions()
         if (client.pacman.IsDead()) // Already dead, no need to check collisions
             continue;
 
-        for (auto& ghost : m_ghosts)
+        for (const auto& ghost : m_ghosts)
         {
             if (IsPacmanTouchingGhost(client.pacman, *ghost))
             {
@@ -371,7 +364,7 @@ int GameLayer::GetPacmanWithLivesCount() const
 
 void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
 {
-    // TODO: Refactor to run less iteractions
+    // TODO: Refactor to run less interactions
     using namespace ui;
 
     Vector2Ex<float> currentPosition = entity->GetPositionAtAnchor();
@@ -382,19 +375,11 @@ void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
     const Vector2Ex<float> movementDelta = targetPosition - currentPosition;
 
     // Total distance to move this frame
-    float totalDistance = movementDelta.GetLength();
+    const float totalDistance = movementDelta.GetLength();
+    float remainingDistance = totalDistance;
 
     // Try to apply queued direction at start if stationary or at current position
-    float remainingDistance = totalDistance;
-    if (TryApplyQueuedDirection(entity, currentPosition, currentDirection))
-        // Direction changed, update current direction for the pacman
-        currentDirection = entity->GetDirection();
-
-    if (totalDistance <= 0)
-    {
-        entity->SetPosition(currentPosition);
-        return;
-    }
+    TryApplyQueuedDirection(entity, currentPosition, currentDirection);
 
     Vector2Ex<float> lastValidPosition = currentPosition;
 
@@ -412,17 +397,30 @@ void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
         // Try to apply queued direction at this position
         if (TryApplyQueuedDirection(entity, intermediatePosition, currentDirection))
         {
+            // Snap position to node to correct any drift. Node positions are at the top-left of tiles.
+            // if (Node* node = m_board.GetClosestNode(intermediatePosition); node)
+            // {
+            //     // Entity position is top-left, same as node position.
+            //     intermediatePosition = node->GetPosition();
+            // }
+
             // Direction changed, update position and direction, then continue in new direction
             lastValidPosition = intermediatePosition;
             currentPosition = intermediatePosition;
-            currentDirection = entity->GetDirection();
             continue;
         }
 
         // Check collision
         if (!CanMoveInDirection(entity, intermediatePosition, currentDirection))
-            // Hit a wall, stop at last valid position
+        {
+            // Hit a wall, stop at last valid position.
+            // Snap the coordinate perpendicular to the movement direction to the center of the tile's lane.
+            // Assuming anchor points are the same (top left).
+            const Tile& currentTile = m_board.GetTileFromPosition(lastValidPosition);
+            lastValidPosition = currentTile.GetPositionAtAnchor();
+            entity->SetPosition(lastValidPosition);
             break;
+        }
 
         lastValidPosition = intermediatePosition;
         currentPosition = intermediatePosition;
@@ -434,7 +432,7 @@ void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
 
 void GameLayer::UpdateHighscores()
 {
-    std::string_view boardName = m_board.GetName();
+    const std::string_view boardName = m_board.GetName();
 
     for (auto& client : m_clients)
     {
@@ -448,7 +446,6 @@ void GameLayer::UpdateHighscores()
 
 void GameLayer::OnUpdate(float ts)
 {
-
     m_timePassedSinceLastSave += ts;
     m_timePassedSinceStart += ts;
 
@@ -456,6 +453,13 @@ void GameLayer::OnUpdate(float ts)
     {
         m_board.SaveHighscoresToFile();
         m_timePassedSinceLastSave = 0.0f;
+    }
+
+    m_ghostModeTimer += ts;
+    if (m_ghostModeTimer >= 10.0f)
+    {
+        m_ghostModeTimer = 0.0f;
+        m_ghostMode = (m_ghostMode == Ghost::State::SCATTER) ? Ghost::State::CHASE : Ghost::State::SCATTER;
     }
 
     HandleKeyPresses();
@@ -486,26 +490,34 @@ void GameLayer::OnUpdate(float ts)
 
     ProcessGhostCollisions(); // Check for collisions after Pac-Mans have moved
 
-    int alivePacmanCount = GetCurrentAlivePacmanCount();
+    const int alivePacmanCount = GetCurrentAlivePacmanCount();
 
     // Process Ghosts
-    for (auto& ghost : m_ghosts)
+    for (const auto& ghost : m_ghosts)
     {
-        if (ghost->GetState() == Ghost::State::CHASE)
+        // If it's time to release a spawning ghost, change its state to the current global mode.
+        if (ghost->GetState() == Ghost::State::SPAWNING && ghost->GetReleaseTime() <= m_timePassedSinceStart)
+            ghost->SetState(m_ghostMode);
+
+        // Ghosts do nothing (including moving) while in the SPAWNING state.
+        if (ghost->GetState() == Ghost::State::SPAWNING)
+            continue;
+
+        ghost->SetState(m_ghostMode);
+
+        if (const Ghost::State state = ghost->GetState(); state == Ghost::State::CHASE)
         {
-            // Ghosts only update their queued directio in and move if there's at least one alive Pacman
+            // Ghosts only update their queued direction in and move if there's at least one alive Pacman
             if (alivePacmanCount > 0)
             {
                 const Pacman& closestPacman = GetClosestAlivePacmanWithNodes(ghost->GetPositionAtAnchor());
                 ghost->Update(m_board, closestPacman.GetPositionAtAnchor(), closestPacman.GetDirection());
             }
         }
-        else
+        else if (state == Ghost::State::SCATTER)
         {
-            if (ghost->GetReleaseTime() <= m_timePassedSinceStart)
-                ghost->SetState(Ghost::State::CHASE);
-
-            continue;
+            // In scatter mode, ghosts target their designated corner (guard position).
+            ghost->Update(m_board, ghost->GetGuardPosition(), ui::Direction::UP); // Pacman direction not relevant here
         }
 
         ProcessMovementSteps(ghost, ts);
@@ -528,14 +540,15 @@ void GameLayer::OnRender()
 
 void GameLayer::RenderScores() const
 {
-    std::string_view boardName = m_board.GetName();
+    const std::string_view boardName = m_board.GetName();
     int yOffset = 10;
-    const int lineHeight = 20;
-    const int lineSpacing = 5;    // Spacing between lines for the same player's info
-    const int playerSpacing = 20; // Extra spacing between different players
 
     for (const auto& client : m_clients)
     {
+        constexpr int lineSpacing = 5;
+        constexpr int playerSpacing = 20;
+        constexpr int lineHeight = 20;
+
         std::string_view username = client.profile->GetUsername();
         const Color playerColor = client.pacman.GetColor();
         const int currentPoints = client.player.GetPoints();

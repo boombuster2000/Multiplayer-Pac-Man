@@ -6,6 +6,7 @@
 #include "game/components/board.h"
 #include "game/components/client.h"
 #include "game/components/entity.h"
+#include "game/components/ghost.h"
 #include "game/components/ghost_blinky.h"
 #include "game/components/ghost_clyde.h"
 #include "game/components/ghost_inky.h"
@@ -30,6 +31,8 @@ class GameLayer : public engine::Layer
 
     float m_timePassedSinceLastSave = 0.0f;
     float m_timePassedSinceStart = 0.0f;
+    float m_ghostModeTimer = 0.0f;
+    Ghost::State m_ghostMode = Ghost::State::SCATTER;
     bool m_isGameOver = false;
 
   private:
@@ -49,18 +52,17 @@ class GameLayer : public engine::Layer
 
     void ProcessPelletCollection(Client& client, const Vector2Ex<float> posBefore, const Vector2Ex<float> posAfter);
 
-    bool CanMoveInDirection(Entity* entity, const Vector2Ex<float>& position, const ui::Direction& direction) const;
-    bool TryApplyQueuedDirection(Entity* entity, Vector2Ex<float>& currentPosition, ui::Direction& currentDirection);
+    bool CanMoveInDirection(const Entity* entity,
+                            const Vector2Ex<float>& position,
+                            const ui::Direction& direction) const;
+    bool TryApplyQueuedDirection(Entity* entity,
+                                 const Vector2Ex<float>& currentPosition,
+                                 ui::Direction& currentDirection) const;
     void RenderScores() const;
     void RenderNodes() const;
     void SetPacmansSpawnPositions();
 
     Pacman& GetClosestAlivePacmanWithNodes(const Vector2Ex<float>& referencePoint) const;
-
-    Blinky ConstructBlinky() const;
-    Pinky ConstructPinky() const;
-    Inky ConstructInky() const;
-    Clyde ConstructClyde() const;
 
     bool IsPacmanTouchingGhost(const Pacman& pacman, const Ghost& ghost) const;
     void ProcessGhostCollisions();
@@ -69,8 +71,8 @@ class GameLayer : public engine::Layer
     int GetPacmanWithLivesCount() const;
 
   public:
-    explicit GameLayer(const std::vector<Client>& players);
-    GameLayer(const std::vector<Client>& players, const Board board);
+    explicit GameLayer(const std::vector<Client>& clients);
+    GameLayer(const std::vector<Client>& clients, const Board board);
     ~GameLayer() final;
 
     void HandleKeyPresses();
