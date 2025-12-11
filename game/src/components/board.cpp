@@ -241,7 +241,7 @@ Board::Board() :
     AddBoundaries();
 
     // Row 2 - top horizontal walls
-    for (size_t x : {2, 4, 5, 6, 7, 8, 9, 10, 11})
+    for (size_t x : {2, 4, 5, 7, 8, 9, 10, 11})
         SetTileType({x, 2}, WALL);
 
     // Row 3 - vertical pillars
@@ -253,11 +253,11 @@ Board::Board() :
         SetTileType({x, 4}, WALL);
 
     // Row 5 - ghost house top
-    for (size_t x : {0, 2, 4, 11})
+    for (size_t x : {0, 2, 11})
         SetTileType({x, 5}, WALL);
 
     // Row 6 - ghost house sides
-    for (size_t x : {0, 2, 4, 5, 6, 7, 9, 11})
+    for (size_t x : {0, 4, 5, 6, 7, 9})
         SetTileType({x, 6}, WALL);
 
     // Row 7 - ghost house sides
@@ -277,7 +277,7 @@ Board::Board() :
         SetTileType({x, 10}, WALL);
 
     // Row 11 - bottom horizontal walls
-    for (size_t x : {2, 3, 4, 5, 6, 7, 8, 9, 11})
+    for (size_t x : {2, 3, 4, 5, 7, 8, 9, 11})
         SetTileType({x, 11}, WALL);
 
     CreateNodesAndArcs();
