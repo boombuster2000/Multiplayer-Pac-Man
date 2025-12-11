@@ -8,10 +8,10 @@ class Board;
 
 class Ghost : public Entity
 {
-  protected:
-    void UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& targetPosition);
+    private:
+    static bool IsOppositeDirection(ui::Direction current, ui::Direction proposed);
 
-  public:
+    public:
     enum class State
     {
         SCATTER,
@@ -47,7 +47,7 @@ class Ghost : public Entity
                    const std::shared_ptr<Texture2D>& texture,
                    const State state = State::SPAWNING);
 
-    virtual ~Ghost() = default;
+    ~Ghost() override = default;
 
     State GetState() const;
     void SetState(const State state);
@@ -57,6 +57,10 @@ class Ghost : public Entity
     float GetReleaseTime() const;
     void SetReleaseTime(const float releaseTime);
 
+    Vector2Ex<float> GetGuardPosition() const;
+    void SetGuardPosition(const Vector2Ex<float>& guardPosition);
+
+    void UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& targetPosition);
     virtual void Update(const Board& board,
                         const Vector2Ex<float>& pacmanPosition,
                         const ui::Direction pacmanDirection) = 0;

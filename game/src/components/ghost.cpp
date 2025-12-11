@@ -1,6 +1,7 @@
 #include "game/components/ghost.h"
 #include "game/components/board.h"
 #include "game/components/node_system.h"
+#include <limits> // Required for std::numeric_limits
 
 Ghost::Ghost(const Vector2Ex<float>& spawnPosition,
              const Vector2Ex<float>& speed,
@@ -44,93 +45,135 @@ void Ghost::SetReleaseTime(const float releaseTime)
     m_releaseTime = releaseTime;
 }
 
+Vector2Ex<float> Ghost::GetGuardPosition() const
+{
+    return m_guardPosition;
+}
+
+void Ghost::SetGuardPosition(const Vector2Ex<float>& guardPosition)
+{
+    m_guardPosition = guardPosition;
+}
+
+// file: src/game/ghost.cpp
 void Ghost::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& targetPosition)
 {
     using enum ui::Direction;
 
     Node* startNode = board.GetClosestNode(GetPositionAtAnchor());
-    Node* endNode = board.GetClosestNode(targetPosition);
+    Node* endNode   = board.GetClosestNode(targetPosition);
     const NodeRouteTable& routeTable = board.GetRouteTable();
 
-    // 1. Handle null nodes: If start or end node is invalid, cannot calculate path.
     if (!startNode || !endNode)
-    {
         return;
-    }
 
-    Node* nextNode = nullptr;
+    if (m_state == State::SCATTER && !Board::IsAtNode(GetPositionAtAnchor(), startNode->GetPosition()))
+        return;
 
-    // 2. Handle case where ghost and Pacman are closest to the same node.
-    // In this scenario, the ghost should try to follow Pacman along an arc.
+    constexpr std::array<ui::Direction,4> priority = {UP, LEFT, DOWN, RIGHT};
+
+    auto NeighborForDir = [&](const ui::Direction d) -> Node*
+    {
+        switch (d)
+        {
+            case UP:    return startNode->GetUpArc().GetEndNode();
+            case DOWN:  return startNode->GetDownArc().GetEndNode();
+            case LEFT:  return startNode->GetLeftArc().GetEndNode();
+            case RIGHT: return startNode->GetRightArc().GetEndNode();
+        }
+        return nullptr;
+    };
+
+    // ----------------------------------------------
+    // Case 1: startNode == endNode (same tile)
+    // ----------------------------------------------
     if (startNode == endNode)
     {
-        // When ghost and Pac-Man are closest to the same node, use a simple "greedy"
-        // strategy: move in the direction that closes the largest distance. This is
-        // more robust than checking arcs and prevents the ghost from getting stuck.
-        const Vector2Ex<float> moveVector = targetPosition - GetPositionAtAnchor();
+        // Scatter special case: use priority only if AT TARGET AND ghost is stationary
+        if (m_state == State::SCATTER && IsStationary())
+        {
+            for (const ui::Direction d : priority)
+            {
+                if (ui::IsOppositeDirection(GetDirection(), d))
+                    continue;
+                if (NeighborForDir(d))
+                {
+                    SetQueuedDirection(d);
+                    return;
+                }
+            }
+            SetQueuedDirection(ui::GetOppositeDirection(GetDirection()));
+            return;
+        }
 
-        if (std::abs(moveVector.x) > std::abs(moveVector.y))
-        {
-            // Prioritize horizontal movement
-            if (moveVector.x > 0)
-                SetQueuedDirection(RIGHT);
-            else
-                SetQueuedDirection(LEFT);
-        }
-        else
-        {
-            // Prioritize vertical movement
-            if (moveVector.y > 0)
-            {
-                SetQueuedDirection(DOWN); // Y is +ve downwards in screen coordinates
-            }
-            else
-            {
-                SetQueuedDirection(UP);
-            }
-        }
+        // Non-stationary scatter or non-scatter: greedy fallback
+        const Vector2Ex<float> mv = targetPosition - GetPositionAtAnchor();
+        const ui::Direction d =
+            (std::abs(mv.x) > std::abs(mv.y)) ?
+                (mv.x > 0 ? RIGHT : LEFT) :
+                (mv.y > 0 ? DOWN : UP);
+
+        SetQueuedDirection(d);
         return;
     }
 
-    // 3. Standard pathfinding: startNode and endNode are different.
+    // ----------------------------------------------
+    // Case 2: Pathfinding for start != end
+    // ----------------------------------------------
     Node* hop = routeTable.at(startNode).at(endNode);
+    Node* nextNode = nullptr;
 
-    // The route table gives an intermediate node 'hop' on the path from start to end.
-    // To find the actual 'nextNode' (the first step from 'startNode'), we must
-    // trace the path back.
     if (hop == endNode)
     {
-        // The algorithm indicates a direct path, so 'endNode' should be a neighbor.
         nextNode = endNode;
     }
     else
     {
-        // The path is multi-step. We recursively look up the intermediate node
-        // until we find the one that is on the direct path from startNode.
-        // That node is our first hop.
         while (routeTable.at(startNode).at(hop) != hop)
-        {
             hop = routeTable.at(startNode).at(hop);
-        }
-
         nextNode = hop;
     }
 
-    // 4. Determine direction based on nextNode.
-    if (nextNode == startNode->GetUpArc().GetEndNode())
+    ui::Direction proposed = GetDirection();
+
+    if (nextNode == startNode->GetUpArc().GetEndNode())        proposed = UP;
+    else if (nextNode == startNode->GetDownArc().GetEndNode()) proposed = DOWN;
+    else if (nextNode == startNode->GetLeftArc().GetEndNode()) proposed = LEFT;
+    else if (nextNode == startNode->GetRightArc().GetEndNode())proposed = RIGHT;
+
+    // -------------------------------------------------------
+    // Scatter: If proposed direction is reverse, find next-shortest path.
+    // -------------------------------------------------------
+    if (m_state == State::SCATTER && ui::IsOppositeDirection(GetDirection(), proposed))
     {
-        SetQueuedDirection(UP);
+        ui::Direction bestDir = ui::GetOppositeDirection(GetDirection());
+        float bestDist = std::numeric_limits<float>::infinity();
+
+        for (const ui::Direction d : {UP, DOWN, LEFT, RIGHT})
+        {
+            if (ui::IsOppositeDirection(GetDirection(), d))
+                continue;
+
+            const Node* n = NeighborForDir(d);
+            if (!n)
+                continue;
+
+            if (const float dist = (n->GetPosition() - endNode->GetPosition()).GetLengthSqr(); dist < bestDist)
+            {
+                bestDist = dist;
+                bestDir = d;
+            }
+        }
+
+        if (bestDir != GetOppositeDirection(GetDirection()))
+        {
+            SetQueuedDirection(bestDir);
+            return;
+        }
+
+        SetQueuedDirection(proposed);
+        return;
     }
-    else if (nextNode == startNode->GetDownArc().GetEndNode())
-    {
-        SetQueuedDirection(DOWN);
-    }
-    else if (nextNode == startNode->GetLeftArc().GetEndNode())
-    {
-        SetQueuedDirection(LEFT);
-    }
-    else if (nextNode == startNode->GetRightArc().GetEndNode())
-    {
-        SetQueuedDirection(RIGHT);
-    }
+
+    SetQueuedDirection(proposed);
 }
