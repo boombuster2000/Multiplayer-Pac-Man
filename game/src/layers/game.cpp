@@ -61,23 +61,46 @@ void GameLayer::ProcessPelletCollection(Client& client,
     TryCollectPellet(client.player, pacmanPosition, pacmanDimensions, posBefore);
     TryCollectPellet(client.player, pacmanPosition, pacmanDimensions, posAfter);
 
-    // Pacman at most have moved across a tile boundary, and pellets on those have already been checked for collection
-    if ((posBefore - posAfter).GetLength() < 1)
-        return;
-
     const Vector2Ex<size_t> posBeforeIndex = m_board.GetRelativeIndexFromPosition(posBefore);
     const Vector2Ex<size_t> posAfterIndex = m_board.GetRelativeIndexFromPosition(posAfter);
-    const Vector2Ex<int> indexSteps = Vector2Ex<int>(posAfterIndex) - Vector2Ex<int>(posBeforeIndex);
-    const Vector2Ex<int> indexStep = indexSteps.GetUnitVector();
 
-    // I don't want to check tile at posBefore and posAfter as pacman may have passed the pellet at the centre of tile.
-    // They will be checked separately
-    for (int i = 1; i < indexStep.GetLength(); i++)
+    if (posBeforeIndex == posAfterIndex)
+        return;
+
+    const Vector2Ex<int> indexDiff(static_cast<int>(posAfterIndex.x - posBeforeIndex.x), static_cast<int>(posAfterIndex.y - posBeforeIndex.y));
+
+    // If there's a diagonal change in tile indices, it's a corner turn.
+    if (indexDiff.x != 0 && indexDiff.y != 0)
     {
-        Tile& tile = m_board.GetTile(posBeforeIndex + indexStep);
-        Pellet& pellet = tile.GetPellet();
+        // A turn means Pacman moved in an L-shape. The corner of the L is where a pellet might be missed.
+        // There are two possible corners. We check both.
+        const Vector2Ex<size_t> corner1Index(posAfterIndex.x, posBeforeIndex.y);
+        Tile& corner1Tile = m_board.GetTile(corner1Index);
+        TryCollectPellet(client.player, pacmanPosition, pacmanDimensions, corner1Tile.GetPellet());
 
-        TryCollectPellet(client.player, pacmanPosition, pacmanDimensions, pellet);
+        const Vector2Ex<size_t> corner2Index(posBeforeIndex.x, posAfterIndex.y);
+        Tile& corner2Tile = m_board.GetTile(corner2Index);
+        TryCollectPellet(client.player, pacmanPosition, pacmanDimensions, corner2Tile.GetPellet());
+    }
+
+    // Check for pellets skipped during fast straight movement
+    if (indexDiff.y == 0 && std::abs(indexDiff.x) > 1)
+    {
+        const int step = (indexDiff.x > 0) ? 1 : -1;
+        for (int i = step; std::abs(i) < std::abs(indexDiff.x); i += step)
+        {
+            Tile& tile = m_board.GetTile({posBeforeIndex.x + i, posBeforeIndex.y});
+            TryCollectPellet(client.player, pacmanPosition, pacmanDimensions, tile.GetPellet());
+        }
+    }
+    else if (indexDiff.x == 0 && std::abs(indexDiff.y) > 1)
+    {
+        const int step = (indexDiff.y > 0) ? 1 : -1;
+        for (int i = step; std::abs(i) < std::abs(indexDiff.y); i += step)
+        {
+            Tile& tile = m_board.GetTile({posBeforeIndex.x, posBeforeIndex.y + i});
+            TryCollectPellet(client.player, pacmanPosition, pacmanDimensions, tile.GetPellet());
+        }
     }
 }
 
