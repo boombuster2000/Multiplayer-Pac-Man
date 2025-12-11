@@ -7,292 +7,6 @@
 #include <fstream>
 #include <string_view>
 
-Board::Board() :
-    Grid(Vector2Ex<size_t>(14, 14),
-         Vector2Ex<float>(50, 50),
-         Vector2Ex<float>(static_cast<float>(GetScreenWidth()) / 2, static_cast<float>(GetScreenHeight()) / 2),
-         ui::AnchorPoint::MIDDLE,
-         Vector2Ex<float>(0, 0),
-         Tile::Type::PATH,
-         Pellet::Type::NORMAL,
-         Vector2Ex<float>(0, 0),
-         Vector2Ex<float>(50, 50)),
-    m_name("test-file")
-{
-    using enum Tile::Type;
-    AddBoundaries();
-
-    // Row 2 - top horizontal walls
-    for (size_t x : {2, 4, 5, 6, 7, 8, 9, 10, 11})
-        SetTileType({x, 2}, WALL);
-
-    // Row 3 - vertical pillars
-    for (size_t x : {2, 11})
-        SetTileType({x, 3}, WALL);
-
-    // Row 4 - inner walls with gaps
-    for (size_t x : {2, 4, 5, 6, 7, 8, 9, 11})
-        SetTileType({x, 4}, WALL);
-
-    // Row 5 - ghost house top
-    for (size_t x : {0, 2, 4, 11})
-        SetTileType({x, 5}, WALL);
-
-    // Row 6 - ghost house sides
-    for (size_t x : {0, 2, 4, 5, 6, 7, 9, 11})
-        SetTileType({x, 6}, WALL);
-
-    // Row 7 - ghost house sides
-    for (size_t x : {0, 2, 4, 5, 6, 7, 9, 11})
-        SetTileType({x, 7}, WALL);
-
-    // Row 8 - ghost house bottom
-    for (size_t x : {0, 2, 4, 9, 11})
-        SetTileType({x, 8}, WALL);
-
-    // Row 9 - inner walls with gaps
-    for (size_t x : {2, 4, 5, 6, 7, 8, 9, 11})
-        SetTileType({x, 9}, WALL);
-
-    // Row 10 - vertical pillars
-    for (size_t x : {2, 11})
-        SetTileType({x, 10}, WALL);
-
-    // Row 11 - bottom horizontal walls
-    for (size_t x : {2, 3, 4, 5, 6, 7, 8, 9, 11})
-        SetTileType({x, 11}, WALL);
-
-    CreateNodesAndArcs();
-}
-
-Board::Board(std::string_view filename)
-{
-    *this = Board::LoadFromFile(filename);
-}
-
-const std::string& Board::GetName() const
-{
-    return m_name;
-}
-
-const std::unordered_map<Vector2Ex<size_t>, Node*>& Board::GetNodeMap() const
-{
-    return m_nodeMap;
-}
-
-std::vector<Node*> Board::GetNodes() const
-{
-    return m_nodes;
-}
-
-bool Board::HasLineOfSight(const Vector2Ex<float>& pos1, const Vector2Ex<float>& pos2) const
-{
-    Vector2Ex<float> line = pos2 - pos1;
-    float length = line.GetLength();
-
-    if (length == 0.0f)
-        return true;
-
-    Vector2Ex<float> direction = line / length;
-
-    // Walk along the line in small steps (e.g., 1 pixel at a time)
-    for (float i = 0.0f; i < length; i += 1.0f)
-    {
-        Vector2Ex<float> currentPoint = pos1 + direction * i;
-        const Tile& tile = GetTileFromPosition(currentPoint);
-        if (tile.GetType() == Tile::Type::WALL)
-            return false;
-    }
-
-    // Check the final point as well to be safe
-    const Tile& endTile = GetTileFromPosition(pos2);
-    if (endTile.GetType() == Tile::Type::WALL)
-        return false;
-
-    return true;
-}
-
-Node* Board::GetClosestNode(const Vector2Ex<float> position) const
-{
-    if (m_nodes.empty())
-    {
-        return nullptr;
-    }
-
-    Node* closestNode = nullptr;
-    float smallestDistanceSq = std::numeric_limits<float>::max();
-
-    for (const auto& node : m_nodes)
-    {
-        // Only consider nodes with a clear line of sight
-        if (!HasLineOfSight(position, node->GetPosition()))
-        {
-            continue;
-        }
-
-        float distanceSq = (position - node->GetPosition()).GetLengthSqr();
-        if (distanceSq < smallestDistanceSq)
-        {
-            smallestDistanceSq = distanceSq;
-            closestNode = node;
-        }
-    }
-
-    // Fallback: if no node has LOS, find the closest one regardless of walls.
-    // This can prevent entities from getting stuck if they are in a bad spot.
-    if (closestNode == nullptr)
-    {
-        for (const auto& node : m_nodes)
-        {
-            float distanceSq = (position - node->GetPosition()).GetLengthSqr();
-            if (distanceSq < smallestDistanceSq)
-            {
-                smallestDistanceSq = distanceSq;
-                closestNode = node;
-            }
-        }
-    }
-
-    return closestNode;
-}
-
-const NodeRouteTable& Board::GetRouteTable() const
-{
-    return m_routeTable;
-}
-
-const NodeDistanceTable& Board::GetDistanceTable() const
-{
-    return m_distanceTable;
-}
-void Board::SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type)
-{
-    Grid::GetTile(index).SetType(type);
-}
-
-Blinky Board::GetBlinky()
-{
-    return Blinky(GetGhostSpawnPoint(Ghost::Type::BLINKY),
-                  Vector2Ex<float>(350, 350),
-                  GetTileDimensions(),
-                  ui::Direction::RIGHT,
-                  Ghost::Type::BLINKY,
-                  GetPositionFromIndex({1, 1}),
-                  0,
-                  Ghost::State::CHASE);
-}
-
-Pinky Board::GetPinky()
-{
-    return Pinky(GetGhostSpawnPoint(Ghost::Type::PINKY),
-                 Vector2Ex<float>(350, 350),
-                 GetTileDimensions(),
-                 ui::Direction::RIGHT,
-                 Ghost::Type::PINKY,
-                 GetPositionFromIndex({2, 1}),
-                 5);
-}
-
-Inky Board::GetInky()
-{
-    return Inky(GetGhostSpawnPoint(Ghost::Type::INKY),
-                Vector2Ex<float>(350, 350),
-                GetTileDimensions(),
-                ui::Direction::RIGHT,
-                Ghost::Type::INKY,
-                GetPositionFromIndex({3, 1}),
-                10);
-}
-
-Clyde Board::GetClyde()
-{
-    return Clyde(GetGhostSpawnPoint(Ghost::Type::CLYDE),
-                 Vector2Ex<float>(350, 350),
-                 GetTileDimensions(),
-                 ui::Direction::RIGHT,
-                 Ghost::Type::CLYDE,
-                 GetPositionFromIndex({4, 1}),
-                 15);
-}
-
-void Board::SaveToFile() const
-{
-    json j = *this;
-
-    const std::filesystem::path& boardFolder = FilePaths::s_boardsDirectory;
-    const std::string filename = m_name + std::string(".json");
-
-    std::ofstream file(boardFolder / filename);
-    if (file.is_open())
-    {
-        file << j.dump(4);
-        file.close();
-    }
-}
-
-void Board::SaveHighscoresToFile() const
-{
-    const std::filesystem::path& boardFolder = FilePaths::s_boardsDirectory;
-    const std::filesystem::path filename = m_name + std::string(".json");
-
-    if (!std::filesystem::exists(boardFolder / filename))
-        return;
-
-    Board originalBoard = Board::LoadFromFile(boardFolder / filename);
-
-    for (const auto& [profileName, score] : m_highScores)
-    {
-        originalBoard.SetHighscore(profileName, score);
-    }
-
-    json j = originalBoard;
-
-    std::ofstream file(boardFolder / filename);
-
-    if (file.is_open())
-    {
-        file << j.dump(4);
-        file.close();
-    }
-}
-
-HighscoreMap Board::GetHighscores() const
-{
-    return m_highScores;
-}
-
-void Board::SetHighscore(std::string_view profileName, int score)
-{
-    if (auto it = m_highScores.find(profileName); it != m_highScores.end())
-        // Profile exists, update if score is higher
-        if (score > it->second)
-            it->second = score;
-
-        else
-            // Profile doesn't exist, insert new score
-            m_highScores.emplace(profileName, score);
-}
-
-Board Board::LoadFromFile(const std::string& filename)
-{
-    std::ifstream file(filename);
-    if (!file.is_open())
-        throw std::filesystem::filesystem_error("Failed to open file",
-                                                std::filesystem::path(filename),
-                                                std::error_code{});
-
-    json j;
-    file >> j;
-    file.close();
-    Board board = j.get<Board>();
-    return board;
-}
-
-Board Board::LoadFromFile(const std::filesystem::path& filepath)
-{
-    return Board::LoadFromFile(filepath.string());
-}
-
 void Board::AddBoundaries()
 {
     using enum Tile::Type;
@@ -452,6 +166,32 @@ bool Board::IsTileJunction(const Vector2Ex<size_t>& index) const
     // A junction is any path tile that is NOT part of a straight corridor.
     return !(isHorizontalCorridor || isVerticalCorridor) || (isHorizontalCorridor && isVerticalCorridor);
 }
+bool Board::HasLineOfSight(const Vector2Ex<float>& pos1, const Vector2Ex<float>& pos2) const
+{
+    Vector2Ex<float> line = pos2 - pos1;
+    float length = line.GetLength();
+
+    if (length == 0.0f)
+        return true;
+
+    Vector2Ex<float> direction = line / length;
+
+    // Walk along the line in small steps (e.g., 1 pixel at a time)
+    for (float i = 0.0f; i < length; i += 1.0f)
+    {
+        Vector2Ex<float> currentPoint = pos1 + direction * i;
+        const Tile& tile = GetTileFromPosition(currentPoint);
+        if (tile.GetType() == Tile::Type::WALL)
+            return false;
+    }
+
+    // Check the final point as well to be safe
+    const Tile& endTile = GetTileFromPosition(pos2);
+    if (endTile.GetType() == Tile::Type::WALL)
+        return false;
+
+    return true;
+}
 
 Vector2Ex<size_t> Board::GetIndexOfNextJunction(const Vector2Ex<size_t>& startIndex,
                                                 const ui::Direction& direction) const
@@ -485,6 +225,144 @@ void Board::CreateNodesAndArcs()
     Floyds();
 }
 
+Board::Board() :
+    Grid(Vector2Ex<size_t>(14, 14),
+         Vector2Ex<float>(50, 50),
+         Vector2Ex<float>(static_cast<float>(GetScreenWidth()) / 2, static_cast<float>(GetScreenHeight()) / 2),
+         ui::AnchorPoint::MIDDLE,
+         Vector2Ex<float>(0, 0),
+         Tile::Type::PATH,
+         Pellet::Type::NORMAL,
+         Vector2Ex<float>(0, 0),
+         Vector2Ex<float>(50, 50)),
+    m_name("test-file")
+{
+    using enum Tile::Type;
+    AddBoundaries();
+
+    // Row 2 - top horizontal walls
+    for (size_t x : {2, 4, 5, 6, 7, 8, 9, 10, 11})
+        SetTileType({x, 2}, WALL);
+
+    // Row 3 - vertical pillars
+    for (size_t x : {2, 11})
+        SetTileType({x, 3}, WALL);
+
+    // Row 4 - inner walls with gaps
+    for (size_t x : {2, 4, 5, 6, 7, 8, 9, 11})
+        SetTileType({x, 4}, WALL);
+
+    // Row 5 - ghost house top
+    for (size_t x : {0, 2, 4, 11})
+        SetTileType({x, 5}, WALL);
+
+    // Row 6 - ghost house sides
+    for (size_t x : {0, 2, 4, 5, 6, 7, 9, 11})
+        SetTileType({x, 6}, WALL);
+
+    // Row 7 - ghost house sides
+    for (size_t x : {0, 2, 4, 5, 6, 7, 9, 11})
+        SetTileType({x, 7}, WALL);
+
+    // Row 8 - ghost house bottom
+    for (size_t x : {0, 2, 4, 9, 11})
+        SetTileType({x, 8}, WALL);
+
+    // Row 9 - inner walls with gaps
+    for (size_t x : {2, 4, 5, 6, 7, 8, 9, 11})
+        SetTileType({x, 9}, WALL);
+
+    // Row 10 - vertical pillars
+    for (size_t x : {2, 11})
+        SetTileType({x, 10}, WALL);
+
+    // Row 11 - bottom horizontal walls
+    for (size_t x : {2, 3, 4, 5, 6, 7, 8, 9, 11})
+        SetTileType({x, 11}, WALL);
+
+    CreateNodesAndArcs();
+}
+
+Board::Board(std::string_view filename)
+{
+    *this = Board::LoadFromFile(filename);
+}
+
+const std::string& Board::GetName() const
+{
+    return m_name;
+}
+
+const std::unordered_map<Vector2Ex<size_t>, Node*>& Board::GetNodeMap() const
+{
+    return m_nodeMap;
+}
+
+std::vector<Node*> Board::GetNodes() const
+{
+    return m_nodes;
+}
+
+Node* Board::GetClosestNode(const Vector2Ex<float> position) const
+{
+    if (m_nodes.empty())
+    {
+        return nullptr;
+    }
+
+    Node* closestNode = nullptr;
+    float smallestDistanceSq = std::numeric_limits<float>::max();
+
+    for (const auto& node : m_nodes)
+    {
+        // Only consider nodes with a clear line of sight
+        if (!HasLineOfSight(position, node->GetPosition()))
+        {
+            continue;
+        }
+
+        float distanceSq = (position - node->GetPosition()).GetLengthSqr();
+        if (distanceSq < smallestDistanceSq)
+        {
+            smallestDistanceSq = distanceSq;
+            closestNode = node;
+        }
+    }
+
+    // Fallback: if no node has LOS, find the closest one regardless of walls.
+    // This can prevent entities from getting stuck if they are in a bad spot.
+    if (closestNode == nullptr)
+    {
+        for (const auto& node : m_nodes)
+        {
+            float distanceSq = (position - node->GetPosition()).GetLengthSqr();
+            if (distanceSq < smallestDistanceSq)
+            {
+                smallestDistanceSq = distanceSq;
+                closestNode = node;
+            }
+        }
+    }
+
+    return closestNode;
+}
+
+bool Board::IsAtNode(const Vector2Ex<float>& pos, const Vector2Ex<float>& nodePos)
+{
+    constexpr float NODE_EPSILON = 0;
+    return (pos - nodePos).GetLength() <= NODE_EPSILON;
+}
+
+const NodeRouteTable& Board::GetRouteTable() const
+{
+    return m_routeTable;
+}
+
+const NodeDistanceTable& Board::GetDistanceTable() const
+{
+    return m_distanceTable;
+}
+
 Vector2Ex<float> Board::GetPlayerSpawnPoint(const int player) const
 {
     switch (player)
@@ -516,4 +394,132 @@ Vector2Ex<float> Board::GetGhostSpawnPoint(const Ghost::Type ghostType) const
     }
 
     return GetPositionFromIndex({8, 8});
+}
+
+void Board::SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type)
+{
+    Grid::GetTile(index).SetType(type);
+}
+
+Blinky Board::GetBlinky()
+{
+    return Blinky(GetGhostSpawnPoint(Ghost::Type::BLINKY),
+                  Vector2Ex<float>(350, 350),
+                  GetTileDimensions(),
+                  ui::Direction::RIGHT,
+                  Ghost::Type::BLINKY,
+                  GetPositionFromIndex({1, 1}),
+                  0,
+                  Ghost::State::CHASE);
+}
+
+Pinky Board::GetPinky()
+{
+    return Pinky(GetGhostSpawnPoint(Ghost::Type::PINKY),
+                 Vector2Ex<float>(350, 350),
+                 GetTileDimensions(),
+                 ui::Direction::RIGHT,
+                 Ghost::Type::PINKY,
+                 GetPositionFromIndex({2, 1}),
+                 5);
+}
+
+Inky Board::GetInky()
+{
+    return Inky(GetGhostSpawnPoint(Ghost::Type::INKY),
+                Vector2Ex<float>(350, 350),
+                GetTileDimensions(),
+                ui::Direction::RIGHT,
+                Ghost::Type::INKY,
+                GetPositionFromIndex({3, 1}),
+                10);
+}
+
+Clyde Board::GetClyde()
+{
+    return Clyde(GetGhostSpawnPoint(Ghost::Type::CLYDE),
+                 Vector2Ex<float>(350, 350),
+                 GetTileDimensions(),
+                 ui::Direction::RIGHT,
+                 Ghost::Type::CLYDE,
+                 GetPositionFromIndex({4, 1}),
+                 15);
+}
+
+void Board::SaveToFile() const
+{
+    json j = *this;
+
+    const std::filesystem::path& boardFolder = FilePaths::s_boardsDirectory;
+    const std::string filename = m_name + std::string(".json");
+
+    std::ofstream file(boardFolder / filename);
+    if (file.is_open())
+    {
+        file << j.dump(4);
+        file.close();
+    }
+}
+
+HighscoreMap Board::GetHighscores() const
+{
+    return m_highScores;
+}
+
+void Board::SetHighscore(std::string_view profileName, int score)
+{
+    if (auto it = m_highScores.find(profileName); it != m_highScores.end())
+        // Profile exists, update if score is higher
+        if (score > it->second)
+            it->second = score;
+
+        else
+            // Profile doesn't exist, insert new score
+            m_highScores.emplace(profileName, score);
+}
+
+void Board::SaveHighscoresToFile() const
+{
+    const std::filesystem::path& boardFolder = FilePaths::s_boardsDirectory;
+    const std::filesystem::path filename = m_name + std::string(".json");
+
+    if (!std::filesystem::exists(boardFolder / filename))
+        return;
+
+    Board originalBoard = Board::LoadFromFile(boardFolder / filename);
+
+    for (const auto& [profileName, score] : m_highScores)
+    {
+        originalBoard.SetHighscore(profileName, score);
+    }
+
+    json j = originalBoard;
+
+    std::ofstream file(boardFolder / filename);
+
+    if (file.is_open())
+    {
+        file << j.dump(4);
+        file.close();
+    }
+}
+
+Board Board::LoadFromFile(const std::string& filename)
+{
+    std::ifstream file(filename);
+    if (!file.is_open())
+        throw std::filesystem::filesystem_error("Failed to open file",
+                                                std::filesystem::path(filename),
+                                                std::error_code{});
+
+    json j;
+    file >> j;
+    file.close();
+    Board board = j.get<Board>();
+    return board;
+}
+
+Board Board::LoadFromFile(const std::filesystem::path& filepath)
+{
+    return Board::LoadFromFile(filepath.string());
 }
