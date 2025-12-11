@@ -10,7 +10,6 @@
 #include "game/components/tile.h"
 #include "game/utils/highscore_utils.h"
 #include "node_system.h"
-#include <array>
 #include <filesystem>
 #include <nlohmann/json.hpp>
 #include <string>
@@ -55,7 +54,6 @@ class Board : public ui::Grid<Tile>
   public:
     Board();
     explicit Board(std::string_view filename);
-
     const std::string& GetName() const;
 
     const std::unordered_map<Vector2Ex<size_t>, Node*>& GetNodeMap() const;
@@ -63,6 +61,7 @@ class Board : public ui::Grid<Tile>
     std::vector<Node*> GetNodes() const;
 
     Node* GetClosestNode(const Vector2Ex<float> position) const;
+    static bool IsAtNode(const Vector2Ex<float>& pos, const Vector2Ex<float>& nodePos);
 
     const NodeRouteTable& GetRouteTable() const;
     const NodeDistanceTable& GetDistanceTable() const;
