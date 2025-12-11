@@ -60,6 +60,7 @@ class GameLayer : public engine::Layer
                                  ui::Direction& currentDirection) const;
     void RenderScores() const;
     void RenderNodes() const;
+    void RenderLives() const;
     void SetPacmansSpawnPositions();
 
     Pacman& GetClosestAlivePacmanWithNodes(const Vector2Ex<float>& referencePoint) const;

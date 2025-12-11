@@ -71,7 +71,7 @@ void GameLayer::ProcessPelletCollection(Client& client,
     const Vector2Ex<int> indexStep = indexSteps.GetUnitVector();
 
     // I don't want to check tile at posBefore and posAfter as pacman may have passed the pellet at the centre of tile.
-    // They will be checked seperatley
+    // They will be checked separately
     for (int i = 1; i < indexStep.GetLength(); i++)
     {
         Tile& tile = m_board.GetTile(posBeforeIndex + indexStep);
@@ -160,6 +160,42 @@ void GameLayer::RenderNodes() const
         }
     }
 }
+void GameLayer::RenderLives() const
+{
+    using enum ui::AnchorPoint;
+    float yOffset = 10;
+    constexpr float xOffset = 30;
+
+    constexpr float ySpacing = 10;
+
+    constexpr float radius = 17;
+
+    Vector2Ex<float> startPosition = m_board.GetPositionAtAnchor(TOP_RIGHT);
+    startPosition.x += xOffset;
+
+    for (const auto& client : m_clients)
+    {
+        const Color pacmanColor = client.pacman.GetColor();
+        std::shared_ptr<Texture2D> texture = client.pacman.GetTexture();
+        const int lives = client.pacman.GetLives();
+
+        startPosition.y += yOffset;
+
+        Vector2Ex<float> position = startPosition;
+        for (int i = 0; i < lives; i++)
+        {
+            constexpr float xSpacing = 3;
+            const float scale = radius / static_cast<float>(texture->width);
+
+            DrawTextureEx(*texture, position,0, scale, pacmanColor);
+            position.x += radius + xSpacing;
+        }
+
+
+        yOffset += radius + ySpacing;
+
+    }
+}
 
 void GameLayer::SetPacmansSpawnPositions()
 {
@@ -176,9 +212,8 @@ void GameLayer::SetPacmansSpawnPositions()
 Pacman& GameLayer::GetClosestAlivePacmanWithNodes(const Vector2Ex<float>& referencePoint) const
 {
     if (m_clients.empty())
-    {
         throw std::runtime_error("GetClosestAlivePacmanWithNodes called with no clients");
-    }
+
 
     const NodeDistanceTable& distanceTable = m_board.GetDistanceTable();
     Node* referenceNode = m_board.GetClosestNode(referencePoint);
@@ -398,12 +433,6 @@ void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
         if (TryApplyQueuedDirection(entity, intermediatePosition, currentDirection))
         {
             // Snap position to node to correct any drift. Node positions are at the top-left of tiles.
-            // if (Node* node = m_board.GetClosestNode(intermediatePosition); node)
-            // {
-            //     // Entity position is top-left, same as node position.
-            //     intermediatePosition = node->GetPosition();
-            // }
-
             // Direction changed, update position and direction, then continue in new direction
             lastValidPosition = intermediatePosition;
             currentPosition = intermediatePosition;
@@ -414,11 +443,10 @@ void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
         if (!CanMoveInDirection(entity, intermediatePosition, currentDirection))
         {
             // Hit a wall, stop at last valid position.
-            // Snap the coordinate perpendicular to the movement direction to the center of the tile's lane.
-            // Assuming anchor points are the same (top left).
+            // Snap the coordinate
             const Tile& currentTile = m_board.GetTileFromPosition(lastValidPosition);
             lastValidPosition = currentTile.GetPositionAtAnchor();
-            entity->SetPosition(lastValidPosition);
+            entity->SetPosition(lastValidPosition + entity->GetObjectOrigin());
             break;
         }
 
@@ -535,6 +563,7 @@ void GameLayer::OnRender()
         ghost->Render();
 
     RenderScores();
+    RenderLives();
     // RenderNodes();
 }
 
@@ -577,3 +606,4 @@ void GameLayer::RenderScores() const
         yOffset += lineHeight + playerSpacing;                                // Add extra spacing for the next player
     }
 }
+
