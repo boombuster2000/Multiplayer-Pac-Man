@@ -566,7 +566,26 @@ void GameLayer::OnRender()
     m_board.Render();
 
     for (const auto& client : m_clients)
+    {
+        const std::string_view username = client.profile->GetUsername();
+        const Color playerColor = client.pacman.GetColor();
         client.pacman.Render();
+
+        // Calculate text dimensions
+        const char* usernameCStr = username.data();
+        constexpr int fontSize = 20;
+        const Vector2Ex<float> pacmanPosition = client.pacman.GetPositionAtAnchor();
+        const Vector2Ex<float> pacmanDimensions = client.pacman.GetDimensions();
+
+        const float textWidth = MeasureText(usernameCStr, fontSize);
+        const float centerX = pacmanPosition.x + (pacmanDimensions.x / 2);
+        const float textX = centerX - (textWidth / 2);
+        const float textY = pacmanPosition.y - fontSize - 15; // Increased gap for triangle
+
+        DrawText(usernameCStr, static_cast<int>(textX), static_cast<int>(textY), fontSize, playerColor);
+    }
+
+
 
     for (const auto& ghost : m_ghosts)
         ghost->Render();
