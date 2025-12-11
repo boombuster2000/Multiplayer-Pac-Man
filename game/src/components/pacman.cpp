@@ -1,7 +1,7 @@
 #include "game/components/pacman.h"
 #include "game/game_application.h"
 
-float Pacman::ConvertDirectionToRotation(const ui::Direction& direction) const
+float Pacman::ConvertDirectionToRotation(const ui::Direction& direction)
 {
     using enum ui::Direction;
     switch (direction)
@@ -12,9 +12,7 @@ float Pacman::ConvertDirectionToRotation(const ui::Direction& direction) const
         return 90.0f;
     case LEFT:
         return 180.0f;
-    case RIGHT:
-        return 0.0f;
-    default:
+    default: // Or RIGHT
         return 0.0f;
     }
 }
@@ -25,7 +23,7 @@ Pacman::Pacman(Vector2Ex<float> spawnPosition, Vector2Ex<float> dimensions, floa
            Vector2Ex<float>(speed, speed),
            dimensions,
            ui::Direction::RIGHT,
-           game::GameApplication::Get().GetTexturesManager().GetTexture("pac-man"),
+           game::GameApplication::GetTexturesManager().GetTexture("pac-man"),
            color)
 {
 }

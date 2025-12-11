@@ -3,7 +3,6 @@
 #include "engine/ui/enums.h"
 #include "game/components/entity.h"
 #include "raylib.h"
-#include <memory>
 
 class Pacman : public Entity
 {
@@ -14,7 +13,7 @@ private:
     float m_respawnTimer = 0.0f;
 
   private:
-    float ConvertDirectionToRotation(const ui::Direction& direction) const;
+    static float ConvertDirectionToRotation(const ui::Direction& direction);
 
   public:
     Pacman(Vector2Ex<float> spawnPosition,
@@ -25,15 +24,15 @@ private:
     void SetQueuedDirection(const ui::Direction& direction) final;
     void ApplyQueuedDirection() final;
 
-    int GetLives() const;
-    void SetLives(const int lives);
-    void RemoveLife(const int livesToRemove = 1);
-    void AddLife(const int livesToAdd = 1);
+    [[nodiscard]] int GetLives() const;
+    void SetLives(int lives);
+    void RemoveLife(int livesToRemove = 1);
+    void AddLife(int livesToAdd = 1);
 
-    bool IsDead() const;
-    void SetDead(const bool isDead);
+    [[nodiscard]] bool IsDead() const;
+    void SetDead(bool isDead);
 
-    float GetRespawnTimer() const;
-    void SetRespawnTimer(const float time);
-    void UpdateRespawnTimer(const float dt);
+    [[nodiscard]] float GetRespawnTimer() const;
+    void SetRespawnTimer(float time);
+    void UpdateRespawnTimer(float dt);
 };
