@@ -107,6 +107,11 @@ void Entity::SetTexture(const std::shared_ptr<Texture2D>& texture)
 {
     m_texture = texture;
 }
+void Entity::SetPosition(const Vector2Ex<float> position)
+{
+    m_lastPosition = GetPositionAtAnchor();
+    ui::RenderableObject::SetPosition(position);
+}
 
 Vector2Ex<float> Entity::GetNextPosition(const ui::Direction& direction, const float deltaTime) const
 {
@@ -166,6 +171,15 @@ Vector2Ex<float> Entity::GetNextPositionWithStep(const ui::Direction& direction,
     }
 
     return nextPosition;
+}
+bool Entity::IsStationary() const
+{
+    return m_lastPosition == GetPositionAtAnchor();
+}
+
+Vector2Ex<float> Entity::GetLastPosition() const
+{
+    return m_lastPosition;
 }
 
 void Entity::Render(Vector2Ex<float> offset) const

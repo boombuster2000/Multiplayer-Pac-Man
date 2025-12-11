@@ -23,6 +23,9 @@ class Entity : public ui::RenderableObject
     float m_rotation = 0.0f;
     Color m_color;
 
+protected:
+    Vector2Ex<float> m_lastPosition;
+
   private:
     Entity() = default;
 
@@ -62,8 +65,13 @@ class Entity : public ui::RenderableObject
     std::shared_ptr<Texture2D> GetTexture() const;
     void SetTexture(const std::shared_ptr<Texture2D>& texture);
 
+    void SetPosition(const Vector2Ex<float> position) final;
     Vector2Ex<float> GetNextPosition(const ui::Direction& direction, const float deltaTime) const;
     Vector2Ex<float> GetNextPositionWithStep(const ui::Direction& direction, const float step) const;
+
+    bool IsStationary() const;
+    Vector2Ex<float> GetLastPosition() const;
+
 
     void Render(Vector2Ex<float> offset = {0, 0}) const final;
 };

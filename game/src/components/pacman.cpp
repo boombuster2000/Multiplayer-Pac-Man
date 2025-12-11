@@ -30,12 +30,6 @@ Pacman::Pacman(Vector2Ex<float> spawnPosition, Vector2Ex<float> dimensions, floa
 {
 }
 
-void Pacman::SetPosition(const Vector2Ex<float> position)
-{
-    m_lastPosition = GetWorldOrigin();
-    ui::RenderableObject::SetPosition(position);
-}
-
 void Pacman::SetQueuedDirection(const ui::Direction& direction)
 {
     Entity::SetQueuedDirection(direction);
@@ -47,16 +41,6 @@ void Pacman::ApplyQueuedDirection()
 {
     Entity::ApplyQueuedDirection();
     SetRotation(ConvertDirectionToRotation(GetDirection()));
-}
-
-Vector2Ex<float> Pacman::GetLastPosition() const
-{
-    return m_lastPosition;
-}
-
-bool Pacman::IsStationary() const
-{
-    return GetWorldOrigin() == m_lastPosition;
 }
 
 int Pacman::GetLives() const

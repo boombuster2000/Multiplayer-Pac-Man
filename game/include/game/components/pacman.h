@@ -8,8 +8,7 @@
 class Pacman : public Entity
 {
 
-  private:
-    Vector2Ex<float> m_lastPosition;
+private:
     int m_lives = 3;
     bool m_isDead = false;
     float m_respawnTimer = 0.0f;
@@ -23,13 +22,8 @@ class Pacman : public Entity
            float speed,
            Color color = Color(255, 239, 0, 255));
 
-    void SetPosition(const Vector2Ex<float> position) final;
     void SetQueuedDirection(const ui::Direction& direction) final;
     void ApplyQueuedDirection() final;
-
-    Vector2Ex<float> GetLastPosition() const;
-
-    bool IsStationary() const;
 
     int GetLives() const;
     void SetLives(const int lives);
