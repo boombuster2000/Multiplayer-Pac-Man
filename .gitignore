@@ -1,9 +1,8 @@
 /build
 /out
 .vscode
-*.afdesign
-*.af
 .vs
 .env
 .cmake_cache
 .idea
+.affinity
