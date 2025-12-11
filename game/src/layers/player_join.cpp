@@ -68,9 +68,9 @@ void PlayerJoinLayer::RebuildPlayerMenus()
 
             for (const auto& profileJson : profileJsons)
             {
-                auto profile = std::make_shared<Profile>(profileJson.get<Profile>());
 
-                if (takenUsernames.find(std::string(profile->GetUsername())) == takenUsernames.end())
+                if (auto profile = std::make_shared<Profile>(profileJson.get<Profile>());
+                    !takenUsernames.contains(std::string(profile->GetUsername())))
                 {
                     auto option = std::make_unique<ui::TextMenuOption>(std::string(profile->GetUsername()),
                                                                        selectedStyle,
@@ -108,14 +108,16 @@ void PlayerJoinLayer::AddJoiningPlayer(PlayerInput* controls)
         break;
     case 3:
         joiningPlayer.pacman.SetColor(Color(255, 65, 235, 255));
+        break;
     case 4:
         joiningPlayer.pacman.SetColor(Color(110, 123, 145, 255));
+        break;
     }
 
     RebuildPlayerMenus();
 }
 
-int PlayerJoinLayer::GetScreenDivisions(const int playerCount) const
+int PlayerJoinLayer::GetScreenDivisions(const int playerCount)
 {
     if (playerCount == 3)
         return 4;
@@ -123,7 +125,7 @@ int PlayerJoinLayer::GetScreenDivisions(const int playerCount) const
     return playerCount;
 }
 
-PlayerJoinLayer::PlayerJoinLayer(const Board board) :
+PlayerJoinLayer::PlayerJoinLayer(const Board& board) :
     m_board(board)
 {
     m_joiningPlayers.reserve(4);
@@ -179,7 +181,7 @@ void PlayerJoinLayer::OnUpdate(float ts)
     }
 
     // GAMEPAD CONTROLS
-    const int numberOfControllers = 4;
+    constexpr int numberOfControllers = 4;
 
     for (int controllerID = 0; controllerID < numberOfControllers; controllerID++)
     {
@@ -271,7 +273,7 @@ void PlayerJoinLayer::OnUpdate(float ts)
     {
         std::vector<Client> clients;
 
-        for (auto& joiningPlayer : m_joiningPlayers)
+        for (const auto& joiningPlayer : m_joiningPlayers)
         {
             if (joiningPlayer.state != ReadyState::READY)
                 return; // Do not start if not all players are ready
@@ -293,14 +295,14 @@ void PlayerJoinLayer::OnRender()
     if (joiningPlayersCount == 0)
     {
         ClearBackground(BLACK);
-        const int fontSize = 30;
+        constexpr int fontSize = 30;
 
         // Define parts and colors
-        const char* part1 = "PRESS THE ";
-        const char* part2 = "UP/W";
-        const char* part3 = " BUTTON ON KEYBOARD OR ";
-        const char* part4 = "SELECT";
-        const char* part5 = " ON CONTROLLER TO JOIN";
+        auto part1 = "PRESS THE ";
+        auto part2 = "UP/W";
+        auto part3 = " BUTTON ON KEYBOARD OR ";
+        auto part4 = "SELECT";
+        auto part5 = " ON CONTROLLER TO JOIN";
 
         // Calculate total width to center the entire message
         const int totalWidth = MeasureText(part1, fontSize) + MeasureText(part2, fontSize) +
@@ -328,26 +330,26 @@ void PlayerJoinLayer::OnRender()
     }
 
     const int screenDivisions = GetScreenDivisions(joiningPlayersCount);
-    const int screenWidth = GetScreenWidth();
-    const int screenHeight = GetScreenHeight();
+    const float screenWidth = static_cast<float>(GetScreenWidth());
+    const float screenHeight = static_cast<float>(GetScreenHeight());
 
     std::vector<Rectangle> screenRects;
     if (screenDivisions <= 1)
     {
-        screenRects.push_back({0.f, 0.f, (float)screenWidth, (float)screenHeight});
+        screenRects.push_back({0.f, 0.f, static_cast<float>(screenWidth), static_cast<float>(screenHeight)});
     }
     else if (screenDivisions == 2)
     {
-        screenRects.push_back({0.f, 0.f, (float)screenWidth / 2, (float)screenHeight});
-        screenRects.push_back({(float)screenWidth / 2, 0.f, (float)screenWidth / 2, (float)screenHeight});
+        screenRects.push_back({0.f, 0.f, screenWidth / 2, screenHeight});
+        screenRects.push_back({screenWidth / 2, 0.f, screenWidth / 2, screenHeight});
     }
     else if (screenDivisions == 4)
     {
-        screenRects.push_back({0.f, 0.f, (float)screenWidth / 2, (float)screenHeight / 2});
-        screenRects.push_back({(float)screenWidth / 2, 0.f, (float)screenWidth / 2, (float)screenHeight / 2});
-        screenRects.push_back({0.f, (float)screenHeight / 2, (float)screenWidth / 2, (float)screenHeight / 2});
+        screenRects.push_back({0.f, 0.f, screenWidth / 2, screenHeight / 2});
+        screenRects.push_back({screenWidth / 2, 0.f, screenWidth / 2, screenHeight / 2});
+        screenRects.push_back({0.f, screenHeight / 2, screenWidth / 2, screenHeight / 2});
         screenRects.push_back(
-            {(float)screenWidth / 2, (float)screenHeight / 2, (float)screenWidth / 2, (float)screenHeight / 2});
+            {screenWidth / 2, screenHeight / 2, screenWidth / 2, screenHeight / 2});
     }
 
     for (int i = 0; i < screenDivisions; ++i)
@@ -358,10 +360,9 @@ void PlayerJoinLayer::OnRender()
         if (i < joiningPlayersCount)
         {
             auto& player = m_joiningPlayers[i];
-            const int fontSize = 30;
             std::string line1, line2;
-            Color color1 = ORANGE;
-            Color color2 = DARKGRAY;
+            auto color1 = ORANGE;
+            auto color2 = DARKGRAY;
 
             switch (player.state)
             {
@@ -373,6 +374,7 @@ void PlayerJoinLayer::OnRender()
                 }
 
                 {
+                    constexpr int fontSize = 30;
                     const int textWidth1 = MeasureText(line1.c_str(), fontSize);
                     DrawText(line1.c_str(),
                              rect.x + rect.width / 2 - textWidth1 / 2,
@@ -387,13 +389,13 @@ void PlayerJoinLayer::OnRender()
                              fontSize - 10,
                              color2);
 
-                    const int backFontSize = 15;
-                    const int y_spacing = backFontSize + 5;
+                    constexpr int backFontSize = 15;
+                    constexpr int y_spacing = backFontSize + 5;
                     int y_start_offset = 10;
 
                     if (screenDivisions == 4)
                     {
-                        const char* back_text = "";
+                        auto back_text = "";
                         if (i == 0)
                         {
                             back_text = "CTRL/B to return to menu";
@@ -402,6 +404,7 @@ void PlayerJoinLayer::OnRender()
                         {
                             back_text = "CTRL/B to change profile";
                         }
+
                         const int text_width = MeasureText(back_text, backFontSize);
                         DrawText(back_text,
                                  rect.x + rect.width / 2 - text_width / 2,
@@ -411,10 +414,13 @@ void PlayerJoinLayer::OnRender()
                     }
                     else
                     {
-                        const char* kb_part1 = "CTRL";
+                        auto kb_part1 = "CTRL";
+
                         const char* kb_part2 =
                             (i == 0) ? " to return to menu (Keyboard)" : " to change profile (Keyboard)";
-                        const char* gp_part1 = "B";
+
+                        auto gp_part1 = "B";
+
                         const char* gp_part2 =
                             (i == 0) ? " to return to menu (Gamepad)" : " to change profile (Gamepad)";
 
@@ -446,11 +452,11 @@ void PlayerJoinLayer::OnRender()
                 player.profileSelectionMenu.Render();
 
                 {
-                    const int selectFontSize = 15;
-                    const char* sel_kb_part1 = "SHIFT";
-                    const char* sel_kb_part2 = " to select (Keyboard)";
-                    const char* sel_gp_part1 = "A";
-                    const char* sel_gp_part2 = " to select (Gamepad)";
+                    constexpr int selectFontSize = 15;
+                    auto sel_kb_part1 = "SHIFT";
+                    auto sel_kb_part2 = " to select (Keyboard)";
+                    auto sel_gp_part1 = "A";
+                    auto sel_gp_part2 = " to select (Gamepad)";
 
                     const int sel_kb_part1_width = MeasureText(sel_kb_part1, selectFontSize);
                     const int sel_kb_total_width = sel_kb_part1_width + MeasureText(sel_kb_part2, selectFontSize);
@@ -459,7 +465,7 @@ void PlayerJoinLayer::OnRender()
 
                     float sel_kb_current_X = rect.x + rect.width / 2 - sel_kb_total_width / 2;
                     float sel_gp_current_X = rect.x + rect.width / 2 - sel_gp_total_width / 2;
-                    const int y_spacing = selectFontSize + 5;
+                    constexpr int y_spacing = selectFontSize + 5;
                     const int y = rect.y + rect.height - y_spacing * 4 - 10;
 
                     DrawText(sel_kb_part1, sel_kb_current_X, y, selectFontSize, ORANGE);
@@ -470,11 +476,11 @@ void PlayerJoinLayer::OnRender()
                     sel_gp_current_X += sel_gp_part1_width;
                     DrawText(sel_gp_part2, sel_gp_current_X, y + y_spacing, selectFontSize, LIGHTGRAY);
 
-                    const int backFontSize = 15;
-                    const char* backPart1 = "CTRL";
-                    const char* backPart2 = " to leave (Keyboard)";
-                    const char* backPart3 = "B";
-                    const char* backPart4 = " to leave (Gamepad)";
+                    constexpr int backFontSize = 15;
+                    auto backPart1 = "CTRL";
+                    auto backPart2 = " to leave (Keyboard)";
+                    auto backPart3 = "B";
+                    auto backPart4 = " to leave (Gamepad)";
 
                     const int backPart1Width = MeasureText(backPart1, backFontSize);
                     const int backPart2Width = MeasureText(backPart2, backFontSize);
@@ -485,7 +491,7 @@ void PlayerJoinLayer::OnRender()
 
                     float backCurrentX = rect.x + rect.width / 2 - backTotalWidth / 2;
                     float backCurrentX2 = rect.x + rect.width / 2 - backTotalWidth2 / 2;
-                    const int back_y_spacing = backFontSize + 5;
+                    constexpr int back_y_spacing = backFontSize + 5;
                     const int backY = y + y_spacing * 2;
 
                     DrawText(backPart1, backCurrentX, backY, backFontSize, ORANGE);
@@ -516,12 +522,12 @@ void PlayerJoinLayer::OnRender()
 
         if (allPlayersReady)
         {
-            const int startFontSize = 40;
-            const char* part1 = "PRESS ";
-            const char* part2 = "ENTER";
-            const char* part3 = " / ";
-            const char* part4 = "START";
-            const char* part5 = " TO START";
+            constexpr int startFontSize = 40;
+            auto part1 = "PRESS ";
+            auto part2 = "ENTER";
+            auto part3 = " / ";
+            auto part4 = "START";
+            auto part5 = " TO START";
 
             const int part1Width = MeasureText(part1, startFontSize);
             const int part2Width = MeasureText(part2, startFontSize);
