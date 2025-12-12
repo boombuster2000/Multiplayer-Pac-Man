@@ -72,6 +72,7 @@ class GameLayer : public engine::Layer
     bool IsPacmanTouchingGhost(const Pacman& pacman, const Ghost& ghost) const;
     void ProcessGhostCollisions();
     void HandlePacmanDeath(Pacman& pacman, Ghost& ghost);
+    void HandleGhostDeath(Player& pacman, Ghost& ghost);
     int GetCurrentAlivePacmanCount() const;
     int GetPacmanWithLivesCount() const;
 

@@ -68,6 +68,8 @@ class Board : public ui::Grid<Tile>
 
     Vector2Ex<float> GetPlayerSpawnPoint(const int player) const;
     Vector2Ex<float> GetGhostSpawnPoint(const Ghost::Type ghostType) const;
+    std::pair<Vector2Ex<float>,Vector2Ex<float>> GetGhostSpawnRegion() const;
+    static bool IsInRegion(const std::pair<Vector2Ex<float>,Vector2Ex<float>>& region, const Vector2Ex<float>& position);
 
     void SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type);
 

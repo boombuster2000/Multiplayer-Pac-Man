@@ -436,6 +436,33 @@ Vector2Ex<float> Board::GetGhostSpawnPoint(const Ghost::Type ghostType) const
     return GetPositionFromIndex({8, 8});
 }
 
+std::pair<Vector2Ex<float>, Vector2Ex<float>> Board::GetGhostSpawnRegion() const
+{
+    return {
+    GetPositionFromIndex({5, 8}),GetPositionFromIndex({9,9}) - Vector2Ex<float>{1,1}
+    };
+}
+
+bool Board::IsInRegion(
+    const std::pair<Vector2Ex<float>, Vector2Ex<float>>& region,
+    const Vector2Ex<float>& position
+)
+{
+    const auto& p1 = region.first;
+    const auto& p2 = region.second;
+
+    // Normalize region bounds (why: region corners may come in any order)
+    const float minX = std::min(p1.x, p2.x);
+    const float maxX = std::max(p1.x, p2.x);
+    const float minY = std::min(p1.y, p2.y);
+    const float maxY = std::max(p1.y, p2.y);
+
+    const float x = position.x;
+    const float y = position.y;
+
+    return (x >= minX && x <= maxX && y >= minY && y <= maxY);
+}
+
 void Board::SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type)
 {
     Grid::GetTile(index).SetType(type);

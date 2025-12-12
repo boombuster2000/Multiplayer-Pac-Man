@@ -383,6 +383,16 @@ void GameLayer::HandlePacmanDeath(Pacman& pacman, Ghost& ghost)
         pacman.SetPosition(pacman.GetSpawnPosition());
 }
 
+void GameLayer::HandleGhostDeath(Player& player, Ghost& ghost)
+{
+    Color newColor = ghost.GetColor();
+    newColor.a = 128;
+    ghost.SetColor(newColor);
+
+    player.AddPoints(200); // points gained by kill ghost
+    ghost.SetState(Ghost::State::DEAD);
+}
+
 void GameLayer::ProcessGhostCollisions()
 {
     for (auto& client : m_clients)
@@ -392,10 +402,21 @@ void GameLayer::ProcessGhostCollisions()
 
         for (const auto& ghost : m_ghosts)
         {
+            if (ghost->GetState() == Ghost::State::DEAD)
+                continue;
+
             if (IsPacmanTouchingGhost(client.pacman, *ghost))
             {
-                HandlePacmanDeath(client.pacman, *ghost);
-                break; // One collision is enough to kill pacman, move to next client
+                if (!m_isFrightenedModeEnabled)
+                {
+                    HandlePacmanDeath(client.pacman, *ghost);
+                    break; // One collision is enough to kill, move to next client
+                }
+                else
+                {
+                    HandleGhostDeath(client.player, *ghost);
+                }
+
             }
         }
     }
@@ -516,7 +537,6 @@ void GameLayer::OnUpdate(float ts)
         m_timePassedSinceLastSave = 0.0f;
     }
 
-
     // Keeps track of what mode they should return to.
     if ( m_ghostModeTimer >= 15.0f)
     {
@@ -582,6 +602,25 @@ void GameLayer::OnUpdate(float ts)
     // Process Ghosts
     for (const auto& ghost : m_ghosts)
     {
+        // Make ghost travel back to spawn
+        if (ghost->GetState() == Ghost::State::DEAD)
+        {
+            if (Board::IsInRegion(m_board.GetGhostSpawnRegion(), ghost->GetPositionAtAnchor()))
+            {
+                ghost->SetState(m_ghostMode);
+                Color newColor = ghost->GetColor();
+                newColor.a = 255;
+                ghost->SetColor(newColor);
+            }
+            else
+            {
+                ghost->UpdateQueuedDirection(m_board, ghost->GetSpawnPosition());
+            }
+
+            ProcessMovementSteps(ghost, ts);
+            continue;
+        }
+
         // If it's time to release a spawning ghost, change its state to the current global mode.
         if (ghost->GetState() == Ghost::State::SPAWNING && ghost->GetReleaseTime() <= m_timePassedSinceStart)
         {
@@ -673,9 +712,6 @@ void GameLayer::OnUpdate(float ts)
 
         ProcessMovementSteps(ghost, ts);
     }
-
-    if (!m_frightenedStateDebounce && m_ghostMode == Ghost::State::FRIGHTENED)
-        m_frightenedStateDebounce = true;
 
 }
 
