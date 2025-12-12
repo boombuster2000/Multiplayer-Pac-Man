@@ -438,6 +438,7 @@ Vector2Ex<float> Board::GetGhostSpawnPoint(const Ghost::Type ghostType) const
 
 std::pair<Vector2Ex<float>, Vector2Ex<float>> Board::GetGhostSpawnRegion() const
 {
+    // Note: GetPositionFromIndex returns the top left coord of tile.
     return {
     GetPositionFromIndex({5, 8}),GetPositionFromIndex({9,9}) - Vector2Ex<float>{1,1}
     };
