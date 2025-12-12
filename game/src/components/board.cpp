@@ -283,16 +283,25 @@ Board::Board() :
     {
         using enum Pellet::Type;
         constexpr std::array<Vector2Ex<size_t>, 10> superPelletsCoords{
-            Vector2Ex<size_t>{1, 1},
-            Vector2Ex<size_t>{1, 12},
-            Vector2Ex<size_t>{12, 1},
-            Vector2Ex<size_t>{12, 12},
+            //Vector2Ex<size_t>{1, 1},
+            //Vector2Ex<size_t>{1, 12},
+            //Vector2Ex<size_t>{12, 1},
+            //Vector2Ex<size_t>{12, 12},
             Vector2Ex<size_t>{6, 2},
             Vector2Ex<size_t>{2, 3},
             Vector2Ex<size_t>{2, 6},
-            Vector2Ex<size_t>{6, 11},
-            Vector2Ex<size_t>{11, 6},
-            Vector2Ex<size_t>{11, 10}
+            Vector2Ex<size_t>{6, 11}
+            //Vector2Ex<size_t>{11, 6},
+            //Vector2Ex<size_t>{11, 10}
+        };
+
+        constexpr std::array<Vector2Ex<size_t>, 10> noPelletsCoords{
+            Vector2Ex<size_t>{5,8},
+            Vector2Ex<size_t>{6,8},
+            Vector2Ex<size_t>{7,8},
+            Vector2Ex<size_t>{8,8},
+            Vector2Ex<size_t>{8,7},
+            Vector2Ex<size_t>{8,6},
         };
 
         for (const auto& coord : superPelletsCoords)
@@ -301,6 +310,15 @@ Board::Board() :
             Pellet& pellet = tile.GetPellet();
             pellet.SetType(SUPER);
         }
+
+        for (const auto& coord : noPelletsCoords)
+        {
+            Tile& tile = GetTile(coord);
+            Pellet& pellet = tile.GetPellet();
+            pellet.SetType(NONE);
+        }
+
+
     }
 
     CreateNodesAndArcs();
@@ -340,9 +358,8 @@ Node* Board::GetClosestNode(const Vector2Ex<float> position) const
     {
         // Only consider nodes with a clear line of sight
         if (!HasLineOfSight(position, node->GetPosition()))
-        {
             continue;
-        }
+
 
         float distanceSq = (position - node->GetPosition()).GetLengthSqr();
         if (distanceSq < smallestDistanceSq)
