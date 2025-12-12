@@ -32,8 +32,9 @@ class GameLayer : public engine::Layer
     float m_timePassedSinceLastSave = 0.0f;
     float m_timePassedSinceStart = 0.0f;
     float m_ghostModeTimer = 0.0f;
-    Ghost::State m_ghostMode = Ghost::State::SCATTER;
+    Ghost::State m_ghostMode = Ghost::State::CHASE;
     bool m_isGameOver = false;
+    bool m_frightenedStateDebounce = false;
 
   private:
     static bool IsPacmanTouchingPellet(const Pellet& pellet,

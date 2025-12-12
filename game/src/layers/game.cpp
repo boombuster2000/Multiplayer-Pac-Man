@@ -4,7 +4,10 @@
 #include "game/layers/game_options_menu.h"
 #include "game/layers/main_menu.h"
 #include "raylib.h"
+#include <algorithm>
 #include <array>
+#include <cstdlib>
+#include <ctime>
 #include <format>
 #include <iostream>
 #include <limits>
@@ -34,6 +37,10 @@ bool GameLayer::TryCollectPellet(Player& player,
 
     const int pointsGained = pellet.GetValue();
     player.AddPoints(pointsGained);
+
+    if (const Pellet::Type pelletType = pellet.GetType(); pelletType == Pellet::Type::SUPER)
+        m_ghostMode = Ghost::State::FRIGHTENED;
+
     UpdateHighscores();
     pellet.SetType(Pellet::Type::NONE);
 
@@ -294,6 +301,7 @@ GameLayer::GameLayer(const std::vector<Client>& clients) :
     m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde}
 {
     SetPacmansSpawnPositions();
+    srand(time(nullptr));
 }
 
 GameLayer::GameLayer(const std::vector<Client>& clients, Board board) :
@@ -306,6 +314,7 @@ GameLayer::GameLayer(const std::vector<Client>& clients, Board board) :
     m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde}
 {
     SetPacmansSpawnPositions();
+    srand(time(nullptr));
 }
 
 GameLayer::~GameLayer()
@@ -503,7 +512,7 @@ void GameLayer::OnUpdate(float ts)
     }
 
     m_ghostModeTimer += ts;
-    if (m_ghostModeTimer >= 10.0f)
+    if (m_ghostModeTimer >= 20.0f)
     {
         m_ghostModeTimer = 0.0f;
         m_ghostMode = (m_ghostMode == Ghost::State::SCATTER) ? Ghost::State::CHASE : Ghost::State::SCATTER;
@@ -579,9 +588,61 @@ void GameLayer::OnUpdate(float ts)
             // In scatter mode, ghosts target their designated corner (guard position).
             ghost->Update(m_board, ghost->GetGuardPosition(), ui::Direction::UP); // Pacman direction not relevant here
         }
+        else if (state == Ghost::State::FRIGHTENED)
+        {
+            // Should immediately go in opposite direction
+            if (!m_frightenedStateDebounce)
+                ghost->SetQueuedDirection(ui::GetOppositeDirection(ghost->GetDirection()));
+
+            ghost->SetSpeed({200,200});
+
+            // Can only change directions at nodes.
+            if (Board::IsAtNode(ghost->GetPositionAtAnchor(), m_board.GetClosestNode(ghost->GetPositionAtAnchor())->GetPosition()))
+            {
+                // In frightened mode, ghosts move randomly.
+                std::vector<ui::Direction> possibleDirections;
+                constexpr std::array<ui::Direction, 4> allDirections = {
+                    ui::Direction::UP, ui::Direction::DOWN, ui::Direction::LEFT, ui::Direction::RIGHT};
+
+                const Vector2Ex<float> currentPos = ghost->GetPositionAtAnchor();
+
+                for (const auto& direction : allDirections)
+                {
+                    if (const Vector2Ex<float> peekPosition = currentPos + Vector2Ex<float>::GetDirectionVector(direction);
+                        CanMoveInDirection(ghost, peekPosition, direction))
+                    {
+                        possibleDirections.push_back(direction);
+                    }
+                }
+
+                if (possibleDirections.size() > 1)
+                {
+                    const ui::Direction oppositeDirection = ui::GetOppositeDirection(ghost->GetDirection());
+                    // Don't move in the opposite direction unless it's the only option
+                    if (auto it = std::ranges::find(possibleDirections, oppositeDirection);
+                        it != possibleDirections.end())
+                    {
+                        possibleDirections.erase(it);
+                    }
+                }
+
+                if (!possibleDirections.empty())
+                {
+                    // Choose a random direction from the possible options
+                    const size_t randomIndex = rand() % possibleDirections.size();
+                    ghost->SetQueuedDirection(possibleDirections[randomIndex]);
+                }
+            }
+
+
+        }
 
         ProcessMovementSteps(ghost, ts);
     }
+
+    if (!m_frightenedStateDebounce && m_ghostMode == Ghost::State::FRIGHTENED)
+        m_frightenedStateDebounce = true;
+
 }
 
 void GameLayer::OnRender()
