@@ -9,7 +9,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <format>
-#include <iostream>
 #include <limits>
 #include <memory>
 #include <stdexcept>
@@ -74,7 +73,8 @@ void GameLayer::ProcessPelletCollection(Client& client,
     if (posBeforeIndex == posAfterIndex)
         return;
 
-    const Vector2Ex<int> indexDiff(static_cast<int>(posAfterIndex.x - posBeforeIndex.x), static_cast<int>(posAfterIndex.y - posBeforeIndex.y));
+    const Vector2Ex<int> indexDiff(static_cast<int>(posAfterIndex.x - posBeforeIndex.x),
+                                   static_cast<int>(posAfterIndex.y - posBeforeIndex.y));
 
     // If there's a diagonal change in tile indices, it's a corner turn.
     if (indexDiff.x != 0 && indexDiff.y != 0)
@@ -215,7 +215,7 @@ void GameLayer::RenderLives() const
             constexpr float xSpacing = 3;
             const float scale = radius / static_cast<float>(texture->width);
 
-            DrawTextureEx(*texture, position,0, scale, pacmanColor);
+            DrawTextureEx(*texture, position, 0, scale, pacmanColor);
             position.x += radius + xSpacing;
         }
 
@@ -239,7 +239,6 @@ Pacman& GameLayer::GetClosestAlivePacmanWithNodes(const Vector2Ex<float>& refere
 {
     if (m_clients.empty())
         throw std::runtime_error("GetClosestAlivePacmanWithNodes called with no clients");
-
 
     const NodeDistanceTable& distanceTable = m_board.GetDistanceTable();
     Node* referenceNode = m_board.GetClosestNode(referencePoint);
@@ -355,7 +354,7 @@ void GameLayer::HandleKeyPresses()
     }
 }
 
-bool GameLayer::IsPacmanTouchingGhost(const Pacman& pacman, const Ghost& ghost) const
+bool GameLayer::IsPacmanTouchingGhost(const Pacman& pacman, const Ghost& ghost)
 {
     const Vector2Ex<float> pacmanPosition = pacman.GetPositionAtAnchor();
     const Vector2Ex<float> pacmanDimensions = pacman.GetDimensions();
@@ -391,6 +390,7 @@ void GameLayer::HandleGhostDeath(Player& player, Ghost& ghost)
 
     player.AddPoints(200); // points gained by kill ghost
     ghost.SetState(Ghost::State::DEAD);
+    ghost.SetDidJustDie(true);
 }
 
 void GameLayer::ProcessGhostCollisions()
@@ -416,7 +416,6 @@ void GameLayer::ProcessGhostCollisions()
                 {
                     HandleGhostDeath(client.player, *ghost);
                 }
-
             }
         }
     }
@@ -444,6 +443,215 @@ int GameLayer::GetPacmanWithLivesCount() const
     }
 
     return pacmanWithLivesCount;
+}
+void GameLayer::RespawnGhost(Ghost* ghost) const
+{
+    ghost->SetState(m_mainGhostMode); // Sync ghosts back to what it should be on.
+
+    Color newColor = ghost->GetColor();
+    newColor.a = 255;
+
+    ghost->SetColor(newColor);
+}
+
+void GameLayer::ProcessDeadGhost(Ghost* ghost) const
+{
+    if (Board::IsInRegion(m_board.GetGhostSpawnRegion(), ghost->GetPositionAtAnchor()))
+        RespawnGhost(ghost);
+    else
+        ghost->UpdateQueuedDirection(m_board, ghost->GetSpawnPosition());
+}
+
+void GameLayer::HandleFrightenedGhostMovementDecision(Ghost* ghost) const
+{
+    // Can only change directions at nodes.
+    if (Board::IsAtNode(ghost->GetPositionAtAnchor(),
+                        m_board.GetClosestNode(ghost->GetPositionAtAnchor())->GetPosition()))
+    {
+        // In frightened mode, ghosts move randomly.
+        std::vector<ui::Direction> possibleDirections;
+        constexpr std::array<ui::Direction, 4> allDirections = {ui::Direction::UP,
+                                                                ui::Direction::DOWN,
+                                                                ui::Direction::LEFT,
+                                                                ui::Direction::RIGHT};
+
+        const Vector2Ex<float> currentPos = ghost->GetPositionAtAnchor();
+
+        for (const auto& direction : allDirections)
+        {
+            if (const Vector2Ex<float> peekPosition = currentPos + Vector2Ex<float>::GetDirectionVector(direction);
+                CanMoveInDirection(ghost, peekPosition, direction))
+            {
+                possibleDirections.push_back(direction);
+            }
+        }
+
+        if (possibleDirections.size() > 1)
+        {
+            const ui::Direction oppositeDirection = ui::GetOppositeDirection(ghost->GetDirection());
+            // Don't move in the opposite direction unless it's the only option
+            if (const auto it = std::ranges::find(possibleDirections, oppositeDirection);
+                it != possibleDirections.end())
+            {
+                possibleDirections.erase(it);
+            }
+        }
+
+        if (!possibleDirections.empty())
+        {
+            // Choose a random direction from the possible options
+            const size_t randomIndex = rand() % possibleDirections.size();
+            ghost->SetQueuedDirection(possibleDirections[randomIndex]);
+        }
+    }
+}
+void GameLayer::Chase(Ghost* ghost) const
+{
+    const Pacman& closestPacman = GetClosestAlivePacmanWithNodes(ghost->GetPositionAtAnchor());
+    ghost->Update(m_board, closestPacman.GetPositionAtAnchor(), closestPacman.GetDirection());
+}
+void GameLayer::Scatter(Ghost* ghost) const
+{
+    // In scatter mode, ghosts target their designated corner (guard position).
+    ghost->Update(m_board, ghost->GetGuardPosition(), ui::Direction::UP); // Pacman direction not relevant here
+}
+
+void GameLayer::UpdateTimers(const float ts)
+{
+    m_timePassedSinceLastSave += ts;
+    m_timePassedSinceStart += ts;
+    m_ghostModeTimer += ts;
+
+    if (m_isFrightenedModeEnabled)
+        m_frightenedModeTimer += ts;
+
+    if (m_mainGhostMode == Ghost::State::FRIGHTENED)
+        m_ghostModeTimer += ts;
+}
+void GameLayer::SaveHighscoresToBoard()
+{
+    if (m_timePassedSinceLastSave < 10.0f)
+        return;
+
+    m_board.SaveHighscoresToFile();
+    m_timePassedSinceLastSave = 0.0f;
+}
+
+void GameLayer::UpdateGhostModes()
+{
+    if (m_ghostModeTimer >= 15.0f)
+    {
+        m_ghostModeTimer = 0.0f;
+        m_mainGhostMode = (m_mainGhostMode == Ghost::State::SCATTER) ? Ghost::State::CHASE : Ghost::State::SCATTER;
+    }
+
+    // Revert ghosts back to normal
+    if (m_isFrightenedModeEnabled && m_frightenedModeTimer >= 10.0f)
+    {
+        m_frightenedModeTimer = 0.0f;
+        m_frightenedStateDebounce = false;
+        m_isFrightenedModeEnabled = false;
+    }
+}
+void GameLayer::ProcessPacmans(const float ts)
+{
+    for (auto& client : m_clients)
+    {
+        Pacman& pacman = client.pacman;
+        if (pacman.IsDead())
+        {
+            pacman.UpdateRespawnTimer(ts);
+
+            // Pacman comes to life again
+            if (pacman.GetRespawnTimer() <= 0.f && pacman.GetLives() > 0)
+            {
+                pacman.SetDead(false);
+
+                // Making solid color again.
+                Color color = pacman.GetColor();
+                color.a = 255;
+                pacman.SetColor(color);
+            }
+        }
+
+        // If permanently dead they can't move
+        if (pacman.GetLives() > 0)
+            ProcessMovementSteps(&pacman, ts);
+
+        if (!pacman.IsDead())
+            ProcessPelletCollection(client, pacman.GetLastPosition(), pacman.GetPositionAtAnchor());
+    }
+}
+void GameLayer::ProcessGhosts(const float ts)
+{
+    const int alivePacmanCount = GetCurrentAlivePacmanCount();
+    for (const auto& ghost : m_ghosts)
+    {
+        // Handles ghosts getting released.
+        if (ghost->GetState() == Ghost::State::SPAWNING && ghost->GetReleaseTime() <= m_timePassedSinceStart)
+            ghost->SetState(m_mainGhostMode);
+
+        // Ghosts do nothing (including moving) while in the SPAWNING state.
+        if (ghost->GetState() == Ghost::State::SPAWNING)
+            continue;
+
+        // Handles dead ghosts.
+        if (ghost->GetState() == Ghost::State::DEAD)
+        {
+            ProcessDeadGhost(ghost);
+            ProcessMovementSteps(ghost, ts);
+            continue;
+        }
+
+        // Change ghosts from frightened appearance and normal appearance
+        if (m_isFrightenedModeEnabled)
+        {
+            if (!ghost->DidJustDie())
+            {
+                ghost->SetSpeed({200, 200});
+                ghost->SetState(Ghost::State::FRIGHTENED);
+                ghost->SetColor(GOLD);
+
+                // Should immediately go in opposite direction
+                if (!m_frightenedStateDebounce)
+                {
+                    ghost->SetQueuedDirection(ui::GetOppositeDirection(ghost->GetDirection()));
+                    m_frightenedStateDebounce = true;
+                }
+            }
+        }
+        else
+        {
+            ghost->SetSpeed({300, 300});
+            ghost->SetState(m_mainGhostMode);
+            ghost->SetColor(WHITE);
+        }
+
+        // Handles movement decisions
+        if (const Ghost::State state = ghost->GetState(); state == Ghost::State::FRIGHTENED)
+        {
+            HandleFrightenedGhostMovementDecision(ghost);
+        }
+        else if (state == Ghost::State::CHASE)
+        {
+            // Ghosts only update their queued direction in and move if there's at least one alive Pacman
+            if (alivePacmanCount > 0)
+            {
+                Chase(ghost);
+            }
+            else // Just goes back to guard position until pacman respawns
+            {
+                ghost->SetState(Ghost::State::SCATTER); // Temporarily set to scatter, will be synced next frame
+                Scatter(ghost);
+            }
+        }
+        else if (state == Ghost::State::SCATTER)
+        {
+            Scatter(ghost);
+        }
+
+        ProcessMovementSteps(ghost, ts);
+    }
 }
 
 void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
@@ -513,7 +721,7 @@ void GameLayer::UpdateHighscores()
 
     for (auto& client : m_clients)
     {
-        std::shared_ptr<Profile> profile = client.profile;
+        const std::shared_ptr<Profile> profile = client.profile;
         const int points = client.player.GetPoints();
 
         client.profile->UpdateHighScore(boardName, points);
@@ -521,198 +729,24 @@ void GameLayer::UpdateHighscores()
     }
 }
 
-void GameLayer::OnUpdate(float ts)
+void GameLayer::OnUpdate(const float ts)
 {
-    m_timePassedSinceLastSave += ts;
-    m_timePassedSinceStart += ts;
-    m_ghostModeTimer += ts;
-
-    if (m_ghostMode == Ghost::State::FRIGHTENED)
-        m_ghostModeTimer += ts;
-
-
-    if (m_timePassedSinceLastSave >= 10.0f)
-    {
-        m_board.SaveHighscoresToFile();
-        m_timePassedSinceLastSave = 0.0f;
-    }
-
-    // Keeps track of what mode they should return to.
-    if ( m_ghostModeTimer >= 15.0f)
-    {
-        m_ghostModeTimer = 0.0f;
-        if (m_ghostMode == Ghost::State::SCATTER || m_ghostMode == Ghost::State::CHASE)
-            m_ghostMode = (m_ghostMode == Ghost::State::SCATTER) ? Ghost::State::CHASE : Ghost::State::SCATTER;
-    }
-
-    if (m_isFrightenedModeEnabled)
-        m_frightenedModeTimer += ts;
-
-    // Return back to normal mode
-    if (m_isFrightenedModeEnabled && m_frightenedModeTimer >= 10.0f)
-    {
-        m_frightenedModeTimer = 0.0f;
-        m_frightenedStateDebounce = false;
-        m_isFrightenedModeEnabled = false;
-    }
+    UpdateTimers(ts);
+    SaveHighscoresToBoard();
+    UpdateGhostModes();
 
     HandleKeyPresses();
 
+    // TODO: Render "Game Over" screen or transition to a game over state.
     if (m_isGameOver)
-    {
-        // TODO: Render "Game Over" screen or transition to a game over state.
         return;
-    }
 
     m_isGameOver = GetPacmanWithLivesCount() <= 0;
 
-    // Process pacmans
-    for (auto& client : m_clients)
-    {
-        if (client.pacman.IsDead())
-        {
-            client.pacman.UpdateRespawnTimer(ts);
-
-            // Pacman comes to life again
-            if (client.pacman.GetRespawnTimer() <= 0.f && client.pacman.GetLives() > 0)
-            {
-                client.pacman.SetDead(false);
-
-                // Making solid color again.
-                Color color = client.pacman.GetColor();
-                color.a = 255;
-                client.pacman.SetColor(color);
-            }
-
-        }
-
-        // If permanently dead they can't move
-        if (client.pacman.GetLives() > 0)
-            ProcessMovementSteps(&client.pacman, ts);
-
-        if (!client.pacman.IsDead())
-            ProcessPelletCollection(client, client.pacman.GetLastPosition(), client.pacman.GetPositionAtAnchor());
-
-    }
+    ProcessPacmans(ts);
 
     ProcessGhostCollisions(); // Check for collisions after Pac-Mans have moved
-
-    const int alivePacmanCount = GetCurrentAlivePacmanCount();
-
-    // Process Ghosts
-    for (const auto& ghost : m_ghosts)
-    {
-        // Make ghost travel back to spawn
-        if (ghost->GetState() == Ghost::State::DEAD)
-        {
-            if (Board::IsInRegion(m_board.GetGhostSpawnRegion(), ghost->GetPositionAtAnchor()))
-            {
-                ghost->SetState(m_ghostMode);
-                Color newColor = ghost->GetColor();
-                newColor.a = 255;
-                ghost->SetColor(newColor);
-            }
-            else
-            {
-                ghost->UpdateQueuedDirection(m_board, ghost->GetSpawnPosition());
-            }
-
-            ProcessMovementSteps(ghost, ts);
-            continue;
-        }
-
-        // If it's time to release a spawning ghost, change its state to the current global mode.
-        if (ghost->GetState() == Ghost::State::SPAWNING && ghost->GetReleaseTime() <= m_timePassedSinceStart)
-        {
-            if (m_isFrightenedModeEnabled)
-                ghost->SetState(Ghost::State::FRIGHTENED);
-            else
-                ghost->SetState(m_ghostMode);
-        }
-
-        // Ghosts do nothing (including moving) while in the SPAWNING state.
-        if (ghost->GetState() == Ghost::State::SPAWNING)
-            continue;
-
-        // Change ghosts to different states.
-        if (m_isFrightenedModeEnabled)
-        {
-            ghost->SetSpeed({200,200});
-            ghost->SetState(Ghost::State::FRIGHTENED);
-        }
-        else
-        {
-            ghost->SetSpeed({300,300});
-            ghost->SetState(m_ghostMode);
-        }
-
-        if (m_isFrightenedModeEnabled)
-        {
-            // Should immediately go in opposite direction
-            if (!m_frightenedStateDebounce)
-            {
-                ghost->SetQueuedDirection(ui::GetOppositeDirection(ghost->GetDirection()));
-                m_frightenedStateDebounce = true;
-            }
-
-            // Can only change directions at nodes.
-            if (Board::IsAtNode(ghost->GetPositionAtAnchor(), m_board.GetClosestNode(ghost->GetPositionAtAnchor())->GetPosition()))
-            {
-                // In frightened mode, ghosts move randomly.
-                std::vector<ui::Direction> possibleDirections;
-                constexpr std::array<ui::Direction, 4> allDirections = {
-                    ui::Direction::UP, ui::Direction::DOWN, ui::Direction::LEFT, ui::Direction::RIGHT};
-
-                const Vector2Ex<float> currentPos = ghost->GetPositionAtAnchor();
-
-                for (const auto& direction : allDirections)
-                {
-                    if (const Vector2Ex<float> peekPosition = currentPos + Vector2Ex<float>::GetDirectionVector(direction);
-                        CanMoveInDirection(ghost, peekPosition, direction))
-                    {
-                        possibleDirections.push_back(direction);
-                    }
-                }
-
-                if (possibleDirections.size() > 1)
-                {
-                    const ui::Direction oppositeDirection = ui::GetOppositeDirection(ghost->GetDirection());
-                    // Don't move in the opposite direction unless it's the only option
-                    if (auto it = std::ranges::find(possibleDirections, oppositeDirection);
-                        it != possibleDirections.end())
-                    {
-                        possibleDirections.erase(it);
-                    }
-                }
-
-                if (!possibleDirections.empty())
-                {
-                    // Choose a random direction from the possible options
-                    const size_t randomIndex = rand() % possibleDirections.size();
-                    ghost->SetQueuedDirection(possibleDirections[randomIndex]);
-                }
-            }
-        }
-
-        else if (const Ghost::State state = ghost->GetState(); state == Ghost::State::CHASE)
-        {
-            // Ghosts only update their queued direction in and move if there's at least one alive Pacman
-            if (alivePacmanCount > 0)
-            {
-                const Pacman& closestPacman = GetClosestAlivePacmanWithNodes(ghost->GetPositionAtAnchor());
-                ghost->Update(m_board, closestPacman.GetPositionAtAnchor(), closestPacman.GetDirection());
-            }
-        }
-        else if (state == Ghost::State::SCATTER)
-        {
-            // In scatter mode, ghosts target their designated corner (guard position).
-            ghost->Update(m_board, ghost->GetGuardPosition(), ui::Direction::UP); // Pacman direction not relevant here
-        }
-
-
-        ProcessMovementSteps(ghost, ts);
-    }
-
+    ProcessGhosts(ts);
 }
 
 void GameLayer::OnRender()
@@ -739,8 +773,6 @@ void GameLayer::OnRender()
         DrawText(usernameCStr, static_cast<int>(textX), static_cast<int>(textY), fontSize, playerColor);
     }
 
-
-
     for (const auto& ghost : m_ghosts)
         ghost->Render();
 
@@ -766,11 +798,8 @@ void GameLayer::RenderScores() const
         const auto& personalHighscores = client.profile->GetPersonalHighscores();
 
         int highscore = 0;
-        auto it = personalHighscores.find(boardName);
-        if (it != personalHighscores.end())
-        {
+        if (auto it = personalHighscores.find(boardName); it != personalHighscores.end())
             highscore = it->second;
-        }
 
         // Display Username in a distinct color
         const std::string usernameText = std::format("Username: {}", username);
@@ -788,4 +817,3 @@ void GameLayer::RenderScores() const
         yOffset += lineHeight + playerSpacing;                                // Add extra spacing for the next player
     }
 }
-
