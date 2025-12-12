@@ -55,7 +55,16 @@ void Ghost::SetGuardPosition(const Vector2Ex<float>& guardPosition)
     m_guardPosition = guardPosition;
 }
 
-// file: src/game/ghost.cpp
+bool Ghost::DidJustDie() const
+{
+    return m_didJustDie;
+}
+
+void Ghost::SetDidJustDie(const bool didJustDie)
+{
+    m_didJustDie = didJustDie;
+}
+
 void Ghost::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& targetPosition)
 {
     using enum ui::Direction;
@@ -64,9 +73,8 @@ void Ghost::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& ta
     if (m_state == State::FRIGHTENED)
         return;
 
-
     Node* startNode = board.GetClosestNode(GetPositionAtAnchor());
-    Node* endNode   = board.GetClosestNode(targetPosition);
+    Node* endNode = board.GetClosestNode(targetPosition);
     const NodeRouteTable& routeTable = board.GetRouteTable();
 
     if (!startNode || !endNode)
@@ -75,16 +83,19 @@ void Ghost::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& ta
     if (m_state == State::SCATTER && !Board::IsAtNode(GetPositionAtAnchor(), startNode->GetPosition()))
         return;
 
-    constexpr std::array<ui::Direction,4> priority = {UP, LEFT, DOWN, RIGHT};
+    constexpr std::array<ui::Direction, 4> priority = {UP, LEFT, DOWN, RIGHT};
 
-    auto NeighborForDir = [&](const ui::Direction d) -> Node*
-    {
+    auto NeighborForDir = [&](const ui::Direction d) -> Node* {
         switch (d)
         {
-            case UP:    return startNode->GetUpArc().GetEndNode();
-            case DOWN:  return startNode->GetDownArc().GetEndNode();
-            case LEFT:  return startNode->GetLeftArc().GetEndNode();
-            case RIGHT: return startNode->GetRightArc().GetEndNode();
+        case UP:
+            return startNode->GetUpArc().GetEndNode();
+        case DOWN:
+            return startNode->GetDownArc().GetEndNode();
+        case LEFT:
+            return startNode->GetLeftArc().GetEndNode();
+        case RIGHT:
+            return startNode->GetRightArc().GetEndNode();
         }
         return nullptr;
     };
@@ -113,10 +124,7 @@ void Ghost::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& ta
 
         // Non-stationary scatter or non-scatter: greedy fallback
         const Vector2Ex<float> mv = targetPosition - GetPositionAtAnchor();
-        const ui::Direction d =
-            (std::abs(mv.x) > std::abs(mv.y)) ?
-                (mv.x > 0 ? RIGHT : LEFT) :
-                (mv.y > 0 ? DOWN : UP);
+        const ui::Direction d = (std::abs(mv.x) > std::abs(mv.y)) ? (mv.x > 0 ? RIGHT : LEFT) : (mv.y > 0 ? DOWN : UP);
 
         SetQueuedDirection(d);
         return;
@@ -141,10 +149,14 @@ void Ghost::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& ta
 
     ui::Direction proposed = GetDirection();
 
-    if (nextNode == startNode->GetUpArc().GetEndNode())        proposed = UP;
-    else if (nextNode == startNode->GetDownArc().GetEndNode()) proposed = DOWN;
-    else if (nextNode == startNode->GetLeftArc().GetEndNode()) proposed = LEFT;
-    else if (nextNode == startNode->GetRightArc().GetEndNode())proposed = RIGHT;
+    if (nextNode == startNode->GetUpArc().GetEndNode())
+        proposed = UP;
+    else if (nextNode == startNode->GetDownArc().GetEndNode())
+        proposed = DOWN;
+    else if (nextNode == startNode->GetLeftArc().GetEndNode())
+        proposed = LEFT;
+    else if (nextNode == startNode->GetRightArc().GetEndNode())
+        proposed = RIGHT;
 
     // -------------------------------------------------------
     // Scatter: If proposed direction is reverse, find next-shortest path.
