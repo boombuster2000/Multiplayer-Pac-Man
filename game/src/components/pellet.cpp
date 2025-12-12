@@ -59,7 +59,7 @@ void Pellet::Render(Vector2Ex<float> offset) const
             DrawCircleV(GetWorldOrigin(), radius, WHITE);
             break;
         case Type::SUPER:
-            DrawCircleV(GetWorldOrigin(), radius + 2, WHITE);
+            DrawCircleV(GetWorldOrigin(), radius + 2, GOLD);
             break;
         case Type::NONE:
             break;
