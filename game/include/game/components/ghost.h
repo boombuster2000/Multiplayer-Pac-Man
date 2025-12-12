@@ -8,10 +8,7 @@ class Board;
 
 class Ghost : public Entity
 {
-    private:
-    static bool IsOppositeDirection(ui::Direction current, ui::Direction proposed);
-
-    public:
+  public:
     enum class State
     {
         SCATTER,
@@ -36,6 +33,8 @@ class Ghost : public Entity
     Vector2Ex<float> m_guardPosition;
     float m_releaseTime;
 
+    bool m_didJustDie = false;
+
   public:
     explicit Ghost(const Vector2Ex<float>& spawnPosition,
                    const Vector2Ex<float>& speed,
@@ -49,19 +48,20 @@ class Ghost : public Entity
 
     ~Ghost() override = default;
 
-    State GetState() const;
+    [[nodiscard]] State GetState() const;
     void SetState(const State state);
 
-    Type GetType() const;
+    [[nodiscard]] Type GetType() const;
 
-    float GetReleaseTime() const;
-    void SetReleaseTime(const float releaseTime);
+    [[nodiscard]] float GetReleaseTime() const;
+    void SetReleaseTime(float releaseTime);
 
-    Vector2Ex<float> GetGuardPosition() const;
+    [[nodiscard]] Vector2Ex<float> GetGuardPosition() const;
     void SetGuardPosition(const Vector2Ex<float>& guardPosition);
 
+    bool DidJustDie() const;
+    void SetDidJustDie(bool didJustDie);
+
     void UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& targetPosition);
-    virtual void Update(const Board& board,
-                        const Vector2Ex<float>& pacmanPosition,
-                        const ui::Direction pacmanDirection) = 0;
+    virtual void Update(const Board& board, const Vector2Ex<float>& pacmanPosition, ui::Direction pacmanDirection) = 0;
 };
