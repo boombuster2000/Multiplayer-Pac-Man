@@ -60,6 +60,11 @@ void Ghost::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& ta
 {
     using enum ui::Direction;
 
+    // Direction update handled by game when ghosts frightened
+    if (m_state == State::FRIGHTENED)
+        return;
+
+
     Node* startNode = board.GetClosestNode(GetPositionAtAnchor());
     Node* endNode   = board.GetClosestNode(targetPosition);
     const NodeRouteTable& routeTable = board.GetRouteTable();
