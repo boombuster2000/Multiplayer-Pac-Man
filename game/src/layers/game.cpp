@@ -39,7 +39,7 @@ bool GameLayer::TryCollectPellet(Player& player,
     player.AddPoints(pointsGained);
 
     if (const Pellet::Type pelletType = pellet.GetType(); pelletType == Pellet::Type::SUPER)
-        m_ghostMode = Ghost::State::FRIGHTENED;
+        m_isFrightenedModeEnabled = true;
 
     UpdateHighscores();
     pellet.SetType(Pellet::Type::NONE);
@@ -504,6 +504,11 @@ void GameLayer::OnUpdate(float ts)
 {
     m_timePassedSinceLastSave += ts;
     m_timePassedSinceStart += ts;
+    m_ghostModeTimer += ts;
+
+    if (m_ghostMode == Ghost::State::FRIGHTENED)
+        m_ghostModeTimer += ts;
+
 
     if (m_timePassedSinceLastSave >= 10.0f)
     {
@@ -511,11 +516,24 @@ void GameLayer::OnUpdate(float ts)
         m_timePassedSinceLastSave = 0.0f;
     }
 
-    m_ghostModeTimer += ts;
-    if (m_ghostModeTimer >= 20.0f)
+
+    // Keeps track of what mode they should return to.
+    if ( m_ghostModeTimer >= 15.0f)
     {
         m_ghostModeTimer = 0.0f;
-        m_ghostMode = (m_ghostMode == Ghost::State::SCATTER) ? Ghost::State::CHASE : Ghost::State::SCATTER;
+        if (m_ghostMode == Ghost::State::SCATTER || m_ghostMode == Ghost::State::CHASE)
+            m_ghostMode = (m_ghostMode == Ghost::State::SCATTER) ? Ghost::State::CHASE : Ghost::State::SCATTER;
+    }
+
+    if (m_isFrightenedModeEnabled)
+        m_frightenedModeTimer += ts;
+
+    // Return back to normal mode
+    if (m_isFrightenedModeEnabled && m_frightenedModeTimer >= 10.0f)
+    {
+        m_frightenedModeTimer = 0.0f;
+        m_frightenedStateDebounce = false;
+        m_isFrightenedModeEnabled = false;
     }
 
     HandleKeyPresses();
@@ -566,35 +584,37 @@ void GameLayer::OnUpdate(float ts)
     {
         // If it's time to release a spawning ghost, change its state to the current global mode.
         if (ghost->GetState() == Ghost::State::SPAWNING && ghost->GetReleaseTime() <= m_timePassedSinceStart)
-            ghost->SetState(m_ghostMode);
+        {
+            if (m_isFrightenedModeEnabled)
+                ghost->SetState(Ghost::State::FRIGHTENED);
+            else
+                ghost->SetState(m_ghostMode);
+        }
 
         // Ghosts do nothing (including moving) while in the SPAWNING state.
         if (ghost->GetState() == Ghost::State::SPAWNING)
             continue;
 
-        ghost->SetState(m_ghostMode);
+        // Change ghosts to different states.
+        if (m_isFrightenedModeEnabled)
+        {
+            ghost->SetSpeed({200,200});
+            ghost->SetState(Ghost::State::FRIGHTENED);
+        }
+        else
+        {
+            ghost->SetSpeed({300,300});
+            ghost->SetState(m_ghostMode);
+        }
 
-        if (const Ghost::State state = ghost->GetState(); state == Ghost::State::CHASE)
-        {
-            // Ghosts only update their queued direction in and move if there's at least one alive Pacman
-            if (alivePacmanCount > 0)
-            {
-                const Pacman& closestPacman = GetClosestAlivePacmanWithNodes(ghost->GetPositionAtAnchor());
-                ghost->Update(m_board, closestPacman.GetPositionAtAnchor(), closestPacman.GetDirection());
-            }
-        }
-        else if (state == Ghost::State::SCATTER)
-        {
-            // In scatter mode, ghosts target their designated corner (guard position).
-            ghost->Update(m_board, ghost->GetGuardPosition(), ui::Direction::UP); // Pacman direction not relevant here
-        }
-        else if (state == Ghost::State::FRIGHTENED)
+        if (m_isFrightenedModeEnabled)
         {
             // Should immediately go in opposite direction
             if (!m_frightenedStateDebounce)
+            {
                 ghost->SetQueuedDirection(ui::GetOppositeDirection(ghost->GetDirection()));
-
-            ghost->SetSpeed({200,200});
+                m_frightenedStateDebounce = true;
+            }
 
             // Can only change directions at nodes.
             if (Board::IsAtNode(ghost->GetPositionAtAnchor(), m_board.GetClosestNode(ghost->GetPositionAtAnchor())->GetPosition()))
@@ -633,9 +653,23 @@ void GameLayer::OnUpdate(float ts)
                     ghost->SetQueuedDirection(possibleDirections[randomIndex]);
                 }
             }
-
-
         }
+
+        else if (const Ghost::State state = ghost->GetState(); state == Ghost::State::CHASE)
+        {
+            // Ghosts only update their queued direction in and move if there's at least one alive Pacman
+            if (alivePacmanCount > 0)
+            {
+                const Pacman& closestPacman = GetClosestAlivePacmanWithNodes(ghost->GetPositionAtAnchor());
+                ghost->Update(m_board, closestPacman.GetPositionAtAnchor(), closestPacman.GetDirection());
+            }
+        }
+        else if (state == Ghost::State::SCATTER)
+        {
+            // In scatter mode, ghosts target their designated corner (guard position).
+            ghost->Update(m_board, ghost->GetGuardPosition(), ui::Direction::UP); // Pacman direction not relevant here
+        }
+
 
         ProcessMovementSteps(ghost, ts);
     }
