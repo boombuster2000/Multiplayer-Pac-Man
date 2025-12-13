@@ -55,14 +55,14 @@ void Ghost::SetGuardPosition(const Vector2Ex<float>& guardPosition)
     m_guardPosition = guardPosition;
 }
 
-bool Ghost::DidJustDie() const
+bool Ghost::WasFrightened() const
 {
-    return m_didJustDie;
+    return m_wasFrightened;
 }
 
-void Ghost::SetDidJustDie(const bool didJustDie)
+void Ghost::SetWasFrightened(const bool wasFrightened)
 {
-    m_didJustDie = didJustDie;
+    m_wasFrightened = wasFrightened;
 }
 
 void Ghost::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& targetPosition)

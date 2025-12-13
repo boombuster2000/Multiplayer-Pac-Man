@@ -33,7 +33,7 @@ class Ghost : public Entity
     Vector2Ex<float> m_guardPosition;
     float m_releaseTime;
 
-    bool m_didJustDie = false;
+    bool m_wasFrightened = false;
 
   public:
     explicit Ghost(const Vector2Ex<float>& spawnPosition,
@@ -59,8 +59,8 @@ class Ghost : public Entity
     [[nodiscard]] Vector2Ex<float> GetGuardPosition() const;
     void SetGuardPosition(const Vector2Ex<float>& guardPosition);
 
-    bool DidJustDie() const;
-    void SetDidJustDie(bool didJustDie);
+    bool WasFrightened() const;
+    void SetWasFrightened(bool wasFrightened);
 
     void UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& targetPosition);
     virtual void Update(const Board& board, const Vector2Ex<float>& pacmanPosition, ui::Direction pacmanDirection) = 0;

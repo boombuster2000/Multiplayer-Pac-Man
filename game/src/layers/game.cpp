@@ -390,7 +390,7 @@ void GameLayer::HandleGhostDeath(Player& player, Ghost& ghost)
 
     player.AddPoints(200); // points gained by kill ghost
     ghost.SetState(Ghost::State::DEAD);
-    ghost.SetDidJustDie(true);
+    ghost.SetWasFrightened(true);
 }
 
 void GameLayer::ProcessGhostCollisions()
@@ -407,7 +407,7 @@ void GameLayer::ProcessGhostCollisions()
 
             if (IsPacmanTouchingGhost(client.pacman, *ghost))
             {
-                if (!m_isFrightenedModeEnabled)
+                if (ghost->GetState() != Ghost::State::FRIGHTENED)
                 {
                     HandlePacmanDeath(client.pacman, *ghost);
                     break; // One collision is enough to kill, move to next client
@@ -589,7 +589,11 @@ void GameLayer::ProcessGhosts(const float ts)
     {
         // Handles ghosts getting released.
         if (ghost->GetState() == Ghost::State::SPAWNING && ghost->GetReleaseTime() <= m_timePassedSinceStart)
+        {
             ghost->SetState(m_mainGhostMode);
+            if (m_isFrightenedModeEnabled)
+                ghost->SetWasFrightened(true); // Prevents ghosts just spawning going to frightened mode
+        }
 
         // Ghosts do nothing (including moving) while in the SPAWNING state.
         if (ghost->GetState() == Ghost::State::SPAWNING)
@@ -604,23 +608,22 @@ void GameLayer::ProcessGhosts(const float ts)
         }
 
         // Change ghosts from frightened appearance and normal appearance
-        if (m_isFrightenedModeEnabled)
+        if (m_isFrightenedModeEnabled && !ghost->WasFrightened())
         {
-            if (!ghost->DidJustDie())
-            {
-                ghost->SetSpeed({200, 200});
-                ghost->SetState(Ghost::State::FRIGHTENED);
-                ghost->SetColor(GOLD);
+            ghost->SetSpeed({200, 200});
+            ghost->SetState(Ghost::State::FRIGHTENED);
+            ghost->SetColor(GOLD);
+            ghost->SetWasFrightened(true);
 
-                // Should immediately go in opposite direction
-                if (!m_frightenedStateDebounce)
-                {
-                    ghost->SetQueuedDirection(ui::GetOppositeDirection(ghost->GetDirection()));
-                    m_frightenedStateDebounce = true;
-                }
+            // Should immediately go in opposite direction
+            if (!m_frightenedStateDebounce)
+            {
+                ghost->SetQueuedDirection(ui::GetOppositeDirection(ghost->GetDirection()));
+                m_frightenedStateDebounce = true;
             }
         }
-        else
+
+        if (ghost->GetState() != Ghost::State::FRIGHTENED)
         {
             ghost->SetSpeed({300, 300});
             ghost->SetState(m_mainGhostMode);
