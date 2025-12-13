@@ -41,6 +41,7 @@ bool GameLayer::TryCollectPellet(Player& player,
     {
         m_isFrightenedModeEnabled = true;
         m_shouldResetWasFrightened = true;
+        m_frightenedModeTimer = 0.0f;
     }
 
     UpdateHighscores();
@@ -628,8 +629,7 @@ void GameLayer::ProcessGhosts(const float ts)
                 m_frightenedStateDebounce = true;
             }
         }
-
-        if (ghost->GetState() != Ghost::State::FRIGHTENED)
+        else if (!m_isFrightenedModeEnabled || ghost->GetState() != Ghost::State::FRIGHTENED)
         {
             ghost->SetSpeed({300, 300});
             ghost->SetState(m_mainGhostMode);

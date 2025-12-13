@@ -70,7 +70,7 @@ class GameLayer : public engine::Layer
     static bool IsPacmanTouchingGhost(const Pacman& pacman, const Ghost& ghost);
     void ProcessGhostCollisions();
     static void HandlePacmanDeath(Pacman& pacman, Ghost& ghost);
-    static void HandleGhostDeath(Player& pacman, Ghost& ghost);
+    static void HandleGhostDeath(Player& player, Ghost& ghost);
     int GetCurrentAlivePacmanCount() const;
     int GetPacmanWithLivesCount() const;
 
