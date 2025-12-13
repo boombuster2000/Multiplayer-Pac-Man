@@ -31,6 +31,9 @@ bool GameLayer::TryCollectPellet(Player& player,
                                  const Vector2Ex<float>& pacmanDimensions,
                                  Pellet& pellet)
 {
+    if (pellet.IsEaten())
+        return false;
+
     if (!IsPacmanTouchingPellet(pellet, pacmanDimensions, pacmanPosition))
         return false;
 
@@ -45,7 +48,7 @@ bool GameLayer::TryCollectPellet(Player& player,
     }
 
     UpdateHighscores();
-    pellet.SetType(Pellet::Type::NONE);
+    pellet.SetIsEaten(true);
 
     return pointsGained > 0;
 }
