@@ -594,7 +594,7 @@ void GameLayer::ProcessGhosts(const float ts)
     const int alivePacmanCount = GetCurrentAlivePacmanCount();
     for (const auto& ghost : m_ghosts)
     {
-        if (m_shouldResetWasFrightened)
+        if (m_shouldResetWasFrightened && ghost->GetState() != Ghost::State::DEAD)
             ghost->SetWasFrightened(false);
 
         // Handles ghosts getting released.
@@ -622,7 +622,7 @@ void GameLayer::ProcessGhosts(const float ts)
         {
             ghost->SetSpeed({200, 200});
             ghost->SetState(Ghost::State::FRIGHTENED);
-            ghost->SetColor(GOLD);
+            ghost->SetTexture(game::GameApplication::GetTexturesManager().GetTexture("frightened-ghost"));
             ghost->SetWasFrightened(true);
 
             // Should immediately go in opposite direction
@@ -637,6 +637,7 @@ void GameLayer::ProcessGhosts(const float ts)
             ghost->SetSpeed({300, 300});
             ghost->SetState(m_mainGhostMode);
             ghost->SetColor(WHITE);
+            ghost->ResetTexture();
         }
 
         // Handles movement decisions

@@ -1,7 +1,7 @@
 #include "game/components/ghost.h"
 #include "game/components/board.h"
 #include "game/components/node_system.h"
-#include <limits> // Required for std::numeric_limits
+#include <limits>
 
 Ghost::Ghost(const Vector2Ex<float>& spawnPosition,
              const Vector2Ex<float>& speed,
@@ -13,6 +13,7 @@ Ghost::Ghost(const Vector2Ex<float>& spawnPosition,
              const std::shared_ptr<Texture2D>& texture,
              const State state) :
     Entity(EntityType::GHOST, spawnPosition, speed, dimensions, direction, texture),
+    m_defaultTexture(texture),
     m_state(state),
     m_ghostType(ghostType),
     m_guardPosition(guardPosition),
@@ -63,6 +64,10 @@ bool Ghost::WasFrightened() const
 void Ghost::SetWasFrightened(const bool wasFrightened)
 {
     m_wasFrightened = wasFrightened;
+}
+void Ghost::ResetTexture()
+{
+    SetTexture(m_defaultTexture);
 }
 
 void Ghost::UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& targetPosition)

@@ -27,6 +27,8 @@ class Ghost : public Entity
     };
 
   private:
+    std::shared_ptr<Texture2D> m_defaultTexture;
+
     State m_state;
     Type m_ghostType;
 
@@ -61,6 +63,8 @@ class Ghost : public Entity
 
     bool WasFrightened() const;
     void SetWasFrightened(bool wasFrightened);
+
+    void ResetTexture();
 
     void UpdateQueuedDirection(const Board& board, const Vector2Ex<float>& targetPosition);
     virtual void Update(const Board& board, const Vector2Ex<float>& pacmanPosition, ui::Direction pacmanDirection) = 0;
