@@ -1,5 +1,4 @@
 #include "game/components/pellet.h"
-#include "game/game_application.h"
 
 Pellet::Pellet() :
     RenderableObject(),
@@ -7,7 +6,7 @@ Pellet::Pellet() :
 {
 }
 
-Pellet::Pellet(Vector2Ex<float> position, const Type type) :
+Pellet::Pellet(const Vector2Ex<float> position, const Type type) :
     RenderableObject(position, ui::AnchorPoint::MIDDLE),
     m_type(type)
 {
