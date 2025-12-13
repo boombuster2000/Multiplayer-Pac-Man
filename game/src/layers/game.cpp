@@ -692,7 +692,7 @@ void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
     while (remainingDistance > 0)
     {
         // The incremental step size (1 or less for the last step)
-        // if remainingDistnace is less that 1, remainingDistance will be used as the step so loop will run once
+        // if remaining Distance is less than 1, remainingDistance will be used as the step so loop will run once
         float stepSize = std::min(remainingDistance, 1.0f);
 
         // Calculate the intermediate position using current direction
