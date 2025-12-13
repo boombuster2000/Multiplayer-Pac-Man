@@ -35,12 +35,12 @@ class GameLayer : public engine::Layer
     bool m_isGameOver = false;
     bool m_frightenedStateDebounce = false;
     bool m_isFrightenedModeEnabled = false;
-    bool m_shouldResetDidJustDies = false;
+    bool m_shouldResetWasFrightened = false;
 
   private:
     static bool IsPacmanTouchingPellet(const Pellet& pellet,
-                                const Vector2Ex<float>& pacmanDimensions,
-                                const Vector2Ex<float>& pacmanPosition);
+                                       const Vector2Ex<float>& pacmanDimensions,
+                                       const Vector2Ex<float>& pacmanPosition);
 
     bool TryCollectPellet(Player& player,
                           const Vector2Ex<float>& pacmanPosition,

@@ -38,7 +38,10 @@ bool GameLayer::TryCollectPellet(Player& player,
     player.AddPoints(pointsGained);
 
     if (const Pellet::Type pelletType = pellet.GetType(); pelletType == Pellet::Type::SUPER)
+    {
         m_isFrightenedModeEnabled = true;
+        m_shouldResetWasFrightened = true;
+    }
 
     UpdateHighscores();
     pellet.SetType(Pellet::Type::NONE);
@@ -587,6 +590,9 @@ void GameLayer::ProcessGhosts(const float ts)
     const int alivePacmanCount = GetCurrentAlivePacmanCount();
     for (const auto& ghost : m_ghosts)
     {
+        if (m_shouldResetWasFrightened)
+            ghost->SetWasFrightened(false);
+
         // Handles ghosts getting released.
         if (ghost->GetState() == Ghost::State::SPAWNING && ghost->GetReleaseTime() <= m_timePassedSinceStart)
         {
@@ -750,6 +756,8 @@ void GameLayer::OnUpdate(const float ts)
 
     ProcessGhostCollisions(); // Check for collisions after Pac-Mans have moved
     ProcessGhosts(ts);
+
+    m_shouldResetWasFrightened = false;
 }
 
 void GameLayer::OnRender()
