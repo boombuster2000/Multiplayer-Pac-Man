@@ -45,7 +45,6 @@ class Board : public ui::Grid<Tile>
     void Floyds();
 
     bool IsTileJunction(const Vector2Ex<size_t>& index) const;
-    bool HasLineOfSight(const Vector2Ex<float>& pos1, const Vector2Ex<float>& pos2) const;
 
     Vector2Ex<size_t> GetIndexOfNextJunction(const Vector2Ex<size_t>& startIndex, const ui::Direction& direction) const;
 
@@ -68,8 +67,10 @@ class Board : public ui::Grid<Tile>
 
     Vector2Ex<float> GetPlayerSpawnPoint(const int player) const;
     Vector2Ex<float> GetGhostSpawnPoint(const Ghost::Type ghostType) const;
-    std::pair<Vector2Ex<float>,Vector2Ex<float>> GetGhostSpawnRegion() const;
-    static bool IsInRegion(const std::pair<Vector2Ex<float>,Vector2Ex<float>>& region, const Vector2Ex<float>& position);
+    std::pair<Vector2Ex<float>, Vector2Ex<float>> GetGhostSpawnRegion() const;
+    static bool IsInRegion(const std::pair<Vector2Ex<float>, Vector2Ex<float>>& region,
+                           const Vector2Ex<float>& position);
+    bool HasLineOfSight(const Vector2Ex<float>& pos1, const Vector2Ex<float>& pos2) const;
 
     void SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type);
 
