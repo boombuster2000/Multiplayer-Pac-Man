@@ -14,6 +14,7 @@ void LoadAllTextures()
     texturesManager.AddTexture("pinky", FilePaths::s_texturesDirectory / "pinky.png");
     texturesManager.AddTexture("inky", FilePaths::s_texturesDirectory / "inky.png");
     texturesManager.AddTexture("clyde", FilePaths::s_texturesDirectory / "clyde.png");
+    texturesManager.AddTexture("frightened-ghost", FilePaths::s_texturesDirectory / "frightened-ghost.png");
 }
 
 void LoadKeyBinds()
