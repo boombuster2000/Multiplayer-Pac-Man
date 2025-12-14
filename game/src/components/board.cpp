@@ -2,8 +2,10 @@
 #include "game/components/pellet.h"
 #include "game/file_paths.h"
 #include "game/serialization/json_converters.hpp"
+#include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <limits>
 #include <string_view>
 
 void Board::AddBoundaries()
@@ -283,25 +285,24 @@ Board::Board() :
     {
         using enum Pellet::Type;
         constexpr std::array<Vector2Ex<size_t>, 10> superPelletsCoords{
-            //Vector2Ex<size_t>{1, 1},
-            //Vector2Ex<size_t>{1, 12},
-            //Vector2Ex<size_t>{12, 1},
-            //Vector2Ex<size_t>{12, 12},
+            // Vector2Ex<size_t>{1, 1},
+            // Vector2Ex<size_t>{1, 12},
+            // Vector2Ex<size_t>{12, 1},
+            // Vector2Ex<size_t>{12, 12},
             Vector2Ex<size_t>{6, 2},
             Vector2Ex<size_t>{2, 3},
             Vector2Ex<size_t>{2, 6},
-            Vector2Ex<size_t>{6, 11}
-            //Vector2Ex<size_t>{11, 6},
-            //Vector2Ex<size_t>{11, 10}
+            Vector2Ex<size_t>{6, 11} // Vector2Ex<size_t>{11, 6},
+            // Vector2Ex<size_t>{11, 10}
         };
 
         constexpr std::array<Vector2Ex<size_t>, 10> noPelletsCoords{
-            Vector2Ex<size_t>{5,8},
-            Vector2Ex<size_t>{6,8},
-            Vector2Ex<size_t>{7,8},
-            Vector2Ex<size_t>{8,8},
-            Vector2Ex<size_t>{8,7},
-            Vector2Ex<size_t>{8,6},
+            Vector2Ex<size_t>{5, 8},
+            Vector2Ex<size_t>{6, 8},
+            Vector2Ex<size_t>{7, 8},
+            Vector2Ex<size_t>{8, 8},
+            Vector2Ex<size_t>{8, 7},
+            Vector2Ex<size_t>{8, 6},
         };
 
         for (const auto& coord : superPelletsCoords)
@@ -317,8 +318,6 @@ Board::Board() :
             Pellet& pellet = tile.GetPellet();
             pellet.SetType(NONE);
         }
-
-
     }
 
     CreateNodesAndArcs();
@@ -359,7 +358,6 @@ Node* Board::GetClosestNode(const Vector2Ex<float> position) const
         // Only consider nodes with a clear line of sight
         if (!HasLineOfSight(position, node->GetPosition()))
             continue;
-
 
         float distanceSq = (position - node->GetPosition()).GetLengthSqr();
         if (distanceSq < smallestDistanceSq)
@@ -439,15 +437,10 @@ Vector2Ex<float> Board::GetGhostSpawnPoint(const Ghost::Type ghostType) const
 std::pair<Vector2Ex<float>, Vector2Ex<float>> Board::GetGhostSpawnRegion() const
 {
     // Note: GetPositionFromIndex returns the top left coord of tile.
-    return {
-    GetPositionFromIndex({5, 8}),GetPositionFromIndex({9,9}) - Vector2Ex<float>{1,1}
-    };
+    return {GetPositionFromIndex({5, 8}), GetPositionFromIndex({9, 9}) - Vector2Ex<float>{1, 1}};
 }
 
-bool Board::IsInRegion(
-    const std::pair<Vector2Ex<float>, Vector2Ex<float>>& region,
-    const Vector2Ex<float>& position
-)
+bool Board::IsInRegion(const std::pair<Vector2Ex<float>, Vector2Ex<float>>& region, const Vector2Ex<float>& position)
 {
     const auto& p1 = region.first;
     const auto& p2 = region.second;
@@ -593,4 +586,73 @@ Board Board::LoadFromFile(const std::string& filename)
 Board Board::LoadFromFile(const std::filesystem::path& filepath)
 {
     return Board::LoadFromFile(filepath.string());
+}
+
+float Board::GetDirectedDistanceThroughNodes(const Vector2Ex<float>& pos,
+                                             const ui::Direction& direction,
+                                             const Vector2Ex<float>& target) const
+{
+    if (HasLineOfSight(pos, target))
+        return (pos - target).GetLength();
+
+    // 1. Find the node in front of `pos` based on its direction
+    const auto startIndex = GetRelativeIndexFromPosition(pos);
+    Node* startNode;
+
+    if (IsTileJunction(startIndex))
+    {
+        startNode = m_nodeMap.at(startIndex);
+    }
+    else
+    {
+        const auto nextJunctionIndex = GetIndexOfNextJunction(startIndex, direction);
+
+        if (!m_nodeMap.contains(nextJunctionIndex))
+            return std::numeric_limits<float>::infinity();
+
+        startNode = m_nodeMap.at(nextJunctionIndex);
+    }
+
+    // 2. Find the node closest to the `target`
+    Node* targetNode = GetClosestNode(target);
+
+    if (startNode == nullptr || targetNode == nullptr)
+        return std::numeric_limits<float>::infinity();
+
+    const float distToStartNode = (pos - startNode->GetPosition()).GetLength();
+    const float distToTargetNode = (target - targetNode->GetPosition()).GetLength();
+
+    // 3. Calculate distance
+    if (startNode == targetNode)
+    {
+        // Both positions are relative to the same node.
+        const Vector2Ex<float> vecToPos = pos - startNode->GetPosition();
+        const Vector2Ex<float> vecToTarget = target - startNode->GetPosition();
+
+        const float dot = (vecToPos.GetUnitVector().x * vecToTarget.GetUnitVector().x) +
+                          (vecToPos.GetUnitVector().y * vecToTarget.GetUnitVector().y);
+
+        if (dot > 0.99f) // On the same "spoke" from the node
+        {
+            // If target is between pos and the node, we travel towards it.
+            if (vecToTarget.GetLengthSqr() < vecToPos.GetLengthSqr())
+            {
+                return distToStartNode - distToTargetNode;
+            }
+            else // Target is "behind" us relative to the node, must go to node and turn back.
+            {
+                return distToStartNode + distToTargetNode;
+            }
+        }
+        else // On different spokes, must travel through node.
+        {
+            return distToStartNode + distToTargetNode;
+        }
+    }
+    else
+    {
+        // Standard case: travel from pos -> startNode -> targetNode -> target
+        const float distBetweenNodes = m_distanceTable.at(startNode).at(targetNode);
+        return distToStartNode + distBetweenNodes + distToTargetNode;
+    }
 }

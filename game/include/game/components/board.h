@@ -65,6 +65,10 @@ class Board : public ui::Grid<Tile>
     const NodeRouteTable& GetRouteTable() const;
     const NodeDistanceTable& GetDistanceTable() const;
 
+    float GetDirectedDistanceThroughNodes(const Vector2Ex<float>& pos,
+                                          const ui::Direction& direction,
+                                          const Vector2Ex<float>& target) const;
+
     Vector2Ex<float> GetPlayerSpawnPoint(const int player) const;
     Vector2Ex<float> GetGhostSpawnPoint(const Ghost::Type ghostType) const;
     std::pair<Vector2Ex<float>, Vector2Ex<float>> GetGhostSpawnRegion() const;
