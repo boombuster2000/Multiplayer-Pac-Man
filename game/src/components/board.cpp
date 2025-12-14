@@ -507,6 +507,38 @@ Clyde Board::GetClyde() const
                  15);
 }
 
+bool Board::AreAllPelletsEaten() const
+{
+    for (size_t y = 0; y < GetGridSize().y; ++y)
+    {
+        for (size_t x = 0; x < GetGridSize().x; ++x)
+        {
+            const Tile& tile = GetTile({x, y});
+            const Pellet& pellet = tile.GetPellet();
+            if (pellet.GetType() != Pellet::Type::NONE && !pellet.IsEaten() && tile.GetType() != Tile::Type::WALL)
+            {
+                return false; // Found an uneaten pellet
+            }
+        }
+    }
+    return true; // All pellets are eaten
+}
+
+void Board::ResetPellets()
+{
+    for (size_t y = 0; y < GetGridSize().y; ++y)
+    {
+        for (size_t x = 0; x < GetGridSize().x; ++x)
+        {
+            Tile& tile = GetTile({x, y});
+            if (tile.GetPellet().GetType() != Pellet::Type::NONE)
+            {
+                tile.GetPellet().SetIsEaten(false);
+            }
+        }
+    }
+}
+
 void Board::SaveToFile() const
 {
     json j = *this;

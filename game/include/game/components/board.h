@@ -86,6 +86,9 @@ class Board : public ui::Grid<Tile>
 
     Clyde GetClyde() const;
 
+    bool AreAllPelletsEaten() const;
+    void ResetPellets();
+
     void SaveToFile() const;
 
     HighscoreMap GetHighscores() const;
