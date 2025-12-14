@@ -19,7 +19,6 @@ class Arc
     Node* GetStartNode() const;
     Node* GetEndNode() const;
     float GetLength() const;
-    bool IsPositionOnArc(const Vector2Ex<float>& position) const;
 
     const std::vector<Entity*>& GetEntities() const;
     void AddEntity(Entity* entity);
