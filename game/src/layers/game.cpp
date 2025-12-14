@@ -667,6 +667,46 @@ void GameLayer::ProcessGhosts(const float ts)
     }
 }
 
+void GameLayer::ResetLevel()
+{
+    // Reset pellets on the board
+    m_board.ResetPellets();
+
+    const Vector2Ex<float> speedIncrease(25.f, 25.f);
+
+    // Reset Pac-Mans
+    for (auto& client : m_clients)
+    {
+        client.pacman.IncreaseSpeed(speedIncrease);
+        client.pacman.SetPosition(client.pacman.GetSpawnPosition());
+        client.pacman.SetDirection(ui::Direction::RIGHT);
+        client.pacman.SetQueuedDirection(ui::Direction::RIGHT);
+        client.pacman.SetRotation(0.0f);
+    }
+
+    // Reset Ghosts
+    for (auto* ghost : m_ghosts)
+    {
+        ghost->IncreaseSpeed(speedIncrease);
+        ghost->SetPosition(ghost->GetSpawnPosition());
+        ghost->SetState(Ghost::State::SPAWNING);
+        ghost->SetWasFrightened(false);
+        ghost->ResetTexture();
+        Color c = ghost->GetColor();
+        c.a = 255;
+        ghost->SetColor(c);
+    }
+
+    // Reset timers and game state variables
+    m_timePassedSinceStart = 0.0f;
+    m_ghostModeTimer = 0.0f;
+    m_frightenedModeTimer = 0.0f;
+    m_mainGhostMode = Ghost::State::CHASE;
+    m_isFrightenedModeEnabled = false;
+    m_shouldResetWasFrightened = false;
+    m_frightenedStateDebounce = false;
+}
+
 void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
 {
     // TODO: Refactor to run less interactions
@@ -749,6 +789,14 @@ void GameLayer::OnUpdate(const float ts)
     UpdateGhostModes();
 
     HandleKeyPresses();
+
+    if (m_board.AreAllPelletsEaten())
+    {
+        if (GetPacmanWithLivesCount() > 0)
+        {
+            ResetLevel();
+        }
+    }
 
     // TODO: Render "Game Over" screen or transition to a game over state.
     if (m_isGameOver)

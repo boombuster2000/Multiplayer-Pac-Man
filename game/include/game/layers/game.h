@@ -85,6 +85,7 @@ class GameLayer : public engine::Layer
     void UpdateGhostModes();
     void ProcessPacmans(float ts);
     void ProcessGhosts(float ts);
+    void ResetLevel();
 
   public:
     explicit GameLayer(const std::vector<Client>& clients);
