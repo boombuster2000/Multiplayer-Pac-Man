@@ -2,16 +2,7 @@
 #include "engine/core/vector2ex_hasher.h"
 #include "engine/ui/enums.h"
 #include "game/components/board.h"
-#include "game/components/node_system.h"
 #include "game/game_application.h"
-
-#include <array>
-#include <cmath>
-#include <functional>
-#include <limits>
-#include <queue>
-#include <unordered_map>
-#include <vector>
 
 Pinky::Pinky(const Vector2Ex<float>& spawnPosition,
              const Vector2Ex<float>& speed,
@@ -35,9 +26,6 @@ Pinky::Pinky(const Vector2Ex<float>& spawnPosition,
 
 void Pinky::Update(const Board& board, const Vector2Ex<float>& pacmanPosition, const ui::Direction pacmanDirection)
 {
-    const Vector2Ex<float> pacmanToPinky = GetPositionAtAnchor() - pacmanPosition;
-    const Vector2Ex<float> pacmanDirVec = Vector2Ex<float>::GetDirectionVector(pacmanDirection);
-
     Vector2Ex<float> targetPosition;
 
     // If Pinky is in front of Pac-Man, target Pac-Man directly.
