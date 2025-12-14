@@ -1,15 +1,8 @@
 #include "game/components/ghost_inky.h"
 #include "engine/core/vector2ex_hasher.h"
 #include "engine/ui/enums.h"
-#include "game/components/node_system.h"
+#include "game/components/board.h"
 #include "game/game_application.h"
-#include <array>
-#include <cmath>
-#include <functional>
-#include <limits>
-#include <queue>
-#include <unordered_map>
-#include <vector>
 
 Inky::Inky(const Vector2Ex<float>& spawnPosition,
            const Vector2Ex<float>& speed,
@@ -33,5 +26,6 @@ Inky::Inky(const Vector2Ex<float>& spawnPosition,
 
 void Inky::Update(const Board& board, const Vector2Ex<float>& pacmanPosition, const ui::Direction pacmanDirection)
 {
+    // Same behavior as blinky
     UpdateQueuedDirection(board, pacmanPosition);
 }
