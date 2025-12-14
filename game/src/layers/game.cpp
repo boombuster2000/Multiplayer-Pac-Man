@@ -331,6 +331,7 @@ GameLayer::GameLayer(const std::vector<Client>& clients) :
     srand(time(nullptr));
     m_backgroundMusic.looping = true;
     PlayMusicStream(m_backgroundMusic);
+    SetSoundVolume(m_ghostDeathSound, 2.0);
 }
 
 GameLayer::GameLayer(const std::vector<Client>& clients, Board board) :
@@ -351,12 +352,16 @@ GameLayer::GameLayer(const std::vector<Client>& clients, Board board) :
     srand(time(nullptr));
     m_backgroundMusic.looping = true;
     PlayMusicStream(m_backgroundMusic);
+    SetSoundVolume(m_ghostDeathSound, 2.0);
 }
 
 GameLayer::~GameLayer()
 {
     m_board.SaveHighscoresToFile();
-    StopMusicStream(m_backgroundMusic);
+    UnloadSound(m_pelletCollectSound);
+    UnloadSound(m_ghostDeathSound);
+    UnloadSound(m_countdownBeep);
+    UnloadSound(m_deathSound);
     UnloadMusicStream(m_backgroundMusic);
 }
 
@@ -431,8 +436,6 @@ void GameLayer::HandleGhostDeath(Player& player, Ghost& ghost) const
     player.AddPoints(200); // points gained by kill ghost
     ghost.SetState(Ghost::State::DEAD);
     ghost.SetWasFrightened(true);
-
-    SetSoundVolume(m_ghostDeathSound, 2.0);
     PlaySound(m_ghostDeathSound);
 }
 
