@@ -57,6 +57,7 @@ class Ghost : public Entity
 
     [[nodiscard]] float GetReleaseTime() const;
     void SetReleaseTime(float releaseTime);
+    void DecreaseReleaseTime(float reduction);
 
     [[nodiscard]] Vector2Ex<float> GetGuardPosition() const;
     void SetGuardPosition(const Vector2Ex<float>& guardPosition);
