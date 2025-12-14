@@ -6,6 +6,7 @@
 #include "raylib.h"
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstdlib>
 #include <ctime>
 #include <format>
@@ -304,7 +305,11 @@ GameLayer::GameLayer(const std::vector<Client>& clients) :
     m_pinky(m_board.GetPinky()),
     m_inky(m_board.GetInky()),
     m_clyde(m_board.GetClyde()),
-    m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde}
+    m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde},
+    m_isCountdownActive(true),
+    m_countdownTimer(4.f),
+    m_isLevelClearPauseActive(false),
+    m_levelClearPauseTimer(0.f)
 {
     SetPacmansSpawnPositions();
     srand(time(nullptr));
@@ -317,7 +322,11 @@ GameLayer::GameLayer(const std::vector<Client>& clients, Board board) :
     m_pinky(m_board.GetPinky()),
     m_inky(m_board.GetInky()),
     m_clyde(m_board.GetClyde()),
-    m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde}
+    m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde},
+    m_isCountdownActive(true),
+    m_countdownTimer(4.f),
+    m_isLevelClearPauseActive(false),
+    m_levelClearPauseTimer(0.f)
 {
     SetPacmansSpawnPositions();
     srand(time(nullptr));
@@ -669,6 +678,9 @@ void GameLayer::ProcessGhosts(const float ts)
 
 void GameLayer::ResetLevel()
 {
+    m_isCountdownActive = true;
+    m_countdownTimer = 4.f;
+
     // Reset pellets on the board
     m_board.ResetPellets();
 
@@ -784,18 +796,40 @@ void GameLayer::UpdateHighscores()
 
 void GameLayer::OnUpdate(const float ts)
 {
+    if (m_isCountdownActive)
+    {
+        m_countdownTimer -= ts;
+        if (m_countdownTimer <= 0.f)
+        {
+            m_isCountdownActive = false;
+        }
+        return;
+    }
+
+    if (m_isLevelClearPauseActive)
+    {
+        m_levelClearPauseTimer -= ts;
+        if (m_levelClearPauseTimer <= 0.f)
+        {
+            m_isLevelClearPauseActive = false;
+            if (GetPacmanWithLivesCount() > 0)
+            {
+                ResetLevel();
+            }
+        }
+        return;
+    }
+
     UpdateTimers(ts);
     SaveHighscoresToBoard();
     UpdateGhostModes();
 
     HandleKeyPresses();
 
-    if (m_board.AreAllPelletsEaten())
+    if (m_board.AreAllPelletsEaten() && !m_isLevelClearPauseActive)
     {
-        if (GetPacmanWithLivesCount() > 0)
-        {
-            ResetLevel();
-        }
+        m_isLevelClearPauseActive = true;
+        m_levelClearPauseTimer = 2.f;
     }
 
     // TODO: Render "Game Over" screen or transition to a game over state.
@@ -842,6 +876,32 @@ void GameLayer::OnRender()
     RenderScores();
     RenderLives();
     // RenderNodes();
+
+    if (m_isCountdownActive)
+    {
+        const int countdownNumber = static_cast<int>(ceil(m_countdownTimer));
+        std::string text;
+
+        if (countdownNumber > 1)
+        {
+            text = std::to_string(countdownNumber - 1);
+        }
+        else if (countdownNumber == 1)
+        {
+            text = "GO!";
+        }
+
+        if (!text.empty())
+        {
+            constexpr int fontSize = 100;
+            const float textWidth = MeasureText(text.c_str(), fontSize);
+
+            const float x = (GetScreenWidth() - textWidth) / 2.f;
+            const float y = (GetScreenHeight() - fontSize) / 2.f;
+
+            DrawText(text.c_str(), static_cast<int>(x), static_cast<int>(y), fontSize, YELLOW);
+        }
+    }
 }
 
 void GameLayer::RenderScores() const

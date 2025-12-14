@@ -37,6 +37,12 @@ class GameLayer : public engine::Layer
     bool m_isFrightenedModeEnabled = false;
     bool m_shouldResetWasFrightened = false;
 
+    bool m_isCountdownActive;
+    float m_countdownTimer;
+
+    bool m_isLevelClearPauseActive;
+    float m_levelClearPauseTimer;
+
   private:
     static bool IsPacmanTouchingPellet(const Pellet& pellet,
                                        const Vector2Ex<float>& pacmanDimensions,
