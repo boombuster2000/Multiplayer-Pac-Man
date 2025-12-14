@@ -3,6 +3,7 @@
 #include "game/game_application.h"
 #include "game/layers/game_options_menu.h"
 #include "game/layers/main_menu.h"
+#include "game/layers/game_over_layer.h"
 #include "raylib.h"
 #include <algorithm>
 #include <array>
@@ -873,9 +874,20 @@ void GameLayer::OnUpdate(const float ts)
 
     // TODO: Render "Game Over" screen or transition to a game over state.
     if (m_isGameOver)
+    {
+        // Game over logic has already been triggered.
+        // The layer is suspended, so this part of OnUpdate shouldn't even be reached,
+        // but this is a safeguard.
         return;
+    }
 
-    m_isGameOver = GetPacmanWithLivesCount() <= 0;
+    if (GetPacmanWithLivesCount() <= 0)
+    {
+        m_isGameOver = true;
+        Push(std::make_unique<GameOverLayer>(m_clients));
+        SuspendUpdateAndRender();
+        return; // Stop further processing for this frame
+    }
 
     ProcessPacmans(ts);
 
