@@ -406,7 +406,7 @@ bool GameLayer::IsPacmanTouchingGhost(const Pacman& pacman, const Ghost& ghost)
     return CheckCollisionRecs(pacmanRec, ghostRec);
 }
 
-void GameLayer::HandlePacmanDeath(Pacman& pacman, Ghost& ghost)
+void GameLayer::HandlePacmanDeath(Pacman& pacman, Ghost& ghost) const
 {
     pacman.RemoveLife();
     pacman.SetDead(true);
@@ -422,7 +422,7 @@ void GameLayer::HandlePacmanDeath(Pacman& pacman, Ghost& ghost)
         pacman.SetPosition(pacman.GetSpawnPosition());
 }
 
-void GameLayer::HandleGhostDeath(Player& player, Ghost& ghost)
+void GameLayer::HandleGhostDeath(Player& player, Ghost& ghost) const
 {
     Color newColor = ghost.GetColor();
     newColor.a = 128;
@@ -431,6 +431,9 @@ void GameLayer::HandleGhostDeath(Player& player, Ghost& ghost)
     player.AddPoints(200); // points gained by kill ghost
     ghost.SetState(Ghost::State::DEAD);
     ghost.SetWasFrightened(true);
+
+    SetSoundVolume(m_ghostDeathSound, 2.0);
+    PlaySound(m_ghostDeathSound);
 }
 
 void GameLayer::ProcessGhostCollisions()

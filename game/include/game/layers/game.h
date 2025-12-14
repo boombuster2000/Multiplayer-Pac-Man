@@ -23,6 +23,7 @@ class GameLayer : public engine::Layer
     Sound m_countdownBeep = LoadSound((FilePaths::s_soundsDirectory / "countdown-beep.wav").string().c_str());
     Sound m_deathSound = LoadSound((FilePaths::s_soundsDirectory / "death.wav").string().c_str());
     Sound m_pelletCollectSound = LoadSound((FilePaths::s_soundsDirectory / "pellet-collect.wav").string().c_str());
+    Sound m_ghostDeathSound = LoadSound((FilePaths::s_soundsDirectory / "ghost-death.wav").string().c_str());
 
     Board m_board;
 
@@ -83,8 +84,8 @@ class GameLayer : public engine::Layer
 
     static bool IsPacmanTouchingGhost(const Pacman& pacman, const Ghost& ghost);
     void ProcessGhostCollisions();
-    void HandlePacmanDeath(Pacman& pacman, Ghost& ghost);
-    static void HandleGhostDeath(Player& player, Ghost& ghost);
+    void HandlePacmanDeath(Pacman& pacman, Ghost& ghost) const;
+    void HandleGhostDeath(Player& player, Ghost& ghost) const;
     int GetCurrentAlivePacmanCount() const;
     int GetPacmanWithLivesCount() const;
 
