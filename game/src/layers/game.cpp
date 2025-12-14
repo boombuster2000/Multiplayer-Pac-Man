@@ -313,6 +313,8 @@ GameLayer::GameLayer(const std::vector<Client>& clients) :
 {
     SetPacmansSpawnPositions();
     srand(time(nullptr));
+    m_backgroundMusic.looping = true;
+    PlayMusicStream(m_backgroundMusic);
 }
 
 GameLayer::GameLayer(const std::vector<Client>& clients, Board board) :
@@ -330,11 +332,15 @@ GameLayer::GameLayer(const std::vector<Client>& clients, Board board) :
 {
     SetPacmansSpawnPositions();
     srand(time(nullptr));
+    m_backgroundMusic.looping = true;
+    PlayMusicStream(m_backgroundMusic);
 }
 
 GameLayer::~GameLayer()
 {
     m_board.SaveHighscoresToFile();
+    StopMusicStream(m_backgroundMusic);
+    UnloadMusicStream(m_backgroundMusic);
 }
 
 void GameLayer::HandleKeyPresses()
@@ -796,6 +802,7 @@ void GameLayer::UpdateHighscores()
 
 void GameLayer::OnUpdate(const float ts)
 {
+    UpdateMusicStream(m_backgroundMusic);
     if (m_isCountdownActive)
     {
         m_countdownTimer -= ts;

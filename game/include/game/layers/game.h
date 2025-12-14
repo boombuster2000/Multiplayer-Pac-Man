@@ -11,12 +11,15 @@
 #include "game/components/ghost_inky.h"
 #include "game/components/ghost_pinky.h"
 #include "game/components/pacman.h"
+#include "game/file_paths.h"
+#include <filesystem>
 
 #include <array>
 
 class GameLayer : public engine::Layer
 {
   private:
+    Music m_backgroundMusic = LoadMusicStream((FilePaths::s_musicDirectory / "main-music-loop.mp3").string().c_str());
     Board m_board;
 
     std::vector<Client> m_clients;
