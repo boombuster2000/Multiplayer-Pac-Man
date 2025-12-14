@@ -46,12 +46,27 @@ bool GameLayer::TryCollectPellet(Player& player,
         m_isFrightenedModeEnabled = true;
         m_shouldResetWasFrightened = true;
         m_frightenedModeTimer = 0.0f;
+        SetSoundPitch(m_pelletCollectSound, 1.2);
+    }
+    else
+    {
+        SetSoundPitch(m_pelletCollectSound, 1.0);
     }
 
     UpdateHighscores();
     pellet.SetIsEaten(true);
 
-    return pointsGained > 0;
+    const bool isPelletCollected = pointsGained > 0;
+
+    if (isPelletCollected && m_clients.size() == 1)
+    {
+        if (IsSoundPlaying(m_pelletCollectSound))
+            StopSound(m_pelletCollectSound);
+
+        PlaySound(m_pelletCollectSound);
+    }
+
+    return isPelletCollected;
 }
 
 bool GameLayer::TryCollectPellet(Player& player,

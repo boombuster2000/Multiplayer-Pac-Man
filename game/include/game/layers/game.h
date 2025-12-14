@@ -22,6 +22,7 @@ class GameLayer : public engine::Layer
     Music m_backgroundMusic = LoadMusicStream((FilePaths::s_musicDirectory / "main-music-loop.mp3").string().c_str());
     Sound m_countdownBeep = LoadSound((FilePaths::s_soundsDirectory / "countdown-beep.wav").string().c_str());
     Sound m_deathSound = LoadSound((FilePaths::s_soundsDirectory / "death.wav").string().c_str());
+    Sound m_pelletCollectSound = LoadSound((FilePaths::s_soundsDirectory / "pellet-collect.wav").string().c_str());
 
     Board m_board;
 
