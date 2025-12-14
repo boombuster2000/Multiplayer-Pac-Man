@@ -308,6 +308,7 @@ GameLayer::GameLayer(const std::vector<Client>& clients) :
     m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde},
     m_isCountdownActive(true),
     m_countdownTimer(4.f),
+    m_countdownBeepTimer(0.f),
     m_isLevelClearPauseActive(false),
     m_levelClearPauseTimer(0.f)
 {
@@ -327,6 +328,7 @@ GameLayer::GameLayer(const std::vector<Client>& clients, Board board) :
     m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde},
     m_isCountdownActive(true),
     m_countdownTimer(4.f),
+    m_countdownBeepTimer(0.f),
     m_isLevelClearPauseActive(false),
     m_levelClearPauseTimer(0.f)
 {
@@ -394,6 +396,7 @@ void GameLayer::HandlePacmanDeath(Pacman& pacman, Ghost& ghost)
     pacman.RemoveLife();
     pacman.SetDead(true);
     pacman.SetRespawnTimer(3.0f); // Pac-man is "dead" for 3 seconds.
+    PlaySound(m_deathSound);
 
     // Making pacman slightly transparent
     Color newColor = pacman.GetColor();
@@ -806,10 +809,18 @@ void GameLayer::OnUpdate(const float ts)
     if (m_isCountdownActive)
     {
         m_countdownTimer -= ts;
+        m_countdownBeepTimer -= ts;
+
         if (m_countdownTimer <= 0.f)
         {
             m_isCountdownActive = false;
         }
+        else if (m_countdownBeepTimer <= 0.f)
+        {
+            PlaySound(m_countdownBeep);
+            m_countdownBeepTimer = 1.f;
+        }
+
         return;
     }
 

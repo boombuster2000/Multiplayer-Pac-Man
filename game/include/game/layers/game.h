@@ -20,6 +20,9 @@ class GameLayer : public engine::Layer
 {
   private:
     Music m_backgroundMusic = LoadMusicStream((FilePaths::s_musicDirectory / "main-music-loop.mp3").string().c_str());
+    Sound m_countdownBeep = LoadSound((FilePaths::s_soundsDirectory / "countdown-beep.wav").string().c_str());
+    Sound m_deathSound = LoadSound((FilePaths::s_soundsDirectory / "death.wav").string().c_str());
+
     Board m_board;
 
     std::vector<Client> m_clients;
@@ -42,6 +45,7 @@ class GameLayer : public engine::Layer
 
     bool m_isCountdownActive;
     float m_countdownTimer;
+    float m_countdownBeepTimer;
 
     bool m_isLevelClearPauseActive;
     float m_levelClearPauseTimer;
@@ -78,7 +82,7 @@ class GameLayer : public engine::Layer
 
     static bool IsPacmanTouchingGhost(const Pacman& pacman, const Ghost& ghost);
     void ProcessGhostCollisions();
-    static void HandlePacmanDeath(Pacman& pacman, Ghost& ghost);
+    void HandlePacmanDeath(Pacman& pacman, Ghost& ghost);
     static void HandleGhostDeath(Player& player, Ghost& ghost);
     int GetCurrentAlivePacmanCount() const;
     int GetPacmanWithLivesCount() const;
