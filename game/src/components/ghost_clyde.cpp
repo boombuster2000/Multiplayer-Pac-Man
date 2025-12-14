@@ -1,15 +1,8 @@
 #include "game/components/ghost_clyde.h"
 #include "engine/core/vector2ex_hasher.h"
 #include "engine/ui/enums.h"
-#include "game/components/node_system.h"
+#include "game/components/board.h"
 #include "game/game_application.h"
-#include <array>
-#include <cmath>
-#include <functional>
-#include <limits>
-#include <queue>
-#include <unordered_map>
-#include <vector>
 
 Clyde::Clyde(const Vector2Ex<float>& spawnPosition,
              const Vector2Ex<float>& speed,
@@ -33,5 +26,20 @@ Clyde::Clyde(const Vector2Ex<float>& spawnPosition,
 
 void Clyde::Update(const Board& board, const Vector2Ex<float>& pacmanPosition, const ui::Direction pacmanDirection)
 {
+    // Will chase pacman if distance to pacman is within 4 tiles.
+    const Vector2Ex<float>& tileDimensions = board.GetTileDimensions();
+    constexpr float tilesToTriggerChase = 4;
+    const float distanceToTriggerChase = tileDimensions.x * tilesToTriggerChase; // Assuming tile is square.
+
+    // Need to update direction so that it is towards the next node to target
     UpdateQueuedDirection(board, pacmanPosition);
+
+    const float distanceToTarget =
+        board.GetDirectedDistanceThroughNodes(GetPositionAtAnchor(), GetDirection(), pacmanPosition);
+
+    if (distanceToTarget > distanceToTriggerChase) // if target is too far just go to guard position
+    {
+        SetState(Ghost::State::SCATTER); // Will be synced to main ghost mode next frame by game.
+        UpdateQueuedDirection(board, GetGuardPosition());
+    }
 }
