@@ -44,6 +44,11 @@ void Entity::SetSpeed(const Vector2Ex<float>& speed)
     m_speed = speed;
 }
 
+void Entity::IncreaseSpeed(const Vector2Ex<float>& speedIncrease)
+{
+    m_speed += speedIncrease;
+}
+
 float Entity::GetRotation() const
 {
     return m_rotation;

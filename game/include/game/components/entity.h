@@ -23,7 +23,7 @@ class Entity : public ui::RenderableObject
     float m_rotation = 0.0f;
     Color m_color;
 
-protected:
+  protected:
     Vector2Ex<float> m_lastPosition;
 
   private:
@@ -45,6 +45,7 @@ protected:
 
     Vector2Ex<float> GetSpeed() const;
     void SetSpeed(const Vector2Ex<float>& speed);
+    void IncreaseSpeed(const Vector2Ex<float>& speedIncrease);
 
     float GetRotation() const;
     void SetRotation(const float& rotation);
@@ -71,7 +72,6 @@ protected:
 
     bool IsStationary() const;
     Vector2Ex<float> GetLastPosition() const;
-
 
     void Render(Vector2Ex<float> offset = {0, 0}) const final;
 };
