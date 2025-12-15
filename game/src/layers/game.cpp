@@ -686,6 +686,7 @@ void GameLayer::ResetLevel()
         ghost->SetState(Ghost::State::SPAWNING);
         ghost->SetWasFrightened(false);
         ghost->ResetTexture();
+        ghost->DecreaseReleaseTime(1);
         Color c = ghost->GetColor();
         c.a = 255;
         ghost->SetColor(c);
@@ -884,6 +885,18 @@ void GameLayer::OnUpdate(const float ts)
         return;
     }
 
+    if (m_isGameOverPauseActive)
+    {
+        m_gameOverPauseTimer -= ts;
+        if (m_gameOverPauseTimer <= 0.f)
+        {
+            m_isGameOver = true;
+            Push(std::make_unique<GameOverLayer>(m_clients));
+            SuspendUpdateAndRender();
+        }
+        return; // Stop further processing for this frame
+    }
+
     UpdateTimers(ts);
     SaveHighscoresToBoard();
     UpdateGhostModes();
@@ -905,11 +918,10 @@ void GameLayer::OnUpdate(const float ts)
         return;
     }
 
-    if (GetPacmanWithLivesCount() <= 0)
+    if (GetPacmanWithLivesCount() <= 0 && !m_isGameOverPauseActive)
     {
-        m_isGameOver = true;
-        Push(std::make_unique<GameOverLayer>(m_clients));
-        SuspendUpdateAndRender();
+        m_isGameOverPauseActive = true;
+        m_gameOverPauseTimer = 3.f;
         return; // Stop further processing for this frame
     }
 

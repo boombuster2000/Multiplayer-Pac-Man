@@ -47,7 +47,13 @@ void Ghost::SetReleaseTime(const float releaseTime)
 }
 void Ghost::DecreaseReleaseTime(const float reduction)
 {
+    if (m_releaseTime == 0)
+        return;
+
     m_releaseTime -= reduction;
+
+    if (m_releaseTime < 0)
+        m_releaseTime = 0;
 }
 
 Vector2Ex<float> Ghost::GetGuardPosition() const

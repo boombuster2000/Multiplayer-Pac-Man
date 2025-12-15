@@ -50,6 +50,8 @@ class GameLayer : public engine::Layer
     float m_countdownBeepTimer = 0.0f;
     bool m_isLevelClearPauseActive = false;
     float m_levelClearPauseTimer = 0.0f;
+    bool m_isGameOverPauseActive = false;
+    float m_gameOverPauseTimer = 0.0f;
 
     mutable std::mt19937 m_randomGenerator;
 
