@@ -8,6 +8,33 @@
 #include <limits>
 #include <string_view>
 
+Vector2Ex<float> Board::GetPacmanSpeed() const
+{
+    return m_pacmanSpeed;
+}
+Vector2Ex<float> Board::GetGhostSpeed() const
+{
+    return m_ghostSpeed;
+}
+
+Vector2Ex<float> Board::GetSpeedIncrease() const
+{
+    return m_speedIncreaseIncrement;
+}
+
+float Board::GetGhostReleaseTimeDecrease() const
+{
+    return m_ghostReleaseTimeDecrease;
+}
+float Board::GetFrightenedTime() const
+{
+    return m_frightenedTimeDuration;
+}
+float Board::GetGhostModeTime() const
+{
+    return m_ghostModeTime;
+}
+
 void Board::AddBoundaries()
 {
     using enum Tile::Type;
@@ -405,14 +432,16 @@ Vector2Ex<float> Board::GetPlayerSpawnPoint(const int player) const
 {
     switch (player)
     {
+    case 1:
+        return GetPositionFromIndex(m_player1SpawnPointIndex);
     case 2:
-        return GetPositionFromIndex({12, 12});
+        return GetPositionFromIndex(m_player2SpawnPointIndex);
     case 3:
-        return GetPositionFromIndex({3, 10});
+        return GetPositionFromIndex(m_player3SpawnPointIndex);
     case 4:
-        return GetPositionFromIndex({10, 3});
+        return GetPositionFromIndex(m_player4SpawnPointIndex);
     default:
-        return GetPositionFromIndex({1, 1});
+        return GetPositionFromIndex(m_player1SpawnPointIndex);
     }
 }
 
@@ -465,46 +494,46 @@ void Board::SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type)
 Blinky Board::GetBlinky() const
 {
     return Blinky(GetGhostSpawnPoint(Ghost::Type::BLINKY),
-                  Vector2Ex<float>(350, 350),
+                  m_ghostSpeed,
                   GetTileDimensions(),
                   ui::Direction::RIGHT,
                   Ghost::Type::BLINKY,
-                  GetPositionFromIndex({1, 1}),
-                  0,
+                  GetPositionFromIndex(m_blinkyGuardPointIndex),
+                  m_blinkyReleaseTime,
                   Ghost::State::CHASE);
 }
 
 Pinky Board::GetPinky() const
 {
     return Pinky(GetGhostSpawnPoint(Ghost::Type::PINKY),
-                 Vector2Ex<float>(350, 350),
+                 m_ghostSpeed,
                  GetTileDimensions(),
                  ui::Direction::RIGHT,
                  Ghost::Type::PINKY,
-                 GetPositionFromIndex({2, 1}),
-                 5);
+                 GetPositionFromIndex(m_pinkyGuardPointIndex),
+                 m_pinkyReleaseTime);
 }
 
 Inky Board::GetInky() const
 {
     return Inky(GetGhostSpawnPoint(Ghost::Type::INKY),
-                Vector2Ex<float>(350, 350),
+                m_ghostSpeed,
                 GetTileDimensions(),
                 ui::Direction::RIGHT,
                 Ghost::Type::INKY,
-                GetPositionFromIndex({3, 1}),
-                10);
+                GetPositionFromIndex(m_inkyGuardPointIndex),
+                m_inkyReleaseTime);
 }
 
 Clyde Board::GetClyde() const
 {
     return Clyde(GetGhostSpawnPoint(Ghost::Type::CLYDE),
-                 Vector2Ex<float>(350, 350),
+                 m_ghostSpeed,
                  GetTileDimensions(),
                  ui::Direction::RIGHT,
                  Ghost::Type::CLYDE,
-                 GetPositionFromIndex({4, 1}),
-                 15);
+                 GetPositionFromIndex(m_clydeGuardPointIndex),
+                 m_clydeReleaseTime);
 }
 
 bool Board::AreAllPelletsEaten() const

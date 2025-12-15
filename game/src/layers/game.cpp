@@ -536,14 +536,14 @@ void GameLayer::SaveHighscoresToBoard()
 }
 void GameLayer::UpdateGhostModes()
 {
-    if (m_ghostModeTimer >= 15.0f)
+    if (m_ghostModeTimer >= m_board.GetGhostModeTime())
     {
         m_ghostModeTimer = 0.0f;
         m_mainGhostMode = (m_mainGhostMode == Ghost::State::SCATTER) ? Ghost::State::CHASE : Ghost::State::SCATTER;
     }
 
     // Revert ghosts back to normal
-    if (m_isFrightenedModeEnabled && m_frightenedModeTimer >= 10.0f)
+    if (m_isFrightenedModeEnabled && m_frightenedModeTimer >= m_board.GetFrightenedTime())
     {
         m_frightenedModeTimer = 0.0f;
         m_frightenedStateDebounce = false;
@@ -666,12 +666,10 @@ void GameLayer::ResetLevel()
     // Reset pellets on the board
     m_board.ResetPellets();
 
-    const Vector2Ex<float> speedIncrease(25.f, 25.f);
-
     // Reset Pac-Mans
     for (auto& client : m_clients)
     {
-        client.pacman.IncreaseSpeed(speedIncrease);
+        client.pacman.IncreaseSpeed(m_board.GetSpeedIncrease());
         client.pacman.SetPosition(client.pacman.GetSpawnPosition());
         client.pacman.SetDirection(ui::Direction::RIGHT);
         client.pacman.SetQueuedDirection(ui::Direction::RIGHT);
@@ -681,12 +679,12 @@ void GameLayer::ResetLevel()
     // Reset Ghosts
     for (auto* ghost : m_ghosts)
     {
-        ghost->IncreaseSpeed(speedIncrease);
+        ghost->IncreaseSpeed(m_board.GetSpeedIncrease());
         ghost->SetPosition(ghost->GetSpawnPosition());
         ghost->SetState(Ghost::State::SPAWNING);
         ghost->SetWasFrightened(false);
         ghost->ResetTexture();
-        ghost->DecreaseReleaseTime(1);
+        ghost->DecreaseReleaseTime(m_board.GetGhostReleaseTimeDecrease());
         Color c = ghost->GetColor();
         c.a = 255;
         ghost->SetColor(c);

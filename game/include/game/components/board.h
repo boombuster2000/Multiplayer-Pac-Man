@@ -35,6 +35,35 @@ class Board : public ui::Grid<Tile>
     NodeDistanceTable m_distanceTable;
     NodeRouteTable m_routeTable;
 
+    Vector2Ex<float> m_pacmanSpeed{400, 400};
+    Vector2Ex<float> m_ghostSpeed{300, 300};
+    float m_speedIncreaseIncrement = 25;
+    float m_ghostReleaseTimeDecrease = 1;
+
+    Vector2Ex<size_t> m_blinkySpawnPointIndex{8, 8};
+    Vector2Ex<size_t> m_blinkyGuardPointIndex{4, 1};
+    float m_blinkyReleaseTime = 0;
+
+    Vector2Ex<size_t> m_pinkySpawnPointIndex{7, 8};
+    Vector2Ex<size_t> m_pinkyGuardPointIndex{10, 1};
+    float m_pinkyReleaseTime = 5;
+
+    Vector2Ex<size_t> m_inkySpawnPointIndex{6, 8};
+    Vector2Ex<size_t> m_inkyGuardPointIndex{4, 12};
+    float m_inkyReleaseTime = 10;
+
+    Vector2Ex<size_t> m_clydeSpawnPointIndex{5, 8};
+    Vector2Ex<size_t> m_clydeGuardPointIndex{10, 12};
+    float m_clydeReleaseTime = 15;
+
+    Vector2Ex<size_t> m_player1SpawnPointIndex{1, 1};
+    Vector2Ex<size_t> m_player2SpawnPointIndex{12, 12};
+    Vector2Ex<size_t> m_player3SpawnPointIndex{3, 10};
+    Vector2Ex<size_t> m_player4SpawnPointIndex{10, 3};
+
+    float m_frightenedTimeDuration = 5;
+    float m_ghostModeTime = 5;
+
   private:
     void AddBoundaries();
 
@@ -77,6 +106,13 @@ class Board : public ui::Grid<Tile>
     bool HasLineOfSight(const Vector2Ex<float>& pos1, const Vector2Ex<float>& pos2) const;
 
     void SetTileType(const Vector2Ex<size_t>& index, const Tile::Type& type);
+
+    Vector2Ex<float> GetPacmanSpeed() const;
+    Vector2Ex<float> GetGhostSpeed() const;
+    Vector2Ex<float> GetSpeedIncrease() const;
+    float GetGhostReleaseTimeDecrease() const;
+    float GetFrightenedTime() const;
+    float GetGhostModeTime() const;
 
     Blinky GetBlinky() const;
 
