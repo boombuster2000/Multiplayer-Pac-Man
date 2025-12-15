@@ -193,6 +193,42 @@ bool GameLayer::TryApplyQueuedDirection(Entity* entity,
     return false;
 }
 
+void GameLayer::RenderScores() const
+{
+    const std::string_view boardName = m_board.GetName();
+    int yOffset = 10;
+
+    for (const auto& client : m_clients)
+    {
+        constexpr int lineSpacing = 5;
+        constexpr int playerSpacing = 20;
+        constexpr int lineHeight = 20;
+
+        std::string_view username = client.profile->GetUsername();
+        const Color playerColor = client.pacman.GetColor();
+        const int currentPoints = client.player.GetPoints();
+        const auto& personalHighscores = client.profile->GetPersonalHighscores();
+
+        int highscore = 0;
+        if (auto it = personalHighscores.find(boardName); it != personalHighscores.end())
+            highscore = it->second;
+
+        // Display Username in a distinct colour
+        const std::string usernameText = std::format("Username: {}", username);
+        DrawText(usernameText.c_str(), 10, yOffset, lineHeight, playerColor); // Using DARKBLUE for username
+        yOffset += lineHeight + lineSpacing;
+
+        // Display Current Score in green
+        const std::string currentPointsStr = std::format("Score: {}", currentPoints);
+        DrawText(currentPointsStr.c_str(), 10, yOffset, lineHeight, playerColor); // Using GREEN for current score
+        yOffset += lineHeight + lineSpacing;
+
+        // Display Highscore in gold/yellow
+        const std::string highscoreStr = std::format("Highscore: {}", highscore);
+        DrawText(highscoreStr.c_str(), 10, yOffset, lineHeight, playerColor); // Using ORANGE for highscore
+        yOffset += lineHeight + playerSpacing;                                // Add extra spacing for the next player
+    }
+}
 void GameLayer::RenderNodes() const
 {
     for (const auto& nodes = m_board.GetNodeMap(); const auto& node : nodes | std::views::values)
@@ -210,6 +246,7 @@ void GameLayer::RenderNodes() const
         }
     }
 }
+
 void GameLayer::RenderLives() const
 {
     using enum ui::AnchorPoint;
@@ -310,73 +347,6 @@ Pacman& GameLayer::GetClosestAlivePacmanWithNodes(const Vector2Ex<float>& refere
     return const_cast<Pacman&>(*closestPacman);
 }
 
-GameLayer::GameLayer(const std::vector<Client>& clients) :
-    m_board(),
-    m_clients(clients),
-    m_blinky(m_board.GetBlinky()),
-    m_pinky(m_board.GetPinky()),
-    m_inky(m_board.GetInky()),
-    m_clyde(m_board.GetClyde()),
-    m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde}
-{
-    Init();
-}
-
-GameLayer::GameLayer(const std::vector<Client>& clients, Board board) :
-    m_board(std::move(board)),
-    m_clients(clients),
-    m_blinky(m_board.GetBlinky()),
-    m_pinky(m_board.GetPinky()),
-    m_inky(m_board.GetInky()),
-    m_clyde(m_board.GetClyde()),
-    m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde}
-{
-    Init();
-}
-
-GameLayer::~GameLayer()
-{
-    m_board.SaveHighscoresToFile();
-    UnloadSound(m_pelletCollectSound);
-    UnloadSound(m_ghostDeathSound);
-    UnloadSound(m_countdownBeep);
-    UnloadSound(m_deathSound);
-    UnloadMusicStream(m_backgroundMusic);
-}
-
-void GameLayer::HandleKeyPresses()
-{
-    using enum ui::Direction;
-    const auto& inputManager = game::GameApplication::GetInputManager();
-
-    for (auto& client : m_clients)
-    {
-        Pacman& pacman = client.pacman;
-        const PlayerInput* input = client.input;
-
-        if (input->IsUpPressed())
-            pacman.SetQueuedDirection(UP);
-
-        if (input->IsDownPressed())
-            pacman.SetQueuedDirection(DOWN);
-
-        if (input->IsLeftPressed())
-            pacman.SetQueuedDirection(LEFT);
-
-        if (input->IsRightPressed())
-            pacman.SetQueuedDirection(RIGHT);
-    }
-
-    if (IsKeyPressed(KEY_F1))
-        m_board.SaveToFile();
-
-    if (inputManager.IsAction("pause", engine::InputState::PRESSED))
-    {
-        SuspendUpdate();
-        Push(std::make_unique<GameOptionsMenuLayer>());
-    }
-}
-
 bool GameLayer::IsPacmanTouchingGhost(const Pacman& pacman, const Ghost& ghost)
 {
     const Vector2Ex<float> pacmanPosition = pacman.GetPositionAtAnchor();
@@ -388,34 +358,6 @@ bool GameLayer::IsPacmanTouchingGhost(const Pacman& pacman, const Ghost& ghost)
     const Rectangle ghostRec = {ghostPosition.x, ghostPosition.y, ghostDimensions.x, ghostDimensions.y};
 
     return CheckCollisionRecs(pacmanRec, ghostRec);
-}
-
-void GameLayer::HandlePacmanDeath(Pacman& pacman, Ghost& ghost) const
-{
-    pacman.RemoveLife();
-    pacman.SetDead(true);
-    pacman.SetRespawnTimer(3.0f); // Pac-man is "dead" for 3 seconds.
-    PlaySound(m_deathSound);
-
-    // Making pacman slightly transparent
-    Color newColor = pacman.GetColor();
-    newColor.a = 128;
-    pacman.SetColor(newColor);
-
-    if (pacman.GetLives() > 0)
-        pacman.SetPosition(pacman.GetSpawnPosition());
-}
-
-void GameLayer::HandleGhostDeath(Player& player, Ghost& ghost) const
-{
-    Color newColor = ghost.GetColor();
-    newColor.a = 128;
-    ghost.SetColor(newColor);
-
-    player.AddPoints(200); // points gained by kill ghost
-    ghost.SetState(Ghost::State::DEAD);
-    ghost.SetWasFrightened(true);
-    PlaySound(m_ghostDeathSound);
 }
 
 void GameLayer::ProcessGhostCollisions()
@@ -446,6 +388,34 @@ void GameLayer::ProcessGhostCollisions()
     }
 }
 
+void GameLayer::HandlePacmanDeath(Pacman& pacman, Ghost& ghost) const
+{
+    pacman.RemoveLife();
+    pacman.SetDead(true);
+    pacman.SetRespawnTimer(3.0f); // Pac-man is "dead" for 3 seconds.
+    PlaySound(m_deathSound);
+
+    // Making pacman slightly transparent
+    Color newColor = pacman.GetColor();
+    newColor.a = 128;
+    pacman.SetColor(newColor);
+
+    if (pacman.GetLives() > 0)
+        pacman.SetPosition(pacman.GetSpawnPosition());
+}
+
+void GameLayer::HandleGhostDeath(Player& player, Ghost& ghost) const
+{
+    Color newColor = ghost.GetColor();
+    newColor.a = 128;
+    ghost.SetColor(newColor);
+
+    player.AddPoints(200); // points gained by kill ghost
+    ghost.SetState(Ghost::State::DEAD);
+    ghost.SetWasFrightened(true);
+    PlaySound(m_ghostDeathSound);
+}
+
 int GameLayer::GetCurrentAlivePacmanCount() const
 {
     int aliveCount = 0;
@@ -469,6 +439,7 @@ int GameLayer::GetPacmanWithLivesCount() const
 
     return pacmanWithLivesCount;
 }
+
 void GameLayer::RespawnGhost(Ghost* ghost) const
 {
     ghost->SetState(m_mainGhostMode); // Sync ghosts back to what it should be on.
@@ -536,6 +507,7 @@ void GameLayer::Chase(Ghost* ghost) const
     const Pacman& closestPacman = GetClosestAlivePacmanWithNodes(ghost->GetPositionAtAnchor());
     ghost->Update(m_board, closestPacman.GetPositionAtAnchor(), closestPacman.GetDirection());
 }
+
 void GameLayer::Scatter(Ghost* ghost) const
 {
     // In scatter mode, ghosts target their designated corner (guard position).
@@ -562,7 +534,6 @@ void GameLayer::SaveHighscoresToBoard()
     m_board.SaveHighscoresToFile();
     m_timePassedSinceLastSave = 0.0f;
 }
-
 void GameLayer::UpdateGhostModes()
 {
     if (m_ghostModeTimer >= 15.0f)
@@ -579,6 +550,7 @@ void GameLayer::UpdateGhostModes()
         m_isFrightenedModeEnabled = false;
     }
 }
+
 void GameLayer::ProcessPacmans(const float ts)
 {
     for (auto& client : m_clients)
@@ -735,6 +707,71 @@ void GameLayer::Init()
     m_backgroundMusic.looping = true;
     PlayMusicStream(m_backgroundMusic);
     SetSoundVolume(m_ghostDeathSound, 2.0);
+}
+GameLayer::GameLayer(const std::vector<Client>& clients) :
+    m_board(),
+    m_clients(clients),
+    m_blinky(m_board.GetBlinky()),
+    m_pinky(m_board.GetPinky()),
+    m_inky(m_board.GetInky()),
+    m_clyde(m_board.GetClyde()),
+    m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde}
+{
+    Init();
+}
+
+GameLayer::GameLayer(const std::vector<Client>& clients, Board board) :
+    m_board(std::move(board)),
+    m_clients(clients),
+    m_blinky(m_board.GetBlinky()),
+    m_pinky(m_board.GetPinky()),
+    m_inky(m_board.GetInky()),
+    m_clyde(m_board.GetClyde()),
+    m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde}
+{
+    Init();
+}
+GameLayer::~GameLayer()
+{
+    m_board.SaveHighscoresToFile();
+    UnloadSound(m_pelletCollectSound);
+    UnloadSound(m_ghostDeathSound);
+    UnloadSound(m_countdownBeep);
+    UnloadSound(m_deathSound);
+    UnloadMusicStream(m_backgroundMusic);
+}
+
+void GameLayer::HandleKeyPresses()
+{
+    using enum ui::Direction;
+    const auto& inputManager = game::GameApplication::GetInputManager();
+
+    for (auto& client : m_clients)
+    {
+        Pacman& pacman = client.pacman;
+        const PlayerInput* input = client.input;
+
+        if (input->IsUpPressed())
+            pacman.SetQueuedDirection(UP);
+
+        if (input->IsDownPressed())
+            pacman.SetQueuedDirection(DOWN);
+
+        if (input->IsLeftPressed())
+            pacman.SetQueuedDirection(LEFT);
+
+        if (input->IsRightPressed())
+            pacman.SetQueuedDirection(RIGHT);
+    }
+
+    if (IsKeyPressed(KEY_F1))
+        m_board.SaveToFile();
+
+    if (inputManager.IsAction("pause", engine::InputState::PRESSED))
+    {
+        SuspendUpdate();
+        Push(std::make_unique<GameOptionsMenuLayer>());
+    }
 }
 
 void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
@@ -939,42 +976,5 @@ void GameLayer::OnRender()
 
             DrawText(text.c_str(), static_cast<int>(x), static_cast<int>(y), fontSize, YELLOW);
         }
-    }
-}
-
-void GameLayer::RenderScores() const
-{
-    const std::string_view boardName = m_board.GetName();
-    int yOffset = 10;
-
-    for (const auto& client : m_clients)
-    {
-        constexpr int lineSpacing = 5;
-        constexpr int playerSpacing = 20;
-        constexpr int lineHeight = 20;
-
-        std::string_view username = client.profile->GetUsername();
-        const Color playerColor = client.pacman.GetColor();
-        const int currentPoints = client.player.GetPoints();
-        const auto& personalHighscores = client.profile->GetPersonalHighscores();
-
-        int highscore = 0;
-        if (auto it = personalHighscores.find(boardName); it != personalHighscores.end())
-            highscore = it->second;
-
-        // Display Username in a distinct colour
-        const std::string usernameText = std::format("Username: {}", username);
-        DrawText(usernameText.c_str(), 10, yOffset, lineHeight, playerColor); // Using DARKBLUE for username
-        yOffset += lineHeight + lineSpacing;
-
-        // Display Current Score in green
-        const std::string currentPointsStr = std::format("Score: {}", currentPoints);
-        DrawText(currentPointsStr.c_str(), 10, yOffset, lineHeight, playerColor); // Using GREEN for current score
-        yOffset += lineHeight + lineSpacing;
-
-        // Display Highscore in gold/yellow
-        const std::string highscoreStr = std::format("Highscore: {}", highscore);
-        DrawText(highscoreStr.c_str(), 10, yOffset, lineHeight, playerColor); // Using ORANGE for highscore
-        yOffset += lineHeight + playerSpacing;                                // Add extra spacing for the next player
     }
 }
