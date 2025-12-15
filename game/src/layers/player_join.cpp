@@ -90,7 +90,7 @@ void PlayerJoinLayer::RebuildPlayerMenus()
 
 void PlayerJoinLayer::AddJoiningPlayer(PlayerInput* controls)
 {
-    m_joiningPlayers.emplace_back(controls);
+    m_joiningPlayers.emplace_back(controls, m_board.GetPacmanSpeed());
     auto& joiningPlayer = m_joiningPlayers.back();
 
     if (!m_isFirstPlayerJoined)

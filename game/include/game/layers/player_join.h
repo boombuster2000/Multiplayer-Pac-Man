@@ -32,9 +32,9 @@ class PlayerJoinLayer : public engine::Layer
         ReadyState state = ReadyState::SELECTING_PROFILE;
         ui::Menu profileSelectionMenu;
 
-        explicit JoiningPlayer(PlayerInput* controls) :
+        explicit JoiningPlayer(PlayerInput* controls, Vector2Ex<float> pacmanSpeed) :
             inputControls(controls),
-            pacman({0, 0}, Vector2Ex<float>(50, 50), 400), // position needs to be set later
+            pacman({0, 0}, Vector2Ex<float>(50, 50), pacmanSpeed.x), // position needs to be set later
             profileSelectionMenu({0, 0}, ui::AnchorPoint::MIDDLE, ui::Alignment::CENTER, true, 40.f)
         {
         }
