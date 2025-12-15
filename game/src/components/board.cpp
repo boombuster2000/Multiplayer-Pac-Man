@@ -5,6 +5,7 @@
 #include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <limits>
 #include <string_view>
 
@@ -261,90 +262,122 @@ Board::Board() :
          Pellet::Type::NORMAL,
          Vector2Ex<float>(0, 0),
          Vector2Ex<float>(50, 50)),
-    m_name("test-file")
+    m_name("default")
 {
+    // TOOD: Check default.json exists
+    //  If it does exist load from json
+    //  if laoding fails or doesn't exist load from code
+    //  and create default.json
+    const auto board_path = FilePaths::s_boardsDirectory / (m_name + ".json");
+    bool loaded_from_file = false;
+
+    if (std::filesystem::exists(board_path))
     {
-        using enum Tile::Type;
-        AddBoundaries();
-
-        // Row 2 - top horizontal walls
-        for (size_t x : {2, 4, 5, 7, 8, 9, 10, 11})
-            SetTileType({x, 2}, WALL);
-
-        // Row 3 - vertical pillars
-        for (size_t x : {2, 11})
-            SetTileType({x, 3}, WALL);
-
-        // Row 4 - inner walls with gaps
-        for (size_t x : {2, 4, 5, 6, 7, 8, 9, 11})
-            SetTileType({x, 4}, WALL);
-
-        // Row 5 - ghost house top
-        for (size_t x : {0, 2, 11})
-            SetTileType({x, 5}, WALL);
-
-        // Row 6 - ghost house sides
-        for (size_t x : {0, 4, 5, 6, 7, 9})
-            SetTileType({x, 6}, WALL);
-
-        // Row 7 - ghost house sides
-        for (size_t x : {0, 2, 4, 5, 6, 7, 9, 11})
-            SetTileType({x, 7}, WALL);
-
-        // Row 8 - ghost house bottom
-        for (size_t x : {0, 2, 4, 9, 11})
-            SetTileType({x, 8}, WALL);
-
-        // Row 9 - inner walls with gaps
-        for (size_t x : {2, 4, 5, 6, 7, 8, 9, 11})
-            SetTileType({x, 9}, WALL);
-
-        // Row 10 - vertical pillars
-        for (size_t x : {2, 11})
-            SetTileType({x, 10}, WALL);
-
-        // Row 11 - bottom horizontal walls
-        for (size_t x : {2, 3, 4, 5, 7, 8, 9, 11})
-            SetTileType({x, 11}, WALL);
+        try
+        {
+            std::ifstream file(board_path);
+            if (file.is_open())
+            {
+                const json j = json::parse(file);
+                from_json(j, *this);
+                loaded_from_file = true;
+                std::cout << "Loaded from file" << std::endl;
+            }
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << "Failed to load default board. Creating from code. Error: " << e.what() << std::endl;
+        }
     }
 
-    // Set super pellets
+    if (!loaded_from_file)
     {
-        using enum Pellet::Type;
-        constexpr std::array<Vector2Ex<size_t>, 10> superPelletsCoords{
-            // Vector2Ex<size_t>{1, 1},
-            // Vector2Ex<size_t>{1, 12},
-            // Vector2Ex<size_t>{12, 1},
-            // Vector2Ex<size_t>{12, 12},
-            Vector2Ex<size_t>{6, 2},
-            Vector2Ex<size_t>{2, 3},
-            Vector2Ex<size_t>{2, 6},
-            Vector2Ex<size_t>{6, 11} // Vector2Ex<size_t>{11, 6},
-            // Vector2Ex<size_t>{11, 10}
-        };
-
-        constexpr std::array<Vector2Ex<size_t>, 10> noPelletsCoords{
-            Vector2Ex<size_t>{5, 8},
-            Vector2Ex<size_t>{6, 8},
-            Vector2Ex<size_t>{7, 8},
-            Vector2Ex<size_t>{8, 8},
-            Vector2Ex<size_t>{8, 7},
-            Vector2Ex<size_t>{8, 6},
-        };
-
-        for (const auto& coord : superPelletsCoords)
+        std::cout << "Loading from code" << std::endl;
         {
-            Tile& tile = GetTile(coord);
-            Pellet& pellet = tile.GetPellet();
-            pellet.SetType(SUPER);
+            using enum Tile::Type;
+            AddBoundaries();
+
+            // Row 2 - top horizontal walls
+            for (size_t x : {2, 4, 5, 7, 8, 9, 10, 11})
+                SetTileType({x, 2}, WALL);
+
+            // Row 3 - vertical pillars
+            for (size_t x : {2, 11})
+                SetTileType({x, 3}, WALL);
+
+            // Row 4 - inner walls with gaps
+            for (size_t x : {2, 4, 5, 6, 7, 8, 9, 11})
+                SetTileType({x, 4}, WALL);
+
+            // Row 5 - ghost house top
+            for (size_t x : {0, 2, 11})
+                SetTileType({x, 5}, WALL);
+
+            // Row 6 - ghost house sides
+            for (size_t x : {0, 4, 5, 6, 7, 9})
+                SetTileType({x, 6}, WALL);
+
+            // Row 7 - ghost house sides
+            for (size_t x : {0, 2, 4, 5, 6, 7, 9, 11})
+                SetTileType({x, 7}, WALL);
+
+            // Row 8 - ghost house bottom
+            for (size_t x : {0, 2, 4, 9, 11})
+                SetTileType({x, 8}, WALL);
+
+            // Row 9 - inner walls with gaps
+            for (size_t x : {2, 4, 5, 6, 7, 8, 9, 11})
+                SetTileType({x, 9}, WALL);
+
+            // Row 10 - vertical pillars
+            for (size_t x : {2, 11})
+                SetTileType({x, 10}, WALL);
+
+            // Row 11 - bottom horizontal walls
+            for (size_t x : {2, 3, 4, 5, 7, 8, 9, 11})
+                SetTileType({x, 11}, WALL);
         }
 
-        for (const auto& coord : noPelletsCoords)
+        // Set super pellets
         {
-            Tile& tile = GetTile(coord);
-            Pellet& pellet = tile.GetPellet();
-            pellet.SetType(NONE);
+            using enum Pellet::Type;
+            constexpr std::array<Vector2Ex<size_t>, 10> superPelletsCoords{
+                // Vector2Ex<size_t>{1, 1},
+                // Vector2Ex<size_t>{1, 12},
+                // Vector2Ex<size_t>{12, 1},
+                // Vector2Ex<size_t>{12, 12},
+                Vector2Ex<size_t>{6, 2},
+                Vector2Ex<size_t>{2, 3},
+                Vector2Ex<size_t>{2, 6},
+                Vector2Ex<size_t>{6, 11} // Vector2Ex<size_t>{11, 6},
+                // Vector2Ex<size_t>{11, 10}
+            };
+
+            constexpr std::array<Vector2Ex<size_t>, 10> noPelletsCoords{
+                Vector2Ex<size_t>{5, 8},
+                Vector2Ex<size_t>{6, 8},
+                Vector2Ex<size_t>{7, 8},
+                Vector2Ex<size_t>{8, 8},
+                Vector2Ex<size_t>{8, 7},
+                Vector2Ex<size_t>{8, 6},
+            };
+
+            for (const auto& coord : superPelletsCoords)
+            {
+                Tile& tile = GetTile(coord);
+                Pellet& pellet = tile.GetPellet();
+                pellet.SetType(SUPER);
+            }
+
+            for (const auto& coord : noPelletsCoords)
+            {
+                Tile& tile = GetTile(coord);
+                Pellet& pellet = tile.GetPellet();
+                pellet.SetType(NONE);
+            }
         }
+
+        SaveToFile();
     }
 
     CreateNodesAndArcs();
@@ -451,22 +484,23 @@ Vector2Ex<float> Board::GetGhostSpawnPoint(const Ghost::Type ghostType) const
     switch (ghostType)
     {
     case BLINKY:
-        return GetPositionFromIndex({8, 8});
+        return GetPositionFromIndex(m_blinkySpawnPointIndex);
     case PINKY:
-        return GetPositionFromIndex({7, 8});
+        return GetPositionFromIndex(m_pinkySpawnPointIndex);
     case INKY:
-        return GetPositionFromIndex({6, 8});
+        return GetPositionFromIndex(m_inkySpawnPointIndex);
     case CLYDE:
-        return GetPositionFromIndex({5, 8});
+        return GetPositionFromIndex(m_clydeSpawnPointIndex);
     }
 
-    return GetPositionFromIndex({8, 8});
+    return GetPositionFromIndex(m_blinkySpawnPointIndex);
 }
 
 std::pair<Vector2Ex<float>, Vector2Ex<float>> Board::GetGhostSpawnRegion() const
 {
     // Note: GetPositionFromIndex returns the top left coord of tile.
-    return {GetPositionFromIndex({5, 8}), GetPositionFromIndex({9, 9}) - Vector2Ex<float>{1, 1}};
+    return {GetPositionFromIndex(m_ghostSpawnRegionTopLeftIndex),
+            GetPositionFromIndex(m_ghostSpawnRegionBottomRightIndex) - Vector2Ex<float>{1, 1}};
 }
 
 bool Board::IsInRegion(const std::pair<Vector2Ex<float>, Vector2Ex<float>>& region, const Vector2Ex<float>& position)
@@ -499,8 +533,7 @@ Blinky Board::GetBlinky() const
                   ui::Direction::RIGHT,
                   Ghost::Type::BLINKY,
                   GetPositionFromIndex(m_blinkyGuardPointIndex),
-                  m_blinkyReleaseTime,
-                  Ghost::State::CHASE);
+                  m_blinkyReleaseTime);
 }
 
 Pinky Board::GetPinky() const

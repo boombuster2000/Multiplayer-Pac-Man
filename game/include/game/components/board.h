@@ -56,6 +56,9 @@ class Board : public ui::Grid<Tile>
     Vector2Ex<size_t> m_clydeGuardPointIndex{10, 12};
     float m_clydeReleaseTime = 15;
 
+    Vector2Ex<size_t> m_ghostSpawnRegionTopLeftIndex{5, 8};
+    Vector2Ex<size_t> m_ghostSpawnRegionBottomRightIndex{9, 9};
+
     Vector2Ex<size_t> m_player1SpawnPointIndex{1, 1};
     Vector2Ex<size_t> m_player2SpawnPointIndex{12, 12};
     Vector2Ex<size_t> m_player3SpawnPointIndex{3, 10};
