@@ -11,7 +11,7 @@ GameOverLayer::GameOverLayer(const std::vector<Client>& clients) :
     m_menu({0, 0}, ui::AnchorPoint::MIDDLE, ui::Alignment::CENTER, true, 20.0f),
     m_title("Game Over",
             {60, RED},
-            {(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 4},
+            {static_cast<float>(GetScreenWidth()) / 2, static_cast<float>(GetScreenHeight()) / 4},
             ui::AnchorPoint::MIDDLE,
             true)
 {
@@ -40,7 +40,7 @@ void GameOverLayer::SetupUI(const std::vector<Client>& clients)
                            ui::AnchorPoint::TOP_MIDDLE,
                            true);
 
-        float colWidth = std::max(usernameText.GetDimensions().x, scoreText.GetDimensions().x);
+        const float colWidth = std::max(usernameText.GetDimensions().x, scoreText.GetDimensions().x);
         m_playerScoreUIs.push_back({std::move(usernameText), std::move(scoreText), colWidth});
 
         float colHeight = m_playerScoreUIs.back().username.GetDimensions().y +
@@ -58,16 +58,16 @@ void GameOverLayer::SetupUI(const std::vector<Client>& clients)
             std::accumulate(m_playerScoreUIs.begin(), m_playerScoreUIs.end(), 0.0f, [](float sum, const auto& ui) {
                 return sum + ui.columnWidth;
             });
-        totalWidth += padding * (m_playerScoreUIs.size() - 1);
+        totalWidth += padding * (static_cast<float>(m_playerScoreUIs.size()) - 1);
     }
 
     // 3. Position the scores
-    float currentX = (GetScreenWidth() - totalWidth) / 2.0f;
-    const float yPos = (GetScreenHeight() / 2.0f) - 50.0f;
+    float currentX = (static_cast<float>(GetScreenWidth()) - totalWidth) / 2.0f;
+    const float yPos = (static_cast<float>(GetScreenHeight()) / 2.0f) - 50.0f;
 
     for (auto& ui : m_playerScoreUIs)
     {
-        // Center the username and score text within their column
+        // Centre the username and score text within their column
         float columnStartX = currentX;
         ui.username.SetPosition({columnStartX + ui.columnWidth / 2.0f, yPos});
         ui.score.SetPosition({columnStartX + ui.columnWidth / 2.0f, yPos + ui.username.GetDimensions().y + 10.0f});
@@ -81,18 +81,17 @@ void GameOverLayer::SetupUI(const std::vector<Client>& clients)
     TextStyle selectedStyle = {40, ORANGE};
 
     m_menu.AddOption(std::make_unique<TextMenuOption>("Back to Menu", selectedStyle, unselectedStyle, true, []() {
-        GameLayer* gameLayer = game::GameApplication::Get().GetLayer<GameLayer>();
-        if (gameLayer)
+        if (const GameLayer* gameLayer = game::GameApplication::Get().GetLayer<GameLayer>())
         {
             // Since GameLayer is suspended, we trigger the transition from it.
             // This will replace GameLayer with MainMenuLayer in the stack.
             gameLayer->TransistionTo(std::make_unique<MainMenuLayer>());
         }
-        // Then we pop ourself off the top.
+        // Then we pop ourselves off the top.
         engine::Application::QueuePop<GameOverLayer>();
     }));
 
-    m_menu.SetPosition({(float)GetScreenWidth() / 2, yPos + maxColumnHeight + 80.0f});
+    m_menu.SetPosition({static_cast<float>(GetScreenWidth()) / 2, yPos + maxColumnHeight + 80.0f});
     m_menu.UpdateOptionsAnchorPointPositions();
 }
 
