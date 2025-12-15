@@ -43,8 +43,8 @@ void GameOverLayer::SetupUI(const std::vector<Client>& clients)
         const float colWidth = std::max(usernameText.GetDimensions().x, scoreText.GetDimensions().x);
         m_playerScoreUIs.push_back({std::move(usernameText), std::move(scoreText), colWidth});
 
-        float colHeight = m_playerScoreUIs.back().username.GetDimensions().y +
-                          m_playerScoreUIs.back().score.GetDimensions().y + 10.0f;
+        const float colHeight = m_playerScoreUIs.back().username.GetDimensions().y +
+                                m_playerScoreUIs.back().score.GetDimensions().y + 10.0f;
         if (colHeight > maxColumnHeight)
         {
             maxColumnHeight = colHeight;
@@ -65,14 +65,14 @@ void GameOverLayer::SetupUI(const std::vector<Client>& clients)
     float currentX = (static_cast<float>(GetScreenWidth()) - totalWidth) / 2.0f;
     const float yPos = (static_cast<float>(GetScreenHeight()) / 2.0f) - 50.0f;
 
-    for (auto& ui : m_playerScoreUIs)
+    for (auto& [username, score, columnWidth] : m_playerScoreUIs)
     {
         // Centre the username and score text within their column
-        float columnStartX = currentX;
-        ui.username.SetPosition({columnStartX + ui.columnWidth / 2.0f, yPos});
-        ui.score.SetPosition({columnStartX + ui.columnWidth / 2.0f, yPos + ui.username.GetDimensions().y + 10.0f});
+        const float columnStartX = currentX;
+        username.SetPosition({columnStartX + columnWidth / 2.0f, yPos});
+        score.SetPosition({columnStartX + columnWidth / 2.0f, yPos + username.GetDimensions().y + 10.0f});
 
-        currentX += ui.columnWidth + padding;
+        currentX += columnWidth + padding;
     }
 
     // --- Menu Button ---
@@ -97,9 +97,9 @@ void GameOverLayer::SetupUI(const std::vector<Client>& clients)
 
 void GameOverLayer::OnUpdate(float ts)
 {
-    const auto& inputManager = engine::Application::GetInputManager();
 
-    if (inputManager.IsAction("move_down", engine::InputState::PRESSED))
+    if (const auto& inputManager = engine::Application::GetInputManager();
+        inputManager.IsAction("move_down", engine::InputState::PRESSED))
     {
         m_menu.SelectNext();
     }
