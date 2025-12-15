@@ -624,16 +624,18 @@ HighscoreMap Board::GetHighscores() const
 void Board::SetHighscore(std::string_view profileName, int score)
 {
     if (auto it = m_highScores.find(profileName); it != m_highScores.end())
+    {
         // Profile exists, update if score is higher
-        if (score <= it->second)
-        {
-            // Profile doesn't exist, insert new score
-            m_highScores.emplace(profileName, score);
-        }
-        else
+        if (score > it->second)
         {
             it->second = score;
         }
+    }
+    else
+    {
+        // Profile doesn't exist, insert new score
+        m_highScores.emplace(profileName, score);
+    }
 }
 
 void Board::SaveHighscoresToFile() const
@@ -659,6 +661,7 @@ void Board::SaveHighscoresToFile() const
     {
         file << j.dump(4);
         file.close();
+        std::cout << "Saved highscores to file" << std::endl;
     }
 }
 
