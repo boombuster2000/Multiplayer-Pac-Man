@@ -611,7 +611,7 @@ void GameLayer::ProcessGhosts(const float ts)
         // Change ghosts from frightened appearance and normal appearance
         if (m_isFrightenedModeEnabled && !ghost->WasFrightened())
         {
-            ghost->SetSpeed({200, 200});
+            ghost->SetSpeed(m_board.GetGhostSpeed() * 0.5f);
             ghost->SetState(Ghost::State::FRIGHTENED);
             ghost->SetTexture(game::GameApplication::GetTexturesManager().GetTexture("frightened-ghost"));
             ghost->SetWasFrightened(true);
@@ -625,7 +625,7 @@ void GameLayer::ProcessGhosts(const float ts)
         }
         else if (!m_isFrightenedModeEnabled || ghost->GetState() != Ghost::State::FRIGHTENED)
         {
-            ghost->SetSpeed({300, 300});
+            ghost->SetSpeed(m_board.GetGhostSpeed());
             ghost->SetState(m_mainGhostMode);
             ghost->SetColor(WHITE);
             ghost->ResetTexture();
