@@ -5,15 +5,20 @@
 #include "game/layers/create_profile.h"
 #include "game/layers/main_menu.h"
 #include "game/layers/profile_selection_menu_layer.h"
-#include "game/serialization/json_converters.hpp"
 #include "game/utils/file_utils.h"
 #include <filesystem>
 #include <iostream>
 #include <nlohmann/json.hpp>
 
-ProfileSelectionMenuLayer::ProfileSelectionMenuLayer() : BaseMenuLayer(ui::Alignment::CENTER, true, 10.0f)
+ProfileSelectionMenuLayer::ProfileSelectionMenuLayer() :
+    BaseMenuLayer(ui::Alignment::CENTER, true, 10.0f)
 {
     SetupMenuOptions();
+}
+void ProfileSelectionMenuLayer::OnRender()
+{
+    BaseMenuLayer::OnRender();
+    m_title.Render();
 }
 
 void ProfileSelectionMenuLayer::SetupMenuOptions()
@@ -35,8 +40,11 @@ void ProfileSelectionMenuLayer::SetupMenuOptions()
         {
             auto profile = std::make_shared<Profile>(data.get<Profile>());
 
-            m_menu.AddOption(std::make_unique<TextMenuOption>(profile->GetUsername(), profileSelectedStyle,
-                                                              profileUnselectedStyle, isFirstOption, [this, profile]() {
+            m_menu.AddOption(std::make_unique<TextMenuOption>(profile->GetUsername(),
+                                                              profileSelectedStyle,
+                                                              profileUnselectedStyle,
+                                                              isFirstOption,
+                                                              [this, profile]() {
                                                                   game::GameApplication::Get().SetProfile(profile);
                                                                   TransistionTo(std::make_unique<MainMenuLayer>());
                                                               }));
@@ -50,12 +58,17 @@ void ProfileSelectionMenuLayer::SetupMenuOptions()
     }
 
     m_menu.AddOption(
-        std::make_unique<TextMenuOption>("Create Profile", buttonSelectedStyle, buttonUnselectedStyle, isFirstOption,
+        std::make_unique<TextMenuOption>("Create Profile",
+                                         buttonSelectedStyle,
+                                         buttonUnselectedStyle,
+                                         isFirstOption,
                                          [this]() { TransistionTo(std::make_unique<CreateProfileLayer>()); }));
 
     if (isFirstOption)
         isFirstOption = false; // "Create Profile" took the first slot if no profiles existed.
 
-    m_menu.AddOption(std::make_unique<TextMenuOption>("Exit", buttonSelectedStyle, buttonUnselectedStyle, false,
-                                                      [this]() { game::GameApplication::Get().Stop(); }));
+    m_menu.AddOption(
+        std::make_unique<TextMenuOption>("Exit", buttonSelectedStyle, buttonUnselectedStyle, false, [this]() {
+            game::GameApplication::Get().Stop();
+        }));
 }
