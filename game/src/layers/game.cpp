@@ -2,17 +2,17 @@
 #include "engine/core/input_manager.h"
 #include "game/game_application.h"
 #include "game/layers/game_options_menu.h"
-#include "game/layers/main_menu.h"
 #include "game/layers/game_over_layer.h"
+#include "game/layers/main_menu.h"
 #include "raylib.h"
 #include <algorithm>
 #include <array>
 #include <cmath>
-#include <cstdlib>
 #include <ctime>
 #include <format>
 #include <limits>
 #include <memory>
+
 #include <stdexcept>
 #include <string>
 
@@ -166,13 +166,9 @@ bool GameLayer::CanMoveInDirection(const Entity* entity,
         break;
     }
 
-    for (auto& corner : cornersToCheck)
-    {
-        if (const Tile& tile = m_board.GetTileFromPosition(corner); tile.GetType() == Tile::Type::WALL)
-            return false;
-    }
-
-    return true;
+    return std::ranges::all_of(cornersToCheck, [this](const auto& corner) {
+        return m_board.GetTileFromPosition(corner).GetType() != Tile::Type::WALL;
+    });
 }
 
 bool GameLayer::TryApplyQueuedDirection(Entity* entity,
@@ -321,18 +317,9 @@ GameLayer::GameLayer(const std::vector<Client>& clients) :
     m_pinky(m_board.GetPinky()),
     m_inky(m_board.GetInky()),
     m_clyde(m_board.GetClyde()),
-    m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde},
-    m_isCountdownActive(true),
-    m_countdownTimer(4.f),
-    m_countdownBeepTimer(0.f),
-    m_isLevelClearPauseActive(false),
-    m_levelClearPauseTimer(0.f)
+    m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde}
 {
-    SetPacmansSpawnPositions();
-    srand(time(nullptr));
-    m_backgroundMusic.looping = true;
-    PlayMusicStream(m_backgroundMusic);
-    SetSoundVolume(m_ghostDeathSound, 2.0);
+    Init();
 }
 
 GameLayer::GameLayer(const std::vector<Client>& clients, Board board) :
@@ -342,18 +329,9 @@ GameLayer::GameLayer(const std::vector<Client>& clients, Board board) :
     m_pinky(m_board.GetPinky()),
     m_inky(m_board.GetInky()),
     m_clyde(m_board.GetClyde()),
-    m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde},
-    m_isCountdownActive(true),
-    m_countdownTimer(4.f),
-    m_countdownBeepTimer(0.f),
-    m_isLevelClearPauseActive(false),
-    m_levelClearPauseTimer(0.f)
+    m_ghosts{&m_blinky, &m_pinky, &m_inky, &m_clyde}
 {
-    SetPacmansSpawnPositions();
-    srand(time(nullptr));
-    m_backgroundMusic.looping = true;
-    PlayMusicStream(m_backgroundMusic);
-    SetSoundVolume(m_ghostDeathSound, 2.0);
+    Init();
 }
 
 GameLayer::~GameLayer()
@@ -546,8 +524,9 @@ void GameLayer::HandleFrightenedGhostMovementDecision(Ghost* ghost) const
 
         if (!possibleDirections.empty())
         {
-            // Choose a random direction from the possible options
-            const size_t randomIndex = rand() % possibleDirections.size();
+            std::uniform_int_distribution<std::size_t> dist(0, possibleDirections.size() - 1);
+
+            const std::size_t randomIndex = dist(m_randomGenerator);
             ghost->SetQueuedDirection(possibleDirections[randomIndex]);
         }
     }
@@ -614,7 +593,7 @@ void GameLayer::ProcessPacmans(const float ts)
             {
                 pacman.SetDead(false);
 
-                // Making solid color again.
+                // Making solid colour again.
                 Color color = pacman.GetColor();
                 color.a = 255;
                 pacman.SetColor(color);
@@ -642,7 +621,7 @@ void GameLayer::ProcessGhosts(const float ts)
         {
             ghost->SetState(m_mainGhostMode);
             if (m_isFrightenedModeEnabled)
-                ghost->SetWasFrightened(true); // Prevents ghosts just spawning going to frightened mode
+                ghost->SetWasFrightened(true); // Prevents ghosts just spawning going to frighten mode
         }
 
         // Ghosts do nothing (including moving) while in the SPAWNING state.
@@ -748,6 +727,14 @@ void GameLayer::ResetLevel()
     m_isFrightenedModeEnabled = false;
     m_shouldResetWasFrightened = false;
     m_frightenedStateDebounce = false;
+}
+void GameLayer::Init()
+{
+    SetPacmansSpawnPositions();
+    m_randomGenerator.seed(time(nullptr));
+    m_backgroundMusic.looping = true;
+    PlayMusicStream(m_backgroundMusic);
+    SetSoundVolume(m_ghostDeathSound, 2.0);
 }
 
 void GameLayer::ProcessMovementSteps(Entity* entity, const float& deltaTime)
@@ -913,7 +900,7 @@ void GameLayer::OnRender()
         const Vector2Ex<float> pacmanPosition = client.pacman.GetPositionAtAnchor();
         const Vector2Ex<float> pacmanDimensions = client.pacman.GetDimensions();
 
-        const float textWidth = MeasureText(usernameCStr, fontSize);
+        const auto textWidth = static_cast<float>(MeasureText(usernameCStr, fontSize));
         const float centerX = pacmanPosition.x + (pacmanDimensions.x / 2);
         const float textX = centerX - (textWidth / 2);
         const float textY = pacmanPosition.y - fontSize - 15; // Increased gap for triangle
@@ -930,7 +917,7 @@ void GameLayer::OnRender()
 
     if (m_isCountdownActive)
     {
-        const int countdownNumber = static_cast<int>(ceil(m_countdownTimer));
+        const int countdownNumber = static_cast<int>(std::ceil(m_countdownTimer));
         std::string text;
 
         if (countdownNumber > 1)
@@ -945,10 +932,10 @@ void GameLayer::OnRender()
         if (!text.empty())
         {
             constexpr int fontSize = 100;
-            const float textWidth = MeasureText(text.c_str(), fontSize);
+            const auto textWidth = static_cast<float>(MeasureText(text.c_str(), fontSize));
 
-            const float x = (GetScreenWidth() - textWidth) / 2.f;
-            const float y = (GetScreenHeight() - fontSize) / 2.f;
+            const float x = (static_cast<float>(GetScreenWidth()) - textWidth) / 2.f;
+            const float y = (static_cast<float>(GetScreenHeight()) - fontSize) / 2.f;
 
             DrawText(text.c_str(), static_cast<int>(x), static_cast<int>(y), fontSize, YELLOW);
         }
@@ -975,7 +962,7 @@ void GameLayer::RenderScores() const
         if (auto it = personalHighscores.find(boardName); it != personalHighscores.end())
             highscore = it->second;
 
-        // Display Username in a distinct color
+        // Display Username in a distinct colour
         const std::string usernameText = std::format("Username: {}", username);
         DrawText(usernameText.c_str(), 10, yOffset, lineHeight, playerColor); // Using DARKBLUE for username
         yOffset += lineHeight + lineSpacing;

@@ -12,9 +12,9 @@
 #include "game/components/ghost_pinky.h"
 #include "game/components/pacman.h"
 #include "game/file_paths.h"
-#include <filesystem>
-
 #include <array>
+#include <filesystem>
+#include <random>
 
 class GameLayer : public engine::Layer
 {
@@ -45,12 +45,13 @@ class GameLayer : public engine::Layer
     bool m_isFrightenedModeEnabled = false;
     bool m_shouldResetWasFrightened = false;
 
-    bool m_isCountdownActive;
-    float m_countdownTimer;
-    float m_countdownBeepTimer;
+    bool m_isCountdownActive = true;
+    float m_countdownTimer = 4.0f;
+    float m_countdownBeepTimer = 0.0f;
+    bool m_isLevelClearPauseActive = false;
+    float m_levelClearPauseTimer = 0.0f;
 
-    bool m_isLevelClearPauseActive;
-    float m_levelClearPauseTimer;
+    mutable std::mt19937 m_randomGenerator;
 
   private:
     static bool IsPacmanTouchingPellet(const Pellet& pellet,
@@ -101,6 +102,8 @@ class GameLayer : public engine::Layer
     void ProcessPacmans(float ts);
     void ProcessGhosts(float ts);
     void ResetLevel();
+
+    void Init();
 
   public:
     explicit GameLayer(const std::vector<Client>& clients);
