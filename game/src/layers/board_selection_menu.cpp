@@ -37,12 +37,12 @@ void BoardSelectionMenuLayer::SetupMenuOptions()
     TextStyle boardUnselectedStyle = {30, DARKGRAY};
     TextStyle boardSelectedStyle = {40, ORANGE};
 
-    m_boardPaths.emplace_back("built-in");
+    m_boardPaths.emplace_back("default");
     m_menu.AddOption(
-        std::make_unique<TextMenuOption>("built-in", boardSelectedStyle, boardUnselectedStyle, true, [this]() {
+        std::make_unique<TextMenuOption>("default", boardSelectedStyle, boardUnselectedStyle, true, [this]() {
             Board board{};
 
-            TransistionTo(std::make_unique<PlayerJoinLayer>(std::move(board))); // temporary
+            TransistionTo(std::make_unique<PlayerJoinLayer>(std::move(board)));
         }));
 
     const std::filesystem::path& boardDirectory = FilePaths::s_boardsDirectory;
@@ -52,6 +52,10 @@ void BoardSelectionMenuLayer::SetupMenuOptions()
         {
             std::string filename = entry.path().stem().string();
             std::string fullPath = entry.path().string();
+
+            if (filename == "default")
+                continue;
+
             m_boardPaths.emplace_back(fullPath);
             m_menu.AddOption(
                 std::make_unique<TextMenuOption>(filename,
@@ -110,7 +114,7 @@ void BoardSelectionMenuLayer::UpdateLeaderboard()
     m_lastSelectedIndex = m_menu.GetSelectedIndex();
 
     Board board;
-    if (m_boardPaths[m_lastSelectedIndex] != "built-in" && m_boardPaths[m_lastSelectedIndex] != "back")
+    if (m_boardPaths[m_lastSelectedIndex] != "default" && m_boardPaths[m_lastSelectedIndex] != "back")
     {
         board = Board::LoadFromFile(m_boardPaths[m_lastSelectedIndex]);
     }
