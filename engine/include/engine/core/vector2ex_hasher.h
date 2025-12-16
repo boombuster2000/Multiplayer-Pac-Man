@@ -1,6 +1,5 @@
-// Vector2ExHasher.h
 #pragma once
-#include "Vector2Ex.h"
+#include "vector2Ex.h"
 #include <functional>
 
 namespace std
@@ -11,7 +10,6 @@ struct hash<Vector2Ex<T>>
 {
     size_t operator()(const Vector2Ex<T>& v) const noexcept
     {
-        // Crucial: strong hash combination to reduce collisions
         const size_t hx = std::hash<T>{}(v.x);
         const size_t hy = std::hash<T>{}(v.y);
 
@@ -22,7 +20,6 @@ struct hash<Vector2Ex<T>>
     }
 };
 
-// Optional but explicit, relies on your operator==
 template <typename T>
 struct equal_to<Vector2Ex<T>>
 {
