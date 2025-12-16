@@ -110,7 +110,7 @@ void PlayerJoinLayer::AddJoiningPlayer(PlayerInput* controls)
         joiningPlayer.pacman.SetColor(Color(255, 65, 235, 255));
         break;
     case 4:
-        joiningPlayer.pacman.SetColor(Color(110, 123, 145, 255));
+        joiningPlayer.pacman.SetColor(Color(67, 167, 167, 255));
         break;
     }
 
@@ -348,8 +348,7 @@ void PlayerJoinLayer::OnRender()
         screenRects.push_back({0.f, 0.f, screenWidth / 2, screenHeight / 2});
         screenRects.push_back({screenWidth / 2, 0.f, screenWidth / 2, screenHeight / 2});
         screenRects.push_back({0.f, screenHeight / 2, screenWidth / 2, screenHeight / 2});
-        screenRects.push_back(
-            {screenWidth / 2, screenHeight / 2, screenWidth / 2, screenHeight / 2});
+        screenRects.push_back({screenWidth / 2, screenHeight / 2, screenWidth / 2, screenHeight / 2});
     }
 
     for (int i = 0; i < screenDivisions; ++i)

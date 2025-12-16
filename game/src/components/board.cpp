@@ -20,7 +20,7 @@ Vector2Ex<float> Board::GetGhostSpeed() const
 
 Vector2Ex<float> Board::GetSpeedIncrease() const
 {
-    return m_speedIncreaseIncrement;
+    return {m_speedIncreaseIncrement, m_speedIncreaseIncrement};
 }
 
 float Board::GetGhostReleaseTimeDecrease() const

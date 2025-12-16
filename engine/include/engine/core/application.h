@@ -17,7 +17,6 @@ class InputManager;
 struct ApplicationSpecification
 {
     std::string name = "Raylib Application";
-
     uint32_t width = 1280;
     uint32_t height = 720;
     int targetFPS = 60;
