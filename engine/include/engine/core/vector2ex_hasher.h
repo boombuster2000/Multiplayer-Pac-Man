@@ -1,6 +1,5 @@
-// Vector2ExHasher.h
 #pragma once
-#include "Vector2Ex.h"
+#include "vector2ex.h"
 #include <functional>
 
 namespace std
