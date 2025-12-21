@@ -14,34 +14,26 @@ set(FETCHCONTENT_BASE_DIR "${CMAKE_SOURCE_DIR}/.cmake_cache")
 add_subdirectory(engine)
 add_subdirectory(game)
 
-# Define the source and destination resource directories
+# Define the source directories
 set(RESOURCE_SRC_DIR ${CMAKE_SOURCE_DIR}/resources)
-set(RESOURCE_DST_DIR $<TARGET_FILE_DIR:Pac-Man>/resources)
-set(BOARDS_SRC_DIR ${CMAKE_SOURCE_DIR}/resources/boards)
-set(BOARDS_DST_DIR $<TARGET_FILE_DIR:Pac-Man>/resources/boards)
 set(PROFILES_SRC_DIR ${CMAKE_SOURCE_DIR}/profiles)
-set(PROFILES_DST_DIR $<TARGET_FILE_DIR:Pac-Man>/profiles)
-
-# Recursively collect all resource files
-file(GLOB_RECURSE RESOURCE_FILES "${RESOURCE_SRC_DIR}/*")
-file(GLOB_RECURSE BOARD_FILES "${BOARDS_SRC_DIR}/*")
-file(GLOB_RECURSE PROFILE_FILES "${PROFILES_SRC_DIR}/*")
 
 # Create a custom target for copying resources
 add_custom_target(copy_resources ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${RESOURCE_SRC_DIR}
-        ${RESOURCE_DST_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${BOARDS_SRC_DIR}
-        ${BOARDS_DST_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${PROFILES_SRC_DIR}
-        ${PROFILES_DST_DIR}
-    DEPENDS ${RESOURCE_FILES} ${BOARD_FILES} ${PROFILE_FILES} # re-run if any resource changes
-    COMMENT "Copying resource, board and profile files..."
+        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Pac-Man>/resources"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Pac-Man>/profiles"
+
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${RESOURCE_SRC_DIR}"
+        "$<TARGET_FILE_DIR:Pac-Man>/resources"
+
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PROFILES_SRC_DIR}"
+        "$<TARGET_FILE_DIR:Pac-Man>/profiles"
+
+        COMMENT "Copying resource and profile files..."
+        VERBATIM
 )
 
-# Ensure the resources are copied before building Pac-Man
-add_dependencies(Pac-Man copy_resources)
-
+# Ensure the resources are copied AFTER building Pac-Man (so the directory exists)
+add_dependencies(copy_resources Pac-Man)
