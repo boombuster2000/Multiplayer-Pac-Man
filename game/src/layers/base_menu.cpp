@@ -2,9 +2,12 @@
 #include "engine/core/input_manager.h"
 #include "game/game_application.h"
 
-BaseMenuLayer::BaseMenuLayer(const ui::Alignment alignment, const bool IsVisible, const float spacing)
-    : m_menu({(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2}, ui::AnchorPoint::MIDDLE, alignment, IsVisible,
-             spacing)
+BaseMenuLayer::BaseMenuLayer(const ui::Alignment alignment, const bool IsVisible, const float spacing) :
+    m_menu({(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2},
+           ui::AnchorPoint::MIDDLE,
+           alignment,
+           IsVisible,
+           spacing)
 {
 }
 

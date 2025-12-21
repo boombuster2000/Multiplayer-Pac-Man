@@ -1,20 +1,24 @@
 #include "game/components/tile.h"
 #include "game/game_application.h"
 
-Tile::Tile()
-    : GridTile(), m_type(Type::NONE), m_pellet(GetPositionAtAnchor(ui::AnchorPoint::MIDDLE), Pellet::Type::NONE)
+Tile::Tile() :
+    GridTile(),
+    m_type(Type::NONE),
+    m_pellet(GetPositionAtAnchor(ui::AnchorPoint::MIDDLE), Pellet::Type::NONE)
 {
 }
 
-Tile::Tile(Type type, Vector2Ex<float> position, Vector2Ex<float> dimensions)
-    : GridTile(dimensions, position), m_type(type),
-      m_pellet(GetPositionAtAnchor(ui::AnchorPoint::MIDDLE), Pellet::Type::NONE)
+Tile::Tile(Type type, Vector2Ex<float> position, Vector2Ex<float> dimensions) :
+    GridTile(dimensions, position),
+    m_type(type),
+    m_pellet(GetPositionAtAnchor(ui::AnchorPoint::MIDDLE), Pellet::Type::NONE)
 {
 }
 
-Tile::Tile(Type type, Pellet::Type pelletType, Vector2Ex<float> position, Vector2Ex<float> dimensions)
-    : GridTile(dimensions, position), m_type(type),
-      m_pellet(GetPositionAtAnchor(ui::AnchorPoint::MIDDLE), type == Type::WALL ? Pellet::Type::NONE : pelletType)
+Tile::Tile(Type type, Pellet::Type pelletType, Vector2Ex<float> position, Vector2Ex<float> dimensions) :
+    GridTile(dimensions, position),
+    m_type(type),
+    m_pellet(GetPositionAtAnchor(ui::AnchorPoint::MIDDLE), type == Type::WALL ? Pellet::Type::NONE : pelletType)
 {
 }
 

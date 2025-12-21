@@ -6,8 +6,8 @@ namespace game
 
 GameApplication* GameApplication::s_GameApplication = nullptr;
 
-GameApplication::GameApplication(const engine::ApplicationSpecification& specification)
-    : engine::Application(specification)
+GameApplication::GameApplication(const engine::ApplicationSpecification& specification) :
+    engine::Application(specification)
 {
     s_GameApplication = this;
 }
