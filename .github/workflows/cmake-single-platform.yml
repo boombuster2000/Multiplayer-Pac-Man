@@ -139,7 +139,7 @@ jobs:
         name: build-${{ matrix.os }}-${{ matrix.c_compiler }}
         path: |
           ${{ steps.strings.outputs.build-output-dir }}/game/Pac-Man
-          ${{ steps.strings.outputs.build-output-dir }}/game/Pac-Man.exe.exe
+          ${{ steps.strings.outputs.build-output-dir }}/game/Pac-Man.exe
           ${{ steps.strings.outputs.build-output-dir }}/game/**/*.app
           ${{ steps.strings.outputs.build-output-dir }}/game/Release/Pac-Man.exe
         retention-days: 7
