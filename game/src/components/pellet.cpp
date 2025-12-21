@@ -1,12 +1,14 @@
 #include "game/components/pellet.h"
-#include "game/game_application.h"
 
-Pellet::Pellet() : RenderableObject(), m_type(Type::NONE)
+Pellet::Pellet() :
+    RenderableObject(),
+    m_type(Type::NONE)
 {
 }
 
-Pellet::Pellet(Vector2Ex<float> position, const Type type)
-    : RenderableObject(position, ui::AnchorPoint::MIDDLE), m_type(type)
+Pellet::Pellet(const Vector2Ex<float> position, const Type type) :
+    RenderableObject(position, ui::AnchorPoint::MIDDLE),
+    m_type(type)
 {
 }
 
@@ -23,6 +25,16 @@ void Pellet::SetType(const Type& type)
 int Pellet::GetValue() const
 {
     return Pellet::GetTypePoints(m_type);
+}
+
+bool Pellet::IsEaten() const
+{
+    return m_isEaten;
+}
+
+void Pellet::SetIsEaten(const bool isEaten)
+{
+    m_isEaten = isEaten;
 }
 
 int Pellet::GetTypePoints(const Type& t)
@@ -48,13 +60,23 @@ void Pellet::SetTypePoints(const TypePointValues& newValues)
 
 Vector2Ex<float> Pellet::GetDimensions() const
 {
-    return Vector2Ex<float>(radius, radius);
+    return {radius, radius};
 }
 
 void Pellet::Render(Vector2Ex<float> offset) const
 {
-    if (m_type == Type::NONE)
+    if (m_isEaten)
         return;
 
-    DrawCircleV(GetWorldOrigin(), radius, WHITE);
+    switch (m_type)
+    {
+    case Type::NORMAL:
+        DrawCircleV(GetWorldOrigin(), radius, WHITE);
+        break;
+    case Type::SUPER:
+        DrawCircleV(GetWorldOrigin(), radius + 2, GOLD);
+        break;
+    case Type::NONE:
+        break;
+    }
 }

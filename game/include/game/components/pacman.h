@@ -1,46 +1,38 @@
 #pragma once
 #include "engine/core/vector2ex.h"
 #include "engine/ui/enums.h"
-#include "engine/ui/renderable_object.h"
+#include "game/components/entity.h"
 #include "raylib.h"
-#include <memory>
 
-class Pacman : public ui::RenderableObject
+class Pacman : public Entity
 {
-  private:
-    using enum ui::Direction;
-    std::shared_ptr<Texture2D> m_texture;
-    Vector2Ex<float> m_spawnPosition;
-    Vector2Ex<float> m_dimensions;
-    float m_speed;
-    float m_Rotation;
-    Vector2Ex<float> m_lastPosition;
-    ui::Direction m_currentDirection;
-    ui::Direction m_queuedDirection;
+
+private:
+    int m_lives = 3;
+    bool m_isDead = false;
+    float m_respawnTimer = 0.0f;
 
   private:
-    void SetRotation(const ui::Direction& direction);
+    static float ConvertDirectionToRotation(const ui::Direction& direction);
 
   public:
-    Pacman();
-    Pacman(Vector2Ex<float> spawnPosition, Vector2Ex<float> dimensions, float Speed);
+    Pacman(Vector2Ex<float> spawnPosition,
+           Vector2Ex<float> dimensions,
+           float speed,
+           Color color = Color(255, 239, 0, 255));
 
-    ui::Direction GetCurrentDirection() const;
-    ui::Direction GetQueuedDirection() const;
+    void SetQueuedDirection(const ui::Direction& direction) final;
+    void ApplyQueuedDirection() final;
 
-    void QueueDirection(ui::Direction direction);
-    void ApplyQueuedDirection();
+    [[nodiscard]] int GetLives() const;
+    void SetLives(int lives);
+    void RemoveLife(int livesToRemove = 1);
+    void AddLife(int livesToAdd = 1);
 
-    void SetPosition(const Vector2Ex<float> position) final;
-    Vector2Ex<float> GetNextPosition(const ui::Direction& direction, const float& deltaTime) const;
-    Vector2Ex<float> GetNextPositionWithStep(const ui::Direction& direction, const float step) const;
+    [[nodiscard]] bool IsDead() const;
+    void SetDead(bool isDead);
 
-    float GetSpeed() const;
-
-    bool IsStationary() const;
-
-    Vector2Ex<float> GetDimensions() const final;
-    void SetDimensions(const Vector2Ex<float>& dimensions);
-
-    void Render(Vector2Ex<float> offset = {0, 0}) const final;
+    [[nodiscard]] float GetRespawnTimer() const;
+    void SetRespawnTimer(float time);
+    void UpdateRespawnTimer(float dt);
 };

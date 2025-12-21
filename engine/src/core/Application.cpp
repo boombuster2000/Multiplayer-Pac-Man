@@ -11,12 +11,14 @@ namespace engine
 Application* Application::s_application = nullptr;
 std::queue<LayerAction> Application::s_pendingActions;
 
-Application::Application(const ApplicationSpecification& specification) : m_specification(specification)
+Application::Application(const ApplicationSpecification& specification) :
+    m_specification(specification)
 {
     assert(!s_application && "Only one Application instance may exist at a time");
     s_application = this;
 
     InitWindow(specification.width, specification.height, specification.name.c_str());
+    InitAudioDevice();
     SetExitKey(specification.programExitKey);
 
     if (specification.targetFPS > 0)
@@ -26,6 +28,7 @@ Application::Application(const ApplicationSpecification& specification) : m_spec
 Application::~Application()
 {
     assert(s_application == this && "Destroying unexpected Application instance");
+    CloseAudioDevice();
     CloseWindow();
     s_application = nullptr;
 }

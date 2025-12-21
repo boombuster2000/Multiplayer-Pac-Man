@@ -3,7 +3,6 @@
 #include "game/layers/overlay_layer.h"
 #include "game/layers/profile_selection_menu_layer.h"
 
-
 void LoadAllTextures()
 {
     auto& texturesManager = game::GameApplication::GetTexturesManager();
@@ -11,6 +10,11 @@ void LoadAllTextures()
     texturesManager.AddTexture("wall", FilePaths::s_texturesDirectory / "wall.png");
     texturesManager.AddTexture("path", FilePaths::s_texturesDirectory / "path.png");
     texturesManager.AddTexture("pac-man", FilePaths::s_texturesDirectory / "pac-man.png");
+    texturesManager.AddTexture("blinky", FilePaths::s_texturesDirectory / "blinky.png");
+    texturesManager.AddTexture("pinky", FilePaths::s_texturesDirectory / "pinky.png");
+    texturesManager.AddTexture("inky", FilePaths::s_texturesDirectory / "inky.png");
+    texturesManager.AddTexture("clyde", FilePaths::s_texturesDirectory / "clyde.png");
+    texturesManager.AddTexture("frightened-ghost", FilePaths::s_texturesDirectory / "frightened-ghost.png");
 }
 
 void LoadKeyBinds()
@@ -49,7 +53,7 @@ int main()
     appSpec.name = "Pac-Man";
     appSpec.width = 1280;
     appSpec.height = 720;
-    appSpec.targetFPS = 120;
+    appSpec.targetFPS = 0;
     appSpec.programExitKey = KEY_NULL;
 
     game::GameApplication application(appSpec);

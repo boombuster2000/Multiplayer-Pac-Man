@@ -27,17 +27,26 @@ class Grid : public RenderableObject
 
   public:
     template <typename... Args>
-    Grid()
-        : RenderableObject(), m_tileDimensions(Vector2Ex<float>(0, 0)), m_spacing(Vector2Ex<float>(0, 0)),
-          m_gridSize(Vector2Ex<size_t>(0, 0)), m_grid(GridType())
+    Grid() :
+        RenderableObject(),
+        m_tileDimensions(Vector2Ex<float>(0, 0)),
+        m_spacing(Vector2Ex<float>(0, 0)),
+        m_gridSize(Vector2Ex<size_t>(0, 0)),
+        m_grid(GridType())
     {
     }
 
     template <typename... Args>
-    Grid(Vector2Ex<size_t> arraySize, Vector2Ex<float> tileDimensions, Vector2Ex<float> anchorPointPosition,
-         ui::AnchorPoint anchorPoint, Vector2Ex<float> spacing, Args&&... tileArgs)
-        : RenderableObject(anchorPointPosition, anchorPoint), m_tileDimensions(tileDimensions), m_spacing(spacing),
-          m_gridSize(arraySize)
+    Grid(Vector2Ex<size_t> arraySize,
+         Vector2Ex<float> tileDimensions,
+         Vector2Ex<float> anchorPointPosition,
+         ui::AnchorPoint anchorPoint,
+         Vector2Ex<float> spacing,
+         Args&&... tileArgs) :
+        RenderableObject(anchorPointPosition, anchorPoint),
+        m_tileDimensions(tileDimensions),
+        m_spacing(spacing),
+        m_gridSize(arraySize)
     {
         // Calculate grid dimensions
         float width = arraySize.x * tileDimensions.x + (arraySize.x > 0 ? (arraySize.x - 1) * spacing.x : 0);
@@ -92,7 +101,7 @@ class Grid : public RenderableObject
         return m_grid.end();
     }
 
-    virtual void Set(int y, int x, T object)
+    virtual void Set(size_t y, size_t x, T object)
     {
         m_grid[y][x] = object;
     }
@@ -126,7 +135,7 @@ class Grid : public RenderableObject
         return m_gridSize;
     }
 
-    Vector2Ex<int> GetRelativeIndexFromPosition(const Vector2Ex<float>& position) const
+    Vector2Ex<size_t> GetRelativeIndexFromPosition(const Vector2Ex<float>& position) const
     {
         Vector2Ex<float> topLeft = GetPositionAtAnchor();
         Vector2Ex<float> relativePos = position - topLeft;
@@ -143,10 +152,10 @@ class Grid : public RenderableObject
         x_index = std::clamp(x_index, 0, num_cols > 0 ? num_cols - 1 : 0);
         y_index = std::clamp(y_index, 0, num_rows > 0 ? num_rows - 1 : 0);
 
-        return {x_index, y_index};
+        return {static_cast<size_t>(x_index), static_cast<size_t>(y_index)};
     }
 
-    Vector2Ex<float> GetPositionFromIndex(const Vector2Ex<int>& index) const
+    Vector2Ex<float> GetPositionFromIndex(const Vector2Ex<size_t>& index) const
     {
         if (!IsValidIndex(index))
             throw std::out_of_range("Not valid index.");
@@ -155,41 +164,45 @@ class Grid : public RenderableObject
     }
 
     // Accessors
-    T& GetTile(const int y, const int x)
+    T& GetTile(const size_t y, const size_t x)
     {
         return m_grid[y][x];
     }
 
-    const T& GetTile(const int y, const int x) const
+    const T& GetTile(const size_t y, const size_t x) const
     {
         return m_grid[y][x];
     }
 
-    T& GetTile(const Vector2Ex<int>& index)
+    T& GetTile(const Vector2Ex<size_t>& index)
     {
         return m_grid[index.y][index.x];
     }
 
-    const T& GetTile(const Vector2Ex<int>& index) const
+    const T& GetTile(const Vector2Ex<size_t>& index) const
     {
         return m_grid[index.y][index.x];
     }
 
     T& GetTileFromPosition(const Vector2Ex<float>& position)
     {
-        const Vector2Ex<int> index = GetRelativeIndexFromPosition(position);
+        const Vector2Ex<size_t> index = GetRelativeIndexFromPosition(position);
         return m_grid[index.y][index.x];
     }
 
     const T& GetTileFromPosition(const Vector2Ex<float>& position) const
     {
-        const Vector2Ex<int> index = GetRelativeIndexFromPosition(position);
+        const Vector2Ex<size_t> index = GetRelativeIndexFromPosition(position);
         return m_grid[index.y][index.x];
     }
 
     // Other
+
     bool IsValidIndex(const Vector2Ex<size_t>& index) const
     {
+        if (index.y < 0 || index.x < 0)
+            return false;
+
         if (m_grid.empty() || index.y >= m_grid.size())
             return false;
         if (m_grid.front().empty() || index.x >= m_grid.front().size())
@@ -198,17 +211,10 @@ class Grid : public RenderableObject
         return true;
     }
 
-    bool IsValidIndex(const Vector2Ex<int>& index) const
+    template <NumberLike U>
+    bool IsValidIndex(const Vector2Ex<U>& index) const
     {
-        if (index.y < 0 || index.x < 0)
-            return false;
-
-        if (m_grid.empty() || (size_t)index.y >= m_grid.size())
-            return false;
-        if (m_grid.front().empty() || (size_t)index.x >= m_grid.front().size())
-            return false;
-
-        return true;
+        return IsValidIndex({static_cast<size_t>(index.x), static_cast<size_t>(index.y)});
     }
 
     void Render(Vector2Ex<float> offset = {0, 0}) const override

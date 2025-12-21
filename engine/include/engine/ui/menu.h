@@ -28,6 +28,8 @@ class Menu : public RenderableObject
     void DeleteOption(int index);
     void ClearOptions();
 
+    void SetSpacing(float spacing);
+
     void SelectNext();
     void SelectPrevious();
     void ConfirmSelection();

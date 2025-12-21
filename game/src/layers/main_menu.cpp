@@ -4,8 +4,10 @@
 #include "engine/ui/text_style.h"
 #include "game/game_application.h"
 #include "game/layers/board_selection_menu.h"
+#include "game/layers/profile_selection_menu_layer.h"
 
-MainMenuLayer::MainMenuLayer() : BaseMenuLayer(ui::Alignment::CENTER, true, 10.0f)
+MainMenuLayer::MainMenuLayer() :
+    BaseMenuLayer(ui::Alignment::CENTER, true, 10.0f)
 {
     SetupMenuOptions();
 }
@@ -20,9 +22,12 @@ void MainMenuLayer::SetupMenuOptions()
         TransistionTo(std::make_unique<BoardSelectionMenuLayer>());
     }));
 
-    // TODO: Implement options menu
-    m_menu.AddOption(std::make_unique<TextMenuOption>("Options", selectedStyle, unselectedStyle, false));
+    m_menu.AddOption(
+        std::make_unique<TextMenuOption>("Profile Selection", selectedStyle, unselectedStyle, false, [this]() {
+            TransistionTo(std::make_unique<ProfileSelectionMenuLayer>());
+        }));
 
-    m_menu.AddOption(std::make_unique<TextMenuOption>("Exit", selectedStyle, unselectedStyle, false,
-                                                      []() { game::GameApplication::Get().Stop(); }));
+    m_menu.AddOption(std::make_unique<TextMenuOption>("Exit", selectedStyle, unselectedStyle, false, []() {
+        game::GameApplication::Get().Stop();
+    }));
 }

@@ -28,6 +28,7 @@ class Pellet : public ui::RenderableObject
   private:
     Type m_type;
     float radius = 3.0f;
+    bool m_isEaten = false;
 
     static inline TypePointValues s_typePoints{
         10, // Normal
@@ -43,6 +44,9 @@ class Pellet : public ui::RenderableObject
     void SetType(const Type& type);
 
     int GetValue() const;
+
+    bool IsEaten() const;
+    void SetIsEaten(bool isEaten);
 
     static int GetTypePoints(const Type& t);
     static void SetTypePoints(const TypePointValues& newValues);
