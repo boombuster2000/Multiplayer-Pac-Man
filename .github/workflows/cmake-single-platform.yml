@@ -4,9 +4,9 @@ name: CMake on multiple platforms
 # When should this workflow run?
 on:
   push:
-    branches: [ "master" ]  # Run when code is pushed to master branch
+    branches: [ "main" ]  # Run when code is pushed to master branch
   pull_request:
-    branches: [ "master" ]  # Run when someone creates a pull request to master
+    branches: [ "main" ]  # Run when someone creates a pull request to master
 
 # Jobs are the tasks that will be executed
 jobs:
